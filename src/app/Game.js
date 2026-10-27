@@ -6,9 +6,11 @@ import { PlayingState } from './states/PlayingState.js';
 import { ResultState } from './states/ResultState.js';
 import { TitleState } from './states/TitleState.js';
 
+/** @typedef {import('../gameplay/round/Round.js').RoundResult} RoundResult */
+
 /**
  * The top level. Owns the frame loop and the state machine, and moves between
- * title → playing → (caught) → result → playing again or title. States call back here to move on.
+ * title -> playing -> (caught) -> result -> playing again or title. States call back here to move on.
  */
 export class Game {
   #context;
@@ -39,12 +41,12 @@ export class Game {
     this.#loop.stop();
   }
 
-  /** @param prefill { playerName, chickenMode } to put in the form */
+  /** @param {{ playerName: string, chickenMode: boolean }} prefill - Values to put in the form. */
   showTitle(prefill) {
     this.#states.transition(new TitleState(this.#context, prefill));
   }
 
-  /** @param session { playerName, chickenMode }, kept for "Play again" */
+  /** @param {{ playerName: string, chickenMode: boolean }} session - The player's choices, kept for "Play again". */
   startRound(session) {
     this.#session = session;
     this.#states.transition(new PlayingState(this.#context, this, session));
@@ -54,7 +56,7 @@ export class Game {
     this.#states.transition(new CaughtState(this.#context, this, this.#session));
   }
 
-  /** @param result RoundResult */
+  /** @param {RoundResult} result - The round that just ended. */
   showResult(result) {
     this.#states.transition(new ResultState(this.#context, result));
   }

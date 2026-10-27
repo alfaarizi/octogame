@@ -39,9 +39,12 @@ export class AudioDirector {
   }
 
   /**
-   * @param frame.listener  { position: {x,y,z}, direction: {x,y,z} } — the player's ears
-   * @param frame.ghost     { position: {x,z}, isPresent, isHunting, isFrozen }
-   * @param frame.threatCloseness 0–1
+   * @param {number} seconds - Time since the last frame.
+   * @param {object} frame - The state of the round this frame.
+   * @param {{ position: object, direction: object }} frame.listener - The player's ears; both are { x, y, z }.
+   * @param {{ position: object, isPresent: boolean, isHunting: boolean, isFrozen: boolean }} frame.ghost - The ghost;
+   *   `position` is { x, z }.
+   * @param {number} frame.threatCloseness - How close the ghost is, from 0 to 1.
    */
   updateSoundscape(seconds, { listener, ghost, threatCloseness }) {
     if (!this.#engine.isStarted) return;

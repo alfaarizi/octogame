@@ -19,7 +19,11 @@ export class PlayingState {
   #outcome = null;
   #threat = NO_THREAT;
 
-  /** @param game the Game, which this state asks to move on via showJumpScare() / showResult() */
+  /**
+   * @param {object} context - The objects built by createGameContext().
+   * @param {import('../Game.js').Game} game - Asked to move on via showJumpScare() or showResult().
+   * @param {{ playerName: string, chickenMode: boolean }} session - The current player's choices.
+   */
   constructor(context, game, session) {
     this.#context = context;
     this.#game = game;
@@ -28,7 +32,7 @@ export class PlayingState {
 
   enter() {
     const { audio, events, input, pointerLock, ui, world } = this.#context;
-    // We're inside the click or key press that started the round
+    // Audio can start here because this runs inside the click or key press that started the round.
     audio.start();
     this.#setUpRound();
     ui.hud.show();
@@ -85,7 +89,7 @@ export class PlayingState {
     player.look(look.x, look.y);
     const movement = player.update(seconds, input.readMovementIntent());
     world.footstepCue.update(seconds, movement);
-    // The beam check below needs the camera where the player now is
+    // The beam check below needs the camera where the player now is.
     views.firstPerson.update(seconds, player, movement);
 
     this.#threat = ghost.isPresent ? measureThreat(planarDistance(ghost.position, player.position), config.ghost) : NO_THREAT;

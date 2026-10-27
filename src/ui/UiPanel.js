@@ -4,7 +4,7 @@ import { requireElement } from './dom.js';
 export class UiPanel {
   #root;
 
-  /** @param elementId the id of the panel's element in index.html */
+  /** @param {string} elementId - The id of the panel's element in index.html. */
   constructor(elementId) {
     this.#root = requireElement(elementId);
   }

@@ -2,7 +2,8 @@ import { ListenerSet } from '../utils.js';
 
 /**
  * Captures the mouse for mouse-look, using the browser's Pointer Lock API.
- * Shares its shape with SimulatedPointerLock: isLocked, request(), release(), onChange(listener) → unsubscribe.
+ * Shares its shape with SimulatedPointerLock: isLocked, request(), release(), and onChange(listener),
+ * which returns an unsubscribe function.
  */
 export class BrowserPointerLock {
   #element;

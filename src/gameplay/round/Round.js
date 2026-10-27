@@ -3,12 +3,13 @@ import { GameEvent } from '../../core/GameEvent.js';
 export const RoundOutcome = Object.freeze({ ESCAPED: 'escaped', CAUGHT: 'caught' });
 
 /**
+ * The outcome of one round, as saved to the leaderboard.
  * @typedef {object} RoundResult
  * @property {string} playerName
  * @property {boolean} escaped
  * @property {number} timeSeconds
  * @property {number} candiesCollected
- * @property {number} finishedAt  epoch milliseconds
+ * @property {number} finishedAt - When the round ended, in epoch milliseconds.
  */
 
 /** Score-keeping for one attempt: the clock, the candy count, and opening the exit. */
@@ -57,7 +58,11 @@ export class Round {
     }
   }
 
-  /** @returns {RoundResult} */
+  /**
+   * @param {string} playerName - Who played the round.
+   * @param {string} outcome - A RoundOutcome value.
+   * @returns {RoundResult} The finished round, ready for the leaderboard.
+   */
   summarize(playerName, outcome) {
     return Object.freeze({
       playerName,

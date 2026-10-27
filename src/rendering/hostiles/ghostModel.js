@@ -15,7 +15,7 @@ export const MOUTH_HEIGHT = Object.freeze({ resting: 1.6, frozen: 2.3, screaming
  */
 export function createGhostModel(glow) {
   const object = new THREE.Group();
-  // Lean (x) is applied in the ghost's own frame, after turning (y)
+  // Lean (x) is applied in the ghost's own frame, after turning (y).
   object.rotation.order = 'YXZ';
 
   const bodyGeometry = new THREE.LatheGeometry(GHOST_PROFILE.map(([radius, y]) => new THREE.Vector2(radius, y)), GHOST_SEGMENTS);

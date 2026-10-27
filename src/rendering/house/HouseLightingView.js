@@ -5,7 +5,7 @@ import { createBoxMesh } from '../meshes.js';
 import { GlowingLight } from './GlowingLight.js';
 import { createLanternModel, LANTERN_FACE_GLOW } from './lanternModel.js';
 
-// From the surface it sits on to the pumpkin's center
+/** Height from the surface a lantern sits on to the pumpkin's center. */
 const LANTERN_SEAT_OFFSET = 0.13;
 const LANTERN_LIGHT = Object.freeze({ color: 0xff8a2a, range: 4.5, forwardOffset: 0.25, heightOffset: 0.25 });
 const FIRE_LIGHT = Object.freeze({ color: 0xff5014, range: 5 });

@@ -7,7 +7,7 @@ const FLICKER_MAX_BRIGHTNESS = 0.25;
 const LOW_BATTERY_FLICKER_STRENGTH = 0.4;
 const LOW_BATTERY_MIN_BRIGHTNESS = 0.45;
 
-/** The flashlight's battery, switch and flicker. `brightness` (0–1) is what the beam should show. */
+/** The flashlight's battery, switch and flicker. `brightness` (0 to 1) is what the beam should show. */
 export class Flashlight {
   #config;
   #events;
@@ -25,7 +25,7 @@ export class Flashlight {
     this.#random = random;
   }
 
-  /** 0–1 */
+  /** Battery charge, from 0 to 1. */
   get charge() {
     return this.#charge;
   }
@@ -70,8 +70,9 @@ export class Flashlight {
   }
 
   /**
-   * @param now          round time in seconds
-   * @param interference 0–1, how strongly a nearby ghost makes the light stutter
+   * @param {number} seconds - Time since the last frame.
+   * @param {number} now - Round time, in seconds.
+   * @param {number} interference - How strongly a nearby ghost makes the light stutter, from 0 to 1.
    */
   update(seconds, now, interference) {
     this.#drain(seconds);

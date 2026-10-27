@@ -10,8 +10,12 @@ export class InputController {
   #pressListenersByAction = new Map();
 
   /**
-   * @param surface      the canvas; clicks on it count as MOUSE_PRIMARY while the pointer is locked
-   * @param pointerLock  mouse-look only counts while it's locked
+   * @param {object} options
+   * @param {HTMLElement} options.surface - The canvas. Clicks on it count as MOUSE_PRIMARY while the pointer is locked.
+   * @param {object} options.pointerLock - A BrowserPointerLock or SimulatedPointerLock. Mouse-look only counts while
+   *   it's locked.
+   * @param {Object<string, string[]>} [options.bindings] - Key codes for each Action. Defaults to DEFAULT_KEY_BINDINGS.
+   * @param {EventTarget} [options.eventTarget] - Where keyboard and mouse events are heard. Defaults to window.
    */
   constructor({ surface, pointerLock, bindings = DEFAULT_KEY_BINDINGS, eventTarget = window }) {
     this.#bindings = bindings;

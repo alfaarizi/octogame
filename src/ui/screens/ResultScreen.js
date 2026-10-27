@@ -3,6 +3,8 @@ import { MESSAGES } from '../messages.js';
 import { UiPanel } from '../UiPanel.js';
 import { LeaderboardList } from './LeaderboardList.js';
 
+/** @typedef {import('../../gameplay/round/Round.js').RoundResult} RoundResult */
+
 /** "You escaped!" / "Caught!", the leaderboard, and play again (Enter) or next player (N). */
 export class ResultScreen extends UiPanel {
   #title = requireElement('end-title');
@@ -32,7 +34,11 @@ export class ResultScreen extends UiPanel {
     this.#onNextPlayer = listener;
   }
 
-  /** @param result RoundResult  @param rank 1-based place on the board */
+  /**
+   * @param {RoundResult} result - The round that just ended.
+   * @param {number} rank - Its 1-based place on the board.
+   * @param {RoundResult[]} rankedResults - The leaderboard, best first.
+   */
   show(result, rank, rankedResults) {
     this.#title.textContent = result.escaped ? MESSAGES.escapedTitle : MESSAGES.caughtTitle;
     this.#detail.textContent = result.escaped
@@ -46,7 +52,7 @@ export class ResultScreen extends UiPanel {
   #handleKey(event) {
     if (!this.isVisible) return;
     if (event.code === 'Enter') {
-      // Otherwise a focused button would also fire
+      // Otherwise a focused button would also fire.
       event.preventDefault();
       this.#choose(this.#onPlayAgain);
     } else if (event.code === 'KeyN') {

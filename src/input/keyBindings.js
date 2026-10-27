@@ -12,7 +12,7 @@ export const Action = Object.freeze({
 /** The primary mouse button, bindable like a key. */
 export const MOUSE_PRIMARY = 'MousePrimary';
 
-/** Action → KeyboardEvent.code values (plus MOUSE_PRIMARY) that trigger it. */
+/** Maps each Action to the KeyboardEvent.code values (plus MOUSE_PRIMARY) that trigger it. */
 export const DEFAULT_KEY_BINDINGS = Object.freeze({
   [Action.MOVE_FORWARD]: ['KeyW', 'ArrowUp'],
   [Action.MOVE_BACKWARD]: ['KeyS', 'ArrowDown'],

@@ -1,5 +1,5 @@
-/*
- * Crash guard. Loaded as a classic script (deliberately not a module) before any game code,
+/**
+ * @file Crash guard. Loaded as a classic script (deliberately not a module) before any game code,
  * so it still works when a game file is missing or has a syntax error.
  * Any uncaught error stops the game and shows the "press R" screen; refreshing starts clean.
  * Game code talks to it through window.crashGuard (see src/app/crashReporter.js).
@@ -40,7 +40,7 @@
   });
 
   window.addEventListener('error', function (event) {
-    // Harmless browser noise
+    // ResizeObserver warnings are harmless browser noise.
     if (/ResizeObserver/.test(event.message)) return;
     report(event.error && event.error.stack ? event.error.stack : event.message || 'Unknown error');
   });

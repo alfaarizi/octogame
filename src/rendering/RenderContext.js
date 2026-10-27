@@ -25,7 +25,7 @@ export class RenderContext {
     this.#scene.add(new THREE.HemisphereLight(config.moonlightSkyColor, config.moonlightGroundColor, config.moonlightIntensity));
 
     this.#camera = new THREE.PerspectiveCamera(config.fieldOfView, window.innerWidth / window.innerHeight, CAMERA_NEAR, CAMERA_FAR);
-    // So lights attached to the camera are part of the scene
+    // Added so that lights attached to the camera are part of the scene.
     this.#scene.add(this.#camera);
 
     window.addEventListener('resize', () => this.#fitToWindow());

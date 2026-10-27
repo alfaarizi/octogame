@@ -20,13 +20,13 @@ export const GAME_CONFIG = deepFreeze({
     sprintSpeed: 5,
     sprintDuration: 3,
     sprintRecharge: 4,
-    // Stamina needed before you can sprint again after running out
+    /** Stamina needed before you can sprint again after running out. */
     windedRecoveryLevel: 0.3,
     collisionRadius: 0.3,
     eyeHeight: 1.6,
-    // Radians per pixel
+    /** Radians per pixel. */
     mouseSensitivity: 0.0022,
-    // Radians per second
+    /** Radians per second. */
     keyboardTurnSpeed: 2.2,
     maxPitch: 1.45,
     pickupRadius: 1.2,
@@ -35,13 +35,13 @@ export const GAME_CONFIG = deepFreeze({
   },
 
   flashlight: {
-    // Seconds of light from a full battery
+    /** Seconds of light from a full battery. */
     batteryLife: 60,
     batteryPickupCharge: 0.4,
     lowBatteryLevel: 0.2,
     intensity: 45,
     range: 20,
-    // About 26°
+    /** About 26 degrees. */
     coneAngle: 0.45,
     freezeAngleDegrees: 18,
     freezeRange: 10,
@@ -53,13 +53,13 @@ export const GAME_CONFIG = deepFreeze({
     huntSpeedPerCandy: 0.2,
     enragedSpeed: 3.5,
     insideWallSpeedFactor: 0.5,
-    // Seconds it has to stay in the beam
+    /** Seconds it has to stay in the beam. */
     banishExposure: 1.5,
     respawnDelay: 6,
     enragedRespawnDelay: 2,
-    // Notices you this close, light or not
+    /** Notices you this close, light or not. */
     senseRadius: 5,
-    // Sees a lit flashlight from this far
+    /** Sees a lit flashlight from this far. */
     spotRadius: 12,
     loseInterestDistance: 14,
     loseInterestTime: 5,
@@ -87,7 +87,7 @@ export const GAME_CONFIG = deepFreeze({
     fogDensity: 0.085,
     moonlightSkyColor: 0x7586b8,
     moonlightGroundColor: 0x0b0906,
-    // What you can see with the flashlight off
+    /** How much you can see with the flashlight off. */
     moonlightIntensity: 1.6,
     lanternIntensity: 1.6,
     fireIntensity: 2.5,
@@ -97,12 +97,12 @@ export const GAME_CONFIG = deepFreeze({
 
   audio: {
     masterVolume: 0.8,
-    // Drop a recording at one of these paths to replace the synthesized scream.
+    /** Drop a recording at one of these paths to replace the synthesized scream. */
     screamSamplePaths: ['sounds/scream.mp3', 'sounds/scream.wav', 'sounds/scream.ogg'],
   },
 
   ui: {
-    // So a panicked click after the jump scare doesn't skip the result
+    /** So a panicked click after the jump scare doesn't skip the result. */
     resultInputDelayMs: 1200,
     leaderboardSize: 10,
   },

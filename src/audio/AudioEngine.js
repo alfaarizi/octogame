@@ -1,18 +1,20 @@
 const NOISE_BUFFER_SECONDS = 2;
-// Exponential ramps can't reach exactly 0
+/** Exponential ramps can't reach exactly 0, so they ramp to this instead. */
 const SILENCE = 0.0001;
-// Sources stop a moment after their envelope has faded
+/** Sources stop this long after their envelope has faded. */
 const TAIL_SECONDS = 0.05;
 const SPATIAL_SETTINGS = Object.freeze({ panningModel: 'HRTF', distanceModel: 'inverse', refDistance: 1.5, rolloffFactor: 1.2, maxDistance: 40 });
 
 /**
- * @typedef {object} SoundShape  how a one-off sound is played
- * @property {number} duration
- * @property {number} [volume]  peak loudness
- * @property {number} [attack]  seconds to reach the peak
- * @property {number} [delay]   seconds from now before it starts
- * @property {{ type: BiquadFilterType, frequency: number, endFrequency?: number, resonance?: number }} [filter]
- * @property {AudioNode} [output]  defaults to the master volume
+ * How a one-off sound is played.
+ * @typedef {object} SoundShape
+ * @property {number} duration - Seconds until it has faded out.
+ * @property {number} [volume] - Peak loudness.
+ * @property {number} [attack] - Seconds to reach the peak.
+ * @property {number} [delay] - Seconds from now before it starts.
+ * @property {{ type: BiquadFilterType, frequency: number, endFrequency?: number, resonance?: number }} [filter] - A filter
+ *   whose cutoff glides from `frequency` to `endFrequency`.
+ * @property {AudioNode} [output] - Where the sound goes. Defaults to the master volume.
  */
 
 /**
@@ -90,7 +92,7 @@ export class AudioEngine {
     }
   }
 
-  // ---- nodes ----
+  // ---- Nodes ----
 
   /** A 3D output at `position` (or wherever it's moved later) that sounds can be routed into. */
   createSpatialOutput(position = null) {
@@ -137,7 +139,7 @@ export class AudioEngine {
     return source;
   }
 
-  /** Wobbles `param` around its current value by ±depth at `rate` Hz, forever. */
+  /** Wobbles `param` around its current value by up to `depth` either way, at `rate` Hz, forever. */
   modulate(param, rate, depth, waveform = 'sine') {
     const oscillator = this.createOscillator(waveform, rate);
     oscillator.connect(this.createGain(depth)).connect(param);
@@ -158,7 +160,7 @@ export class AudioEngine {
     return envelope;
   }
 
-  // ---- one-off sounds ----
+  // ---- One-off sounds ----
 
   /**
    * An oscillator note. Its pitch glides from `frequency` to `endFrequency`, or follows
@@ -173,7 +175,10 @@ export class AudioEngine {
     this.#schedule(oscillator, startTime, shape);
   }
 
-  /** A burst of white noise, usually shaped by `filter`. @param {SoundShape} shape */
+  /**
+   * A burst of white noise, usually shaped by `filter`.
+   * @param {SoundShape} shape - How the noise is played.
+   */
   playNoise(shape) {
     const startTime = this.now + (shape.delay ?? 0);
     this.#schedule(this.#createNoiseSource(), startTime, shape, Math.random());
@@ -200,7 +205,7 @@ export class AudioEngine {
     source.start();
   }
 
-  /** source → (filter) → envelope → output, started at `startTime` and stopped once faded. */
+  /** Wires source -> (filter) -> envelope -> output, starts it at `startTime` and stops it once faded. */
   #schedule(source, startTime, { duration, volume = 0.3, attack = 0.005, filter = null, output = this.#master }, startOffset = 0) {
     let signal = source;
     if (filter) {

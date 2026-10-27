@@ -14,7 +14,7 @@ export class PickupView {
   #field;
   #glintHalfAngle;
   #glintRange;
-  // Pickup id → { object, glowMaterial, item, phase }
+  /** Maps each pickup id to its { object, glowMaterial, item, phase }. */
   #meshes = new Map();
 
   constructor(scene, field, { coneAngle, range }) {
@@ -37,7 +37,12 @@ export class PickupView {
     }
   }
 
-  /** @param beam { eye, direction, isOn } where eye/direction are { x, y, z } */
+  /**
+   * @param {number} seconds - Time since the last frame.
+   * @param {number} time - Round time, in seconds, which drives the bobbing.
+   * @param {{ eye: object, direction: object, isOn: boolean }} beam - The flashlight; `eye` and `direction` are
+   *   { x, y, z }.
+   */
   update(seconds, time, beam) {
     this.sync();
     for (const { object, glowMaterial, item, phase } of this.#meshes.values()) {

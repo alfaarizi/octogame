@@ -1,6 +1,8 @@
 import { STANDING_STILL } from '../../gameplay/player/Player.js';
 import { FlashColor } from '../../ui/hud/ScreenEffects.js';
 
+/** @typedef {import('../../gameplay/round/Round.js').RoundResult} RoundResult */
+
 const ESCAPE_FLASH_SECONDS = 1.2;
 
 /** After a round: save the result and show where it landed on the leaderboard. */
@@ -8,7 +10,10 @@ export class ResultState {
   #context;
   #result;
 
-  /** @param result RoundResult */
+  /**
+   * @param {object} context - The objects built by createGameContext().
+   * @param {RoundResult} result - The round that just ended.
+   */
   constructor(context, result) {
     this.#context = context;
     this.#result = result;
@@ -19,7 +24,7 @@ export class ResultState {
     pointerLock.release();
     world.ghost.deactivate();
     views.ghost.hide();
-    // Undo any jump-scare shake
+    // Undo any jump-scare shake.
     views.firstPerson.update(0, world.player, STANDING_STILL);
     views.firstPerson.setBeamBrightness(world.flashlight.brightness);
     ui.hud.hide();

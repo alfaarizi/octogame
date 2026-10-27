@@ -18,7 +18,10 @@ export class CandyNearbyCue {
     this.#cooldown.restart(0);
   }
 
-  /** @param nearestCandy { item, distance } from PickupField.nearest, or null */
+  /**
+   * @param {number} seconds - Time since the last frame.
+   * @param {{ item: object, distance: number } | null} nearestCandy - The result of PickupField.nearest().
+   */
   update(seconds, nearestCandy) {
     if (!nearestCandy || nearestCandy.distance >= this.#range) return;
     if (!this.#cooldown.tick(seconds)) return;

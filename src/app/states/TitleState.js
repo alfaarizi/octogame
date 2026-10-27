@@ -8,7 +8,10 @@ export class TitleState {
   #prefill;
   #elapsed = 0;
 
-  /** @param prefill { playerName, chickenMode } to put in the form */
+  /**
+   * @param {object} context - The objects built by createGameContext().
+   * @param {{ playerName: string, chickenMode: boolean }} prefill - Values to put in the form.
+   */
   constructor(context, prefill) {
     this.#context = context;
     this.#prefill = prefill;

@@ -26,7 +26,14 @@ export class HudDirector {
     this.#effects.clear();
   }
 
-  /** @param frame { batteryCharge, batteryLow, stamina, elapsed, threatCloseness } */
+  /**
+   * @param {object} frame - The state of the round this frame.
+   * @param {number} frame.batteryCharge - From 0 to 1.
+   * @param {boolean} frame.batteryLow - Whether the battery is below the low-battery level.
+   * @param {number} frame.stamina - From 0 to 1.
+   * @param {number} frame.elapsed - Round time, in seconds.
+   * @param {number} frame.threatCloseness - How close the ghost is, from 0 to 1.
+   */
   update({ batteryCharge, batteryLow, stamina, elapsed, threatCloseness }) {
     this.#hud.setBattery(batteryCharge, batteryLow);
     this.#hud.setStamina(stamina);

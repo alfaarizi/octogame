@@ -60,8 +60,9 @@ export class FirstPersonView {
   }
 
   /**
-   * @param pose      { position: { x, z }, yaw, pitch }
-   * @param movement  { moving, sprinting } for the head bob
+   * @param {number} seconds - Time since the last frame.
+   * @param {{ position: { x: number, z: number }, yaw: number, pitch: number }} pose - Where the player stands and looks.
+   * @param {{ moving: boolean, sprinting: boolean }} movement - Drives the head bob.
    */
   update(seconds, { position, yaw, pitch }, { moving, sprinting }) {
     if (moving) {
@@ -75,7 +76,7 @@ export class FirstPersonView {
     this.#torch.position.y = TORCH_POSITION.y + this.#bobOffset * TORCH_BOB_SHARE;
   }
 
-  /** @param fraction 0–1 of the flashlight's full intensity */
+  /** @param {number} fraction - Share of the flashlight's full intensity, from 0 to 1. */
   setBeamBrightness(fraction) {
     this.#spotlight.intensity = this.#maxIntensity * fraction;
   }

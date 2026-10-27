@@ -3,18 +3,19 @@ import { headingTo, planarDistance } from '../../utils.js';
 import { GhostState, PRESENT_GHOST_STATES } from './GhostState.js';
 
 /**
- * @typedef {object} GhostSituation  what the ghost needs to know each frame
- * @property {{ x: number, z: number }} playerPosition
- * @property {boolean} playerLightOn   a lit flashlight can be seen from much farther away
- * @property {boolean} isLit           the beam is on the ghost right now
- * @property {number} candiesCollected each one makes it hunt faster
+ * What the ghost needs to know each frame.
+ * @typedef {object} GhostSituation
+ * @property {{ x: number, z: number }} playerPosition - Where the player stands on the floor plan.
+ * @property {boolean} playerLightOn - Whether the flashlight is lit; a lit one can be seen from much farther away.
+ * @property {boolean} isLit - Whether the beam is on the ghost right now.
+ * @property {number} candiesCollected - Candies found so far; each one makes the ghost hunt faster.
  */
 
 /**
  * How the ghost behaves. It drifts straight through walls (slower inside them), freezes while lit,
  * is banished by enough light, and catches the player on contact.
  *
- *   DORMANT ─wake─▶ WANDERING ⇄ HUNTING ⇄ FROZEN ─enough light─▶ BANISHED ─respawn─▶ WANDERING / HUNTING
+ *   DORMANT --wake--> WANDERING <-> HUNTING <-> FROZEN --enough light--> BANISHED --respawn--> WANDERING / HUNTING
  */
 export class Ghost {
   position = { x: 0, z: 0 };
@@ -25,9 +26,9 @@ export class Ghost {
   #spawnTable;
   #events;
   #state = GhostState.DORMANT;
-  // Seconds until DORMANT wakes or BANISHED respawns
+  /** Seconds until DORMANT wakes or BANISHED respawns. */
   #stateCountdown = Infinity;
-  // Seconds spent in the beam, drains when unlit
+  /** Seconds spent in the beam; drains while unlit. */
   #exposure = 0;
   #outOfSightTime = 0;
   #isEnraged = false;
@@ -79,7 +80,10 @@ export class Ghost {
     }
   }
 
-  /** @param {GhostSituation} situation */
+  /**
+   * @param {number} seconds - Time since the last frame.
+   * @param {GhostSituation} situation - What the ghost knows about the player this frame.
+   */
   update(seconds, situation) {
     if (this.#state === GhostState.DORMANT) this.#updateDormant(seconds);
     else if (this.#state === GhostState.BANISHED) this.#updateBanished(seconds, situation);

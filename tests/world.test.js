@@ -32,7 +32,7 @@ describe('CollisionWorld', () => {
 
   test('pushes a body out of a wall', () => {
     const world = new CollisionWorld(map, []);
-    // Radius 0.3 overlaps the west wall
+    // Radius 0.3 overlaps the west wall.
     const position = { x: 1.1, z: 1.5 };
     world.resolveCircle(position, 0.3);
     assert.ok(Math.abs(position.x - 1.3) < 1e-9);

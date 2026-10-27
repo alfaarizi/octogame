@@ -4,7 +4,7 @@ import { createBoxMesh, createBoxMeshFromBounds } from '../meshes.js';
 import { createFloorTexture, createPortraitTexture, createWallpaperTexture } from './textures.js';
 
 const FLOOR_TEXTURE_METERS = 2;
-// Rugs and other parts this thin don't cast shadows
+/** Rugs and other parts this thin don't cast shadows. */
 const FLAT_PART_HEIGHT = 0.05;
 const PORTRAIT = Object.freeze({ frameWidth: 0.8, frameHeight: 1.0, frameDepth: 0.05, pictureWidth: 0.66, pictureHeight: 0.86, centerHeight: 1.75 });
 

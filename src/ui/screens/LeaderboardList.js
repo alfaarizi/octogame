@@ -1,5 +1,7 @@
 import { MESSAGES } from '../messages.js';
 
+/** @typedef {import('../../gameplay/round/Round.js').RoundResult} RoundResult */
+
 /** Renders ranked round results into an <ol>. Names go in as text, never as HTML. */
 export class LeaderboardList {
   #list;
@@ -12,7 +14,10 @@ export class LeaderboardList {
     this.#size = size;
   }
 
-  /** @param highlight the result to mark as "you", if it made the board */
+  /**
+   * @param {RoundResult[]} rankedResults - The leaderboard, best first.
+   * @param {RoundResult | null} [highlight] - The result to mark as "you", if it made the board.
+   */
   render(rankedResults, highlight = null) {
     if (rankedResults.length === 0) {
       this.#list.replaceChildren(this.#emptyRow());

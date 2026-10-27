@@ -33,7 +33,12 @@ export class Soundscape {
     gain.linearRampToValueAtTime(level, now + seconds);
   }
 
-  /** @param position { x, y, z } or null to leave it where it is */
+  /**
+   * @param {{ x: number, y: number, z: number } | null} position - Where the voice comes from, or null to leave it
+   *   where it is.
+   * @param {number} level - How loud the voice is.
+   * @param {boolean} isFrozen - Whether to add the shudder the ghost makes while frozen.
+   */
   setGhostPresence(position, level, isFrozen) {
     if (position) setNodePosition(this.#ghostOutput, position);
     const now = this.#engine.now;
@@ -49,7 +54,7 @@ export class Soundscape {
     this.#heartbeat.restart(0);
   }
 
-  /** Lub-dub, faster and louder as `closeness` (0–1) rises. */
+  /** Lub-dub, faster and louder as `closeness` (0 to 1) rises. */
   updateHeartbeat(seconds, closeness) {
     if (closeness <= HEARTBEAT.minCloseness) {
       this.resetHeartbeat();

@@ -1,6 +1,6 @@
-import * as THREE from 'three';
+/** @file Textures painted on canvases at startup, so the game needs no image files. */
 
-// Painted on canvases at startup, so the game needs no image files.
+import * as THREE from 'three';
 
 function createCanvas(width, height) {
   const canvas = document.createElement('canvas');
@@ -62,7 +62,7 @@ export function createWallpaperTexture(wallHeight) {
   return toTexture(canvas);
 }
 
-/** 2 m × 2 m of old floorboards. */
+/** A 2 m by 2 m patch of old floorboards. */
 export function createFloorTexture() {
   const size = 512, rows = 8, rowHeight = size / rows;
   const canvas = createCanvas(size, size), context = canvas.getContext('2d');

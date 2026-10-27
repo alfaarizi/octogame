@@ -3,6 +3,8 @@ import { MESSAGES } from '../messages.js';
 import { UiPanel } from '../UiPanel.js';
 import { LeaderboardList } from './LeaderboardList.js';
 
+/** @typedef {import('../../gameplay/round/Round.js').RoundResult} RoundResult */
+
 /** Name entry, chicken mode, how-to-play and the leaderboard. */
 export class TitleScreen extends UiPanel {
   #nameInput = requireElement('name');
@@ -22,12 +24,15 @@ export class TitleScreen extends UiPanel {
     });
   }
 
-  /** @param listener receives the session: { playerName, chickenMode } */
+  /** @param {(session: { playerName: string, chickenMode: boolean }) => void} listener - Called when a round should start. */
   onStart(listener) {
     this.#onStart = listener;
   }
 
-  /** @param prefill { playerName, chickenMode } to put in the form */
+  /**
+   * @param {{ playerName?: string, chickenMode?: boolean }} prefill - Values to put in the form.
+   * @param {RoundResult[]} rankedResults - The leaderboard, best first.
+   */
   show({ playerName = '', chickenMode = false }, rankedResults) {
     this.#nameInput.value = playerName;
     this.#chickenModeToggle.checked = chickenMode;

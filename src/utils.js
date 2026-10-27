@@ -1,5 +1,5 @@
-/*
- * General-purpose helpers shared across the game. Nothing here knows about the game itself,
+/**
+ * @file General-purpose helpers shared across the game. Nothing here knows about the game itself,
  * the page, Three.js or Web Audio, so all of it also runs in the Node unit tests.
  */
 
@@ -11,10 +11,10 @@ export const clamp01 = (value) => clamp(value, 0, 1);
 
 export const degreesToRadians = (degrees) => (degrees * Math.PI) / 180;
 
-/** Maps any angle into (-π, π]. */
+/** Maps any angle into the range (-Math.PI, Math.PI]. */
 export const wrapAngle = (angle) => Math.atan2(Math.sin(angle), Math.cos(angle));
 
-/** Turns `current` toward `target` the short way round, by `fraction` (0–1) of the gap. */
+/** Turns `current` toward `target` the short way round, by `fraction` (0 to 1) of the gap. */
 export const rotateToward = (current, target, fraction) => current + wrapAngle(target - current) * Math.min(1, fraction);
 
 /** Distance between two points on the floor plan ({ x, z }), ignoring height. */
@@ -23,7 +23,7 @@ export const planarDistance = (a, b) => Math.hypot(a.x - b.x, a.z - b.z);
 /** Heading from one floor point to another, in radians, where 0 faces +z. */
 export const headingTo = (from, to) => Math.atan2(to.x - from.x, to.z - from.z);
 
-// Closer than this, a target's width stops widening the cone any further.
+/** Closer than this, a target's width stops widening the cone any further. */
 const MIN_WIDTH_DISTANCE = 0.1;
 
 /**
@@ -42,7 +42,7 @@ export function isWithinCone(eye, direction, target, halfAngle, range, targetRad
 }
 
 // ---- Randomness ----
-// Where a `random` argument is accepted, pass a function returning 0–1 to make results predictable in tests.
+// Where a `random` argument is accepted, pass a function returning values in [0, 1) to make results predictable in tests.
 
 /** A random number within `range` ({ min, max }). */
 export const randomInRange = ({ min, max }, random = Math.random) => min + random() * (max - min);
@@ -64,7 +64,7 @@ export function weightedRandomItem(options) {
   return options[options.length - 1].value;
 }
 
-/** A shuffled copy of `items` (Fisher–Yates). */
+/** A shuffled copy of `items` (Fisher-Yates). */
 export function shuffled(items) {
   const copy = [...items];
   for (let i = copy.length - 1; i > 0; i--) {
@@ -75,8 +75,8 @@ export function shuffled(items) {
 }
 
 /**
- * `steps` values that wander from `start` by up to ±maxStep/2 each step, kept within [min, max].
- * A positive `upwardBias` (0–0.5) makes the walk tend to rise.
+ * `steps` values that wander from `start` by up to `maxStep / 2` either way each step, kept within [min, max].
+ * A positive `upwardBias` (0 to 0.5) makes the walk tend to rise.
  */
 export function randomWalk({ steps, start, min, max, maxStep, upwardBias = 0 }) {
   const values = new Float32Array(steps);
@@ -100,7 +100,7 @@ export function deepFreeze(value) {
 
 // ---- Formatting ----
 
-/** Round time as m:ss.s, e.g. 2:07.4 */
+/** Formats a round time as m:ss.s, e.g. 2:07.4. */
 export function formatRoundTime(totalSeconds) {
   const minutes = Math.floor(totalSeconds / 60);
   const seconds = totalSeconds - minutes * 60;

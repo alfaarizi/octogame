@@ -14,7 +14,7 @@ export class ScreenEffects {
   #flash = requireElement('flash');
   #shown = new ValueChangeTracker();
 
-  /** @param level 0–1 */
+  /** @param {number} level - Vignette opacity, from 0 to 1. */
   setVignette(level) {
     this.#shown.applyIfChanged('vignette', Math.round(level * 100) / 100, (opacity) => (this.#vignette.style.opacity = opacity));
   }
@@ -25,7 +25,7 @@ export class ScreenEffects {
     overlay.style.transition = 'none';
     overlay.style.background = color;
     overlay.style.opacity = 1;
-    // Apply the solid color before starting the fade
+    // Forces a reflow so the solid color applies before the fade starts.
     void overlay.offsetWidth;
     overlay.style.transition = `opacity ${seconds}s ease-out`;
     overlay.style.opacity = 0;

@@ -20,7 +20,10 @@ export class FootstepCue {
     this.#cooldown.restart(FIRST_STEP_DELAY);
   }
 
-  /** @param movement { moving, sprinting } from Player.update */
+  /**
+   * @param {number} seconds - Time since the last frame.
+   * @param {{ moving: boolean, sprinting: boolean }} movement - The result of Player.update().
+   */
   update(seconds, { moving, sprinting }) {
     if (!moving) {
       this.reset();

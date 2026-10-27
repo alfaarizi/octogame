@@ -21,7 +21,7 @@ export class Player {
     this.#collisionWorld = collisionWorld;
   }
 
-  /** 0–1 */
+  /** Sprint stamina left, from 0 to 1. */
   get stamina() {
     return this.#stamina;
   }
@@ -48,8 +48,10 @@ export class Player {
   }
 
   /**
-   * @param {{ forward: number, strafe: number, turn: number, sprint: boolean }} intent
-   *   forward/strafe/turn are -1, 0 or 1 (strafe +1 = right, turn +1 = left).
+   * @param {number} seconds - Time since the last frame.
+   * @param {{ forward: number, strafe: number, turn: number, sprint: boolean }} intent - What the player is asking for.
+   *   `forward`, `strafe` and `turn` are -1, 0 or 1 (strafe +1 is right, turn +1 is left).
+   * @returns {{ moving: boolean, sprinting: boolean }} How the player actually moved.
    */
   update(seconds, intent) {
     this.yaw += intent.turn * this.#config.keyboardTurnSpeed * seconds;

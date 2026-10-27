@@ -16,7 +16,11 @@ export class CaughtState {
   #elapsed = 0;
   #hasFlashed = false;
 
-  /** @param game the Game, which this state asks to move on via showResult() */
+  /**
+   * @param {object} context - The objects built by createGameContext().
+   * @param {import('../Game.js').Game} game - Asked to move on via showResult().
+   * @param {{ playerName: string, chickenMode: boolean }} session - The current player's choices.
+   */
   constructor(context, game, session) {
     this.#context = context;
     this.#game = game;

@@ -27,7 +27,7 @@ export class Hud extends UiPanel {
     this.#shown.applyIfChanged('candies', collected, () => {
       this.#candies.textContent = `🍬 ${collected} / ${required}`;
       this.#candies.classList.remove('bump');
-      // Restart the CSS animation
+      // Forces a reflow so the CSS animation restarts.
       void this.#candies.offsetWidth;
       this.#candies.classList.add('bump');
     });

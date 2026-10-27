@@ -1,14 +1,14 @@
-import { deepFreeze } from '../utils.js';
-
-/*
- * The haunted house as data: the tile grid, furniture, and every spawn point.
- * World meters; tile column = x, tile row = z.
+/**
+ * @file The haunted house as data: the tile grid, furniture, and every spawn point.
+ * Units are meters; a tile's column is x and its row is z.
  * Top row of rooms: bedroom, bathroom, study. Middle: the hallway. Bottom: kitchen, foyer, living room.
  */
 
+import { deepFreeze } from '../utils.js';
+
 export const WALL_HEIGHT = 2.8;
 
-/** # wall, . floor, E front door (solid; you escape by reaching it once it unlocks). */
+/** One character per tile: # wall, . floor, E front door (solid; you escape by reaching it once it unlocks). */
 export const TILE_ROWS = deepFreeze([
   '############################',
   '#........#........#........#',
@@ -36,7 +36,7 @@ export const GHOST_START = deepFreeze({ x: 23, z: 4.5 });
 
 export const EXIT_DOOR = deepFreeze({
   centerX: 14,
-  // Inner face of the south wall
+  /** Inner face of the south wall. */
   wallZ: 18,
   width: 2,
   height: 2.4,
@@ -70,7 +70,7 @@ const Color = deepFreeze({
   LIVING_RUG: 0x1f2a3a,
 });
 
-/** A box spanning x0–x1, z0–z1 on the floor plan and y0–y1 in height. */
+/** A box spanning x0 to x1 and z0 to z1 on the floor plan, and y0 to y1 in height. */
 const box = (x0, z0, x1, z1, y0, y1, color) => ({ x0, z0, x1, z1, y0, y1, color });
 
 /** A floor-plan rectangle: what the player bumps into. */

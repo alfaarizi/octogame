@@ -17,7 +17,8 @@ export function recordingEventBus() {
   };
 }
 
-/** A small walled room with one interior wall:
+/**
+ * A small walled room with one interior wall:
  *
  *   #########
  *   #.......#

@@ -5,7 +5,10 @@ export class CollisionWorld {
   #tileMap;
   #obstacles;
 
-  /** @param obstacles floor-plan rectangles { x0, z0, x1, z1 } */
+  /**
+   * @param {import('./TileMap.js').TileMap} tileMap - The house's walls.
+   * @param {{ x0: number, z0: number, x1: number, z1: number }[]} obstacles - Floor-plan rectangles, such as furniture.
+   */
   constructor(tileMap, obstacles) {
     this.#tileMap = tileMap;
     this.#obstacles = obstacles;
