@@ -30,6 +30,8 @@ export const GAME_CONFIG = deepFreeze({
     keyboardTurnSpeed: 2.2,
     maxPitch: 1.45,
     pickupRadius: 1.2,
+    /** How far above or below their feet the player can pick things up; less than a storey. */
+    reachHeight: 2,
     footstepInterval: 0.48,
     sprintFootstepRate: 1.6,
   },

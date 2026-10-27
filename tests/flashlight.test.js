@@ -3,9 +3,7 @@ import { describe, test } from 'node:test';
 import { GAME_CONFIG } from '../src/config/gameConfig.js';
 import { GameEvent } from '../src/core/GameEvent.js';
 import { Flashlight } from '../src/gameplay/player/Flashlight.js';
-import { FlashlightBeam } from '../src/gameplay/player/FlashlightBeam.js';
-import { TileMap } from '../src/world/TileMap.js';
-import { recordingEventBus, SMALL_ROOM } from './helpers.js';
+import { recordingEventBus } from './helpers.js';
 
 const config = GAME_CONFIG.flashlight;
 
@@ -50,15 +48,5 @@ describe('Flashlight', () => {
     light.update(0.01, 0, 1);
     assert.equal(recorder.count(GameEvent.FLASHLIGHT_FLICKERED), 1);
     assert.ok(light.brightness < 1);
-  });
-});
-
-describe('FlashlightBeam', () => {
-  const lookingEast = (z) => ({ origin: { x: 1.5, y: 1.6, z }, direction: { x: 1, y: 0, z: 0 } });
-
-  test("walls block the beam even when the target's in the cone", () => {
-    const beam = new FlashlightBeam(new TileMap(SMALL_ROOM), config.freezeCone);
-    assert.equal(beam.illuminates(lookingEast(1.5), { x: 6.5, y: 1.3, z: 1.5 }, 0.35), true);
-    assert.equal(beam.illuminates(lookingEast(2.5), { x: 6.5, y: 1.3, z: 2.5 }, 0.35), false);
   });
 });

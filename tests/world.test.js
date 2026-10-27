@@ -1,6 +1,8 @@
 import assert from 'node:assert/strict';
 import { describe, test } from 'node:test';
 import { EXIT_DOOR } from '../src/data/officeLayout.js';
+import { Compass } from '../src/utils.js';
+import { Building } from '../src/world/Building.js';
 import { CollisionWorld } from '../src/world/CollisionWorld.js';
 import { ExitDoor } from '../src/world/ExitDoor.js';
 import { SpawnTable } from '../src/world/SpawnTable.js';
@@ -23,11 +25,14 @@ describe('TileMap', () => {
     assert.equal(map.hasLineOfSight({ x: 1.5, z: 1.5 }, { x: 7.5, z: 1.5 }), true);
   });
 
-  test('openings down to the basement block walking but not sight', () => {
-    const withOpening = new TileMap(['#####', '#.v.#', '#####']);
-    assert.equal(withOpening.isBlocked(2.5, 1.5), true);
-    assert.equal(withOpening.isOpaque(2.5, 1.5), false);
-    assert.equal(withOpening.hasLineOfSight({ x: 1.5, z: 1.5 }, { x: 3.5, z: 1.5 }), true);
+  test('openings in the floor block walking but not sight; stairs block neither', () => {
+    const withOpenings = new TileMap(['#######', '#.v*S.#', '#######']);
+    for (const x of [2.5, 3.5]) {
+      assert.equal(withOpenings.isBlocked(x, 1.5), true);
+      assert.equal(withOpenings.isOpaque(x, 1.5), false);
+    }
+    assert.equal(withOpenings.isBlocked(4.5, 1.5), false);
+    assert.equal(withOpenings.hasLineOfSight({ x: 1.5, z: 1.5 }, { x: 5.5, z: 1.5 }), true);
   });
 
   test('a finer grid is measured in meters', () => {
@@ -67,11 +72,56 @@ describe('CollisionWorld', () => {
     world.resolveCircle(position, 0.3);
     assert.deepEqual(position, { x: 2.5, z: 1.5 });
   });
+
+  test('extra obstacles count for one call only', () => {
+    const world = new CollisionWorld(map, []);
+    const position = { x: 2.9, z: 1.5 };
+    world.resolveCircle(position, 0.3, [{ x0: 3, z0: 1, x1: 4, z1: 2 }]);
+    assert.ok(Math.abs(position.x - 2.7) < 1e-9);
+  });
+});
+
+describe('Building', () => {
+  // A corridor whose stairs rise east from the ground floor to the floor above, which is open over the corridor's west end.
+  const building = new Building(
+    [
+      { elevation: 0, tiles: ['########', '#..SS..#', '########'], obstacles: [], stairs: [
+        { rect: { x0: 3, z0: 1, x1: 5, z1: 2 }, rises: Compass.EAST, low: 0, high: 3, rails: [] },
+      ] },
+      { elevation: 3, tiles: ['########', '#**SS..#', '########'], obstacles: [], stairs: [] },
+    ],
+    1,
+  );
+  const walk = (position, dx, steps) => {
+    for (let i = 0; i < steps; i++) building.move(position, dx, 0, 0.3);
+    return position;
+  };
+
+  test('climbs the stairs to the floor above, and back down', () => {
+    const climber = walk({ x: 1.5, y: 0, z: 1.5 }, 0.05, 120);
+    assert.deepEqual(climber, { x: 6.7, y: 3, z: 1.5 });
+    walk(climber, -0.05, 120);
+    assert.equal(climber.y, 0);
+    assert.ok(Math.abs(climber.x - 1.3) < 1e-9);
+  });
+
+  test("can't step onto stairs that are far above or below", () => {
+    const below = walk({ x: 6.5, y: 0, z: 1.5 }, -0.05, 40);
+    assert.ok(Math.abs(below.x - 5.3) < 1e-9, `stopped at x=${below.x}`);
+    const above = walk({ x: 3.5, y: 3, z: 1.5 }, 0, 1);
+    assert.equal(above.y, 3, 'a body already up there stays up there');
+  });
+
+  test('walls and floors block the view; the same floor with nothing between does not', () => {
+    assert.equal(building.hasLineOfSight({ x: 1.5, y: 0, z: 1.5 }, { x: 6.5, y: 0, z: 1.5 }), true);
+    assert.equal(building.hasLineOfSight({ x: 1.5, y: 0, z: 1.5 }, { x: 6.5, y: 3, z: 1.5 }), false);
+    assert.equal(building.isOpaque({ x: 0.5, y: 3, z: 1.5 }), true);
+  });
 });
 
 describe('SpawnTable', () => {
   const candySpots = ['a', 'a', 'a', 'b', 'b', 'c'].map((room, i) => ({ room, x: i, y: 0, z: 0 }));
-  const ghostSpots = [{ x: 0, z: 0 }, { x: 10, z: 0 }, { x: 20, z: 0 }];
+  const ghostSpots = [{ x: 0, y: 0, z: 0 }, { x: 10, y: 0, z: 0 }, { x: 0, y: 30, z: 0 }];
   const table = new SpawnTable({ candySpots, batterySpots: candySpots, ghostSpots, maxCandiesPerRoom: 2 });
 
   test('never puts more than the allowed number of candies in one room', () => {
@@ -82,10 +132,10 @@ describe('SpawnTable', () => {
     }
   });
 
-  test('respawns the ghost at one of the two spots farthest away', () => {
+  test('respawns the ghost at one of the two spots farthest away, counting height', () => {
     for (let run = 0; run < 20; run++) {
-      const spot = table.ghostSpotFarFrom({ x: 0, z: 0 });
-      assert.ok(spot.x === 10 || spot.x === 20);
+      const spot = table.ghostSpotFarFrom({ x: 0, y: 0, z: 0 });
+      assert.ok(spot.x === 10 || spot.y === 30);
     }
   });
 });

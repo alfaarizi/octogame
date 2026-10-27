@@ -81,7 +81,7 @@ export class FirstPersonView {
     } else {
       this.#bobOffset = easeToward(this.#bobOffset, 0, seconds * HEAD_BOB.settleRate);
     }
-    this.#camera.position.set(position.x, this.#eyeHeight + this.#bobOffset, position.z);
+    this.#camera.position.set(position.x, position.y + this.#eyeHeight + this.#bobOffset, position.z);
     this.#camera.rotation.set(pitch, yaw, 0, 'YXZ');
     this.#torch.position.y = TORCH_POSITION.y + this.#bobOffset * TORCH_BOB_SHARE;
   }

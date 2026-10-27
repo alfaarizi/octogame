@@ -1,8 +1,8 @@
-import { atHeight, clamp } from '../../utils.js';
+import { above, clamp } from '../../utils.js';
 
-/** @typedef {import('../../types.js').FloorPoint} FloorPoint */
 /** @typedef {import('../../types.js').Movement} Movement */
 /** @typedef {import('../../types.js').MovementIntent} MovementIntent */
+/** @typedef {import('../../types.js').Point3} Point3 */
 /** @typedef {import('../../types.js').Ray} Ray */
 /** @typedef {import('../../types.js').SpawnPoint} SpawnPoint */
 
@@ -14,20 +14,24 @@ export const STANDING_STILL = Object.freeze({ moving: false, sprinting: false })
  * Satisfies the Pose type; yaw 0 looks down -z and positive yaw turns left.
  */
 export class Player {
-  /** @type {FloorPoint} */
-  position = { x: 0, z: 0 };
+  /** @type {Point3} Where the player's feet are. */
+  position = { x: 0, y: 0, z: 0 };
   yaw = 0;
   pitch = 0;
   #config;
-  #collisionWorld;
+  #building;
   #stamina = 1;
   #isWinded = false;
   /** @type {Movement} */
   #movement = STANDING_STILL;
 
-  constructor(config, collisionWorld) {
+  /**
+   * @param {typeof import('../../config/gameConfig.js').GAME_CONFIG['player']} config
+   * @param {Pick<import('../../world/Building.js').Building, 'move'>} building - What the player walks around.
+   */
+  constructor(config, building) {
     this.#config = config;
-    this.#collisionWorld = collisionWorld;
+    this.#building = building;
   }
 
   /** Sprint stamina left, from 0 to 1. */
@@ -44,15 +48,14 @@ export class Player {
   get sight() {
     const horizontal = Math.cos(this.pitch);
     return {
-      origin: atHeight(this.position, this.#config.eyeHeight),
+      origin: above(this.position, this.#config.eyeHeight),
       direction: { x: -Math.sin(this.yaw) * horizontal, y: Math.sin(this.pitch), z: -Math.cos(this.yaw) * horizontal },
     };
   }
 
   /** @param {SpawnPoint} spawn */
-  respawn({ x, z, yaw }) {
-    this.position.x = x;
-    this.position.z = z;
+  respawn({ x, y, z, yaw }) {
+    Object.assign(this.position, { x, y, z });
     this.yaw = yaw;
     this.pitch = 0;
     this.#stamina = 1;
@@ -100,9 +103,7 @@ export class Player {
     const sin = Math.sin(this.yaw), cos = Math.cos(this.yaw);
     const dx = -sin * forward + cos * strafe;
     const dz = -cos * forward - sin * strafe;
-    const length = Math.hypot(dx, dz);
-    this.position.x += (dx / length) * speed * seconds;
-    this.position.z += (dz / length) * speed * seconds;
-    this.#collisionWorld.resolveCircle(this.position, this.#config.collisionRadius);
+    const scale = (speed * seconds) / Math.hypot(dx, dz);
+    this.#building.move(this.position, dx * scale, dz * scale, this.#config.collisionRadius);
   }
 }

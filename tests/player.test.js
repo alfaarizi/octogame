@@ -3,13 +3,18 @@ import { describe, test } from 'node:test';
 import { GAME_CONFIG } from '../src/config/gameConfig.js';
 import { Player } from '../src/gameplay/player/Player.js';
 
-const noWalls = { resolveCircle() {} };
+const noWalls = {
+  move(position, dx, dz) {
+    position.x += dx;
+    position.z += dz;
+  },
+};
 const intent = (overrides) => ({ forward: 0, strafe: 0, turn: 0, sprint: false, ...overrides });
 
 describe('Player', () => {
   test('walks forward along -z at yaw 0, at walking speed', () => {
     const player = new Player(GAME_CONFIG.player, noWalls);
-    player.respawn({ x: 0, z: 0, yaw: 0 });
+    player.respawn({ x: 0, y: 0, z: 0, yaw: 0 });
     player.update(1, intent({ forward: 1 }));
     assert.ok(Math.abs(player.position.x) < 1e-9);
     assert.ok(Math.abs(player.position.z + GAME_CONFIG.player.walkSpeed) < 1e-9);
@@ -17,7 +22,7 @@ describe('Player', () => {
 
   test('strafing right moves along +x at yaw 0', () => {
     const player = new Player(GAME_CONFIG.player, noWalls);
-    player.respawn({ x: 0, z: 0, yaw: 0 });
+    player.respawn({ x: 0, y: 0, z: 0, yaw: 0 });
     player.update(0.5, intent({ strafe: 1 }));
     assert.ok(player.position.x > 0);
   });
@@ -25,7 +30,7 @@ describe('Player', () => {
   test('sprint runs out, leaves you winded, and recovers', () => {
     const { sprintDuration, sprintRecharge, sprintSpeed, walkSpeed } = GAME_CONFIG.player;
     const player = new Player(GAME_CONFIG.player, noWalls);
-    player.respawn({ x: 0, z: 0, yaw: 0 });
+    player.respawn({ x: 0, y: 0, z: 0, yaw: 0 });
 
     assert.equal(player.update(0.1, intent({ forward: 1, sprint: true })).sprinting, true);
     player.update(sprintDuration, intent({ forward: 1, sprint: true }));
@@ -40,10 +45,10 @@ describe('Player', () => {
     assert.ok(sprintSpeed > walkSpeed);
   });
 
-  test('sight starts at eye height and looks the way the player faces', () => {
+  test('sight starts at eye height above the feet and looks the way the player faces', () => {
     const player = new Player(GAME_CONFIG.player, noWalls);
-    player.respawn({ x: 3, z: 4, yaw: 0 });
-    assert.deepEqual(player.sight.origin, { x: 3, y: GAME_CONFIG.player.eyeHeight, z: 4 });
+    player.respawn({ x: 3, y: 3, z: 4, yaw: 0 });
+    assert.deepEqual(player.sight.origin, { x: 3, y: 3 + GAME_CONFIG.player.eyeHeight, z: 4 });
     assert.ok(Math.abs(player.sight.direction.z + 1) < 1e-9, 'yaw 0 looks along -z');
     player.yaw = -Math.PI / 2;
     player.pitch = Math.PI / 6;

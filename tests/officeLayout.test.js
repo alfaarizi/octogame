@@ -1,57 +1,58 @@
 import assert from 'node:assert/strict';
 import { describe, test } from 'node:test';
 import { GAME_CONFIG } from '../src/config/gameConfig.js';
-import {
-  BATTERY_SPOTS,
-  CANDY_SPOTS,
-  EXIT_DOOR,
-  GHOST_SPOTS,
-  GHOST_START,
-  OBSTACLES,
-  PLAYER_START,
-  TILE_ROWS,
-  TILE_SIZE,
-} from '../src/data/officeLayout.js';
+import { CANDY_SPOTS, EXIT_DOOR, FLOORS, GHOST_START, PLAYER_START, TILE_SIZE } from '../src/data/officeLayout.js';
 import { planarDistance } from '../src/utils.js';
-import { CollisionWorld } from '../src/world/CollisionWorld.js';
-import { TileMap } from '../src/world/TileMap.js';
+import { Building } from '../src/world/Building.js';
+import { Tile, TileMap } from '../src/world/TileMap.js';
 
 const STEP = 0.1;
 
-/** Every point on a STEP grid the player can walk to from `start` without bumping into anything. */
-function reachablePoints(map, collision, radius, start) {
-  const key = (column, row) => `${column},${row}`;
-  const fits = (column, row) => {
-    const point = { x: column * STEP, z: row * STEP };
-    if (map.isBlocked(point.x, point.z)) return false;
-    collision.resolveCircle(point, radius);
-    return Math.abs(point.x - column * STEP) < 1e-9 && Math.abs(point.z - row * STEP) < 1e-9;
-  };
-  const first = [Math.round(start.x / STEP), Math.round(start.z / STEP)];
-  const seen = new Set([key(...first)]), queue = [first], points = [];
-  while (queue.length > 0) {
-    const [column, row] = queue.pop();
-    points.push({ x: column * STEP, z: row * STEP });
-    for (const [c, r] of [[column + 1, row], [column - 1, row], [column, row + 1], [column, row - 1]]) {
-      if (!seen.has(key(c, r)) && fits(c, r)) {
-        seen.add(key(c, r));
-        queue.push([c, r]);
+/** Every point on a STEP grid, on any floor, that the player can walk to from `start` without bumping into anything. */
+function reachablePoints(building, radius, start) {
+  const key = ({ x, y, z }) => `${Math.round(x / STEP)},${Math.round(z / STEP)},${Math.round(y * 100)}`;
+  const first = { x: start.x, y: start.y, z: start.z };
+  const seen = new Set([key(first)]), queue = [first];
+  for (let index = 0; index < queue.length; index++) {
+    const point = queue[index];
+    for (const [dx, dz] of [[STEP, 0], [-STEP, 0], [0, STEP], [0, -STEP]]) {
+      const next = { ...point };
+      building.move(next, dx, dz, radius);
+      const isUnhindered = Math.abs(next.x - point.x - dx) < 1e-9 && Math.abs(next.z - point.z - dz) < 1e-9;
+      if (isUnhindered && !seen.has(key(next))) {
+        seen.add(key(next));
+        queue.push(next);
       }
     }
   }
-  return points;
+  return queue;
 }
 
-// Guards against level-design mistakes: things placed inside walls, or places you can't get to.
+// Guards against level-design mistakes: things placed inside walls, stairs that don't line up, or places you can't get to.
 describe('office layout', () => {
-  const map = new TileMap(TILE_ROWS, TILE_SIZE);
-  const { collisionRadius, pickupRadius } = GAME_CONFIG.player;
-  const reachable = reachablePoints(map, new CollisionWorld(map, OBSTACLES), collisionRadius, PLAYER_START);
+  const { collisionRadius, pickupRadius, reachHeight } = GAME_CONFIG.player;
+  const reachable = reachablePoints(new Building(FLOORS, TILE_SIZE), collisionRadius, PLAYER_START);
+  const floorAt = (y) => FLOORS.findLast((floor) => floor.elevation <= y + 1e-9);
 
   test('every spawn point is on a tile you can walk on', () => {
-    for (const spot of [PLAYER_START, GHOST_START, ...CANDY_SPOTS, ...BATTERY_SPOTS, ...GHOST_SPOTS]) {
+    for (const spot of [PLAYER_START, GHOST_START, ...FLOORS.flatMap((floor) => [...floor.candySpots, ...floor.batterySpots, ...floor.ghostSpots])]) {
+      const map = new TileMap(floorAt(spot.y).tiles, TILE_SIZE);
       assert.equal(map.isBlocked(spot.x, spot.z), false, `${JSON.stringify(spot)} is inside a wall`);
     }
+  });
+
+  test('every flight of stairs is stairs on the floor it rises from, and stairs or an opening on the floor above', () => {
+    FLOORS.slice(0, -1).forEach((floor, index) => {
+      const maps = [floor, FLOORS[index + 1]].map(({ tiles }) => new TileMap(tiles, TILE_SIZE));
+      for (const { rect } of floor.stairs) {
+        for (let x = rect.x0 + TILE_SIZE / 2; x < rect.x1; x += TILE_SIZE) {
+          for (let z = rect.z0 + TILE_SIZE / 2; z < rect.z1; z += TILE_SIZE) {
+            assert.equal(maps[0].tileAt(x, z), Tile.STAIRS, `(${x}, ${z}) below`);
+            assert.ok([Tile.STAIRS, Tile.VOID].includes(maps[1].tileAt(x, z)), `(${x}, ${z}) above`);
+          }
+        }
+      }
+    });
   });
 
   test('there are enough candy spots for a round, two per room at most', () => {
@@ -59,14 +60,19 @@ describe('office layout', () => {
     assert.ok(rooms.size * 2 >= GAME_CONFIG.round.candiesRequired);
   });
 
+  test('every floor can be reached by stairs from the start', () => {
+    for (const { elevation } of FLOORS) assert.ok(reachable.some((point) => point.y === elevation), `the floor at ${elevation}`);
+  });
+
   test('every candy and battery can be picked up by walking there from the start', () => {
-    for (const spot of [...CANDY_SPOTS, ...BATTERY_SPOTS]) {
-      assert.ok(reachable.some((point) => planarDistance(point, spot) < pickupRadius), `${JSON.stringify(spot)} can't be reached`);
+    for (const spot of FLOORS.flatMap((floor) => [...floor.candySpots, ...floor.batterySpots])) {
+      const isWithinReach = (point) => Math.abs(point.y - spot.y) < reachHeight && planarDistance(point, spot) < pickupRadius;
+      assert.ok(reachable.some(isWithinReach), `${JSON.stringify(spot)} can't be reached`);
     }
   });
 
   test('the player can walk up to the exit', () => {
     const { centerX, trigger } = EXIT_DOOR;
-    assert.ok(reachable.some((point) => point.z > trigger.minZ && Math.abs(point.x - centerX) < trigger.halfWidth));
+    assert.ok(reachable.some((point) => point.y === 0 && point.z > trigger.minZ && Math.abs(point.x - centerX) < trigger.halfWidth));
   });
 });

@@ -8,6 +8,7 @@
 /** @typedef {import('./types.js').Point3} Point3 */
 /** @typedef {import('./types.js').Range} Range */
 /** @typedef {import('./types.js').Ray} Ray */
+/** @typedef {import('./types.js').Rect} Rect */
 
 // ---- Math ----
 
@@ -36,6 +37,13 @@ export const rotateToward = (current, target, fraction) => current + wrapAngle(t
 export const planarDistance = (a, b) => Math.hypot(a.x - b.x, a.z - b.z);
 
 /**
+ * @param {Point3} a
+ * @param {Point3} b
+ * @returns {number} The straight-line distance between the points.
+ */
+export const distanceBetween = (a, b) => Math.hypot(a.x - b.x, a.y - b.y, a.z - b.z);
+
+/**
  * @param {FloorPoint} from
  * @param {FloorPoint} to
  * @returns {number} The heading from one point to the other, in radians, where 0 faces +z.
@@ -59,6 +67,37 @@ export const pointAlongHeading = (origin, heading, distance) => ({
  * @returns {Point3} The floor point raised to height `y`.
  */
 export const atHeight = ({ x, z }, y) => ({ x, y, z });
+
+/**
+ * @param {Point3} point
+ * @param {number} height
+ * @returns {Point3} The point moved up by `height`.
+ */
+export const above = ({ x, y, z }, height) => ({ x, y: y + height, z });
+
+/**
+ * @param {Rect} rect
+ * @param {FloorPoint} side - A Compass direction.
+ * @param {number} thickness
+ * @returns {Rect} A strip `thickness` wide, centered on the side of `rect` that faces `side`.
+ */
+export function edgeStrip({ x0, z0, x1, z1 }, side, thickness) {
+  const half = thickness / 2;
+  if (side.x !== 0) {
+    const x = side.x < 0 ? x0 : x1;
+    return { x0: x - half, z0, x1: x + half, z1 };
+  }
+  const z = side.z < 0 ? z0 : z1;
+  return { x0, z0: z - half, x1, z1: z + half };
+}
+
+/** The compass directions as unit steps on the floor plan, where north is -z. */
+export const Compass = Object.freeze({
+  NORTH: Object.freeze({ x: 0, z: -1 }),
+  SOUTH: Object.freeze({ x: 0, z: 1 }),
+  EAST: Object.freeze({ x: 1, z: 0 }),
+  WEST: Object.freeze({ x: -1, z: 0 }),
+});
 
 /** Closer than this, a target's width stops widening the cone any further. */
 const MIN_WIDTH_DISTANCE = 0.1;

@@ -4,21 +4,22 @@ import { GAME_CONFIG } from '../src/config/gameConfig.js';
 import { GameEvent } from '../src/core/GameEvent.js';
 import { Ghost } from '../src/gameplay/hostiles/Ghost.js';
 import { GhostState } from '../src/gameplay/hostiles/GhostState.js';
-import { TileMap } from '../src/world/TileMap.js';
+import { singleFloorBuilding } from './helpers.js';
 
 const config = GAME_CONFIG.ghost;
 const OPEN_HALL = ['##############################', ...Array(6).fill('#............................#'), '##############################'];
-const spawnTable = { randomGhostSpot: () => ({ x: 25, z: 3 }), ghostSpotFarFrom: () => ({ x: 27, z: 3 }) };
+const at = (x, z) => ({ x, y: 0, z });
+const spawnTable = { randomGhostSpot: () => at(25, 3), ghostSpotFarFrom: () => at(27, 3) };
 
 describe('Ghost', () => {
   let ghost, recorded;
-  const world = (overrides = {}) => ({ playerPosition: { x: 2, z: 3 }, playerLightOn: false, isLit: false, candiesCollected: 0, ...overrides });
+  const world = (overrides = {}) => ({ playerPosition: at(2, 3), playerLightOn: false, isLit: false, candiesCollected: 0, ...overrides });
 
   beforeEach(() => {
     recorded = [];
     const events = { emit: (type) => recorded.push(type) };
-    ghost = new Ghost({ config, tileMap: new TileMap(OPEN_HALL), spawnTable, events });
-    ghost.reset({ x: 20, z: 3 }, 15);
+    ghost = new Ghost({ config, building: singleFloorBuilding(OPEN_HALL), spawnTable, events });
+    ghost.reset(at(20, 3), 15);
   });
 
   test('sleeps through the grace period, then wakes', () => {
@@ -48,29 +49,29 @@ describe('Ghost', () => {
 
   test('spots a lit flashlight from afar and hunts', () => {
     ghost.update(15, world());
-    ghost.update(0.1, world({ playerPosition: { x: 10, z: 3 }, playerLightOn: true }));
+    ghost.update(0.1, world({ playerPosition: at(10, 3), playerLightOn: true }));
     assert.equal(ghost.state, GhostState.HUNTING);
     assert.ok(recorded.includes(GameEvent.GHOST_SPOTTED_PLAYER));
   });
 
   test("doesn't notice a dark player who's far away", () => {
     ghost.update(15, world());
-    ghost.update(0.1, world({ playerPosition: { x: 2, z: 3 }, playerLightOn: false }));
+    ghost.update(0.1, world({ playerPosition: at(2, 3), playerLightOn: false }));
     assert.equal(ghost.state, GhostState.WANDERING);
   });
 
   test('catches the player on contact', () => {
     ghost.update(15, world());
-    ghost.update(0.1, world({ playerPosition: { x: 20.5, z: 3 } }));
+    ghost.update(0.1, world({ playerPosition: at(20.5, 3) }));
     assert.ok(recorded.includes(GameEvent.PLAYER_CAUGHT));
   });
 
   test('hunts faster with each candy collected, fastest when enraged', () => {
     const distanceAfterOneSecond = (setup) => {
-      ghost.reset({ x: 20, z: 3 }, 0);
+      ghost.reset(at(20, 3), 0);
       ghost.update(0, world());
       setup();
-      ghost.update(1, world({ playerPosition: { x: 10, z: 3 }, playerLightOn: true, candiesCollected: 3 }));
+      ghost.update(1, world({ playerPosition: at(10, 3), playerLightOn: true, candiesCollected: 3 }));
       return 20 - ghost.position.x;
     };
     const hunting = distanceAfterOneSecond(() => {});
@@ -84,6 +85,6 @@ describe('Ghost', () => {
     ghost.update(config.banishExposure + 0.1, world({ isLit: true }));
     ghost.update(config.respawnDelay + 0.1, world());
     assert.equal(ghost.state, GhostState.WANDERING);
-    assert.deepEqual(ghost.position, { x: 27, z: 3 });
+    assert.deepEqual(ghost.position, at(27, 3));
   });
 });

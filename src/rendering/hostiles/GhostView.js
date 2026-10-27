@@ -12,7 +12,7 @@ import {
 } from './ghostModel.js';
 
 /** @typedef {import('../../gameplay/hostiles/GhostState.js').GhostStateName} GhostStateName */
-/** @typedef {import('../../types.js').FloorPoint} FloorPoint */
+/** @typedef {import('../../types.js').Point3} Point3 */
 /** @typedef {import('../../types.js').Ray} Ray */
 
 const PALE_GLOW = new THREE.Color(GHOST_GLOW_COLOR);
@@ -59,7 +59,7 @@ export class GhostView {
 
   /**
    * @param {number} seconds - Time since the last frame.
-   * @param {FloorPoint} playerPosition - Where it stares while hunting.
+   * @param {Point3} playerPosition - Where it stares while hunting.
    */
   update(seconds, playerPosition) {
     this.#time += seconds;
@@ -126,7 +126,8 @@ export class GhostView {
     const hover = HOVER.base + Math.sin(this.#time * HOVER.rate) * HOVER.amplitude;
     object.visible = true;
     object.scale.setScalar(1);
-    object.position.set(ghost.position.x + randomSpread(jitter), hover + randomSpread(jitter), ghost.position.z + randomSpread(jitter));
+    const { x, y, z } = ghost.position;
+    object.position.set(x + randomSpread(jitter), y + hover + randomSpread(jitter), z + randomSpread(jitter));
 
     // Faces the way it drifts while wandering; stares at the player otherwise.
     const facing = ghost.state === GhostState.WANDERING ? ghost.heading : headingTo(ghost.position, playerPosition);

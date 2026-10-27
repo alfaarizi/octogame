@@ -1,32 +1,32 @@
 import { GameEvent } from '../../core/GameEvent.js';
-import { Countdown, headingTo, planarDistance } from '../../utils.js';
+import { Countdown, distanceBetween, headingTo } from '../../utils.js';
 import { GhostState, PRESENT_GHOST_STATES } from './GhostState.js';
 
-/** @typedef {import('../../types.js').FloorPoint} FloorPoint */
+/** @typedef {import('../../types.js').Point3} Point3 */
 /** @typedef {import('./GhostState.js').GhostStateName} GhostStateName */
 
 /**
  * What the ghost needs to know each frame.
  * @typedef {object} GhostSituation
- * @property {FloorPoint} playerPosition
+ * @property {Point3} playerPosition
  * @property {boolean} playerLightOn - Whether the flashlight is lit; a lit one can be seen from much farther away.
  * @property {boolean} isLit - Whether the beam is on the ghost right now.
  * @property {number} candiesCollected - Candies found so far; each one makes the ghost hunt faster.
  */
 
 /**
- * How the ghost behaves. It drifts straight through walls (slower inside them), freezes while lit,
+ * How the ghost behaves. It drifts straight through walls and floors (slower inside walls), freezes while lit,
  * is banished by enough light, and catches the player on contact.
  *
  *   DORMANT --wake--> WANDERING <-> HUNTING <-> FROZEN --enough light--> BANISHED --respawn--> WANDERING / HUNTING
  */
 export class Ghost {
-  /** @type {FloorPoint} */
-  position = { x: 0, z: 0 };
+  /** @type {Point3} Where it hovers above. */
+  position = { x: 0, y: 0, z: 0 };
   /** Direction it last drifted, in radians (0 faces +z). */
   heading = 0;
   #config;
-  #tileMap;
+  #building;
   #spawnTable;
   #events;
   /** @type {GhostStateName} */
@@ -37,12 +37,19 @@ export class Ghost {
   #exposure = 0;
   #outOfSightTime = 0;
   #isEnraged = false;
-  /** @type {FloorPoint} */
-  #wanderTarget = { x: 0, z: 0 };
+  /** @type {Point3} */
+  #wanderTarget = { x: 0, y: 0, z: 0 };
 
-  constructor({ config, tileMap, spawnTable, events }) {
+  /**
+   * @param {object} dependencies
+   * @param {typeof import('../../config/gameConfig.js').GAME_CONFIG['ghost']} dependencies.config
+   * @param {Pick<import('../../world/Building.js').Building, 'isOpaque' | 'hasLineOfSight'>} dependencies.building
+   * @param {Pick<import('../../world/SpawnTable.js').SpawnTable, 'randomGhostSpot' | 'ghostSpotFarFrom'>} dependencies.spawnTable
+   * @param {Pick<import('../../core/EventBus.js').EventBus, 'emit'>} dependencies.events
+   */
+  constructor({ config, building, spawnTable, events }) {
     this.#config = config;
-    this.#tileMap = tileMap;
+    this.#building = building;
     this.#spawnTable = spawnTable;
     this.#events = events;
   }
@@ -108,7 +115,7 @@ export class Ghost {
 
   #updatePresent(seconds, situation) {
     if (this.#absorbLight(seconds, situation.isLit)) return;
-    const distance = planarDistance(this.position, situation.playerPosition);
+    const distance = distanceBetween(this.position, situation.playerPosition);
     if (this.#state === GhostState.WANDERING) this.#wander(seconds, situation, distance);
     if (this.#state === GhostState.HUNTING) this.#hunt(seconds, situation, distance);
     if (distance < this.#config.catchDistance) this.#events.emit(GameEvent.PLAYER_CAUGHT);
@@ -167,25 +174,28 @@ export class Ghost {
     return this.#isEnraged ? enragedSpeed : huntSpeed + huntSpeedPerCandy * candiesCollected;
   }
 
-  /** Moves straight at `target`. Returns how far is left to go. */
+  /**
+   * Moves straight at `target`, up or down through floors if it must.
+   * @param {Point3} target
+   * @returns {number} How far is left to go.
+   */
   #driftToward(target, speed, seconds) {
-    const distance = planarDistance(this.position, target);
+    const position = this.position, distance = distanceBetween(position, target);
     if (distance < 1e-3) return 0;
-    const isInsideWall = this.#tileMap.isOpaque(this.position.x, this.position.z);
+    const isInsideWall = this.#building.isOpaque(position);
     const step = Math.min(distance, speed * seconds * (isInsideWall ? this.#config.insideWallSpeedFactor : 1));
-    this.heading = headingTo(this.position, target);
-    this.position.x += ((target.x - this.position.x) / distance) * step;
-    this.position.z += ((target.z - this.position.z) / distance) * step;
+    this.heading = headingTo(position, target);
+    for (const axis of /** @type {const} */ (['x', 'y', 'z'])) position[axis] += ((target[axis] - position[axis]) / distance) * step;
     return distance - step;
   }
 
   #canSee(point) {
-    return this.#tileMap.hasLineOfSight(this.position, point);
+    return this.#building.hasLineOfSight(this.position, point);
   }
 
-  #appearAt(spot, state) {
-    this.position.x = spot.x;
-    this.position.z = spot.z;
+  /** @param {Point3} spot */
+  #appearAt({ x, y, z }, state) {
+    Object.assign(this.position, { x, y, z });
     this.#state = state;
     this.#exposure = 0;
     this.#outOfSightTime = 0;

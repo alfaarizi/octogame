@@ -1,6 +1,6 @@
 /**
  * @file Shared JSDoc types. Distances are meters: x grows eastward and z southward across the
- * floor plan, and y grows upward from the floor.
+ * floor plan, and y grows upward from the ground floor.
  */
 
 /**
@@ -19,8 +19,8 @@
  */
 
 /**
- * Where someone appears and which way they face, as a yaw (see Pose).
- * @typedef {FloorPoint & { yaw: number }} SpawnPoint
+ * Where someone appears, standing at height `y`, and which way they face, as a yaw (see Pose).
+ * @typedef {Point3 & { yaw: number }} SpawnPoint
  */
 
 /**
@@ -75,7 +75,7 @@
  * Where someone stands and where they look. Yaw 0 looks toward -z and turns left as it grows;
  * pitch looks up as it grows.
  * @typedef {object} Pose
- * @property {FloorPoint} position
+ * @property {Point3} position - Where their feet are.
  * @property {number} yaw
  * @property {number} pitch
  */

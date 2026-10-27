@@ -51,13 +51,22 @@ describe('Round', () => {
 
 describe('PickupField', () => {
   test('collects only what is within reach, once', () => {
-    const field = new PickupField(1.2);
-    field.populate({ candySpots: [{ x: 1, y: 0, z: 1 }, { x: 9, y: 0, z: 9 }], batterySpots: [{ x: 1.5, y: 0, z: 1 }] });
-    const reached = field.collectWithinReach({ x: 1, z: 1 });
+    const field = new PickupField({ pickupRadius: 1.2, reachHeight: 2 });
+    field.populate({ candySpots: [{ x: 1, y: 0.8, z: 1 }, { x: 9, y: 0, z: 9 }], batterySpots: [{ x: 1.5, y: 0, z: 1 }] });
+    const standing = { x: 1, y: 0, z: 1 };
+    const reached = field.collectWithinReach(standing);
     assert.deepEqual(reached.map((item) => item.kind).sort(), [PickupKind.BATTERY, PickupKind.CANDY]);
-    assert.equal(field.collectWithinReach({ x: 1, z: 1 }).length, 0);
+    assert.equal(field.collectWithinReach(standing).length, 0);
     assert.equal(field.items.length, 1);
-    assert.equal(field.nearest(PickupKind.CANDY, { x: 0, z: 0 }).item.position.x, 9);
+    assert.equal(field.nearest(PickupKind.CANDY, { x: 0, y: 0, z: 0 }).item.position.x, 9);
+  });
+
+  test("can't reach through a floor or a ceiling", () => {
+    const field = new PickupField({ pickupRadius: 1.2, reachHeight: 2 });
+    field.populate({ candySpots: [{ x: 1, y: 3.1, z: 1 }], batterySpots: [] });
+    assert.equal(field.collectWithinReach({ x: 1, y: 0, z: 1 }).length, 0);
+    assert.equal(field.nearest(PickupKind.CANDY, { x: 1, y: 0, z: 1 }), null);
+    assert.equal(field.collectWithinReach({ x: 1, y: 3, z: 1 }).length, 1);
   });
 });
 

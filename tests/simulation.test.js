@@ -2,13 +2,13 @@ import assert from 'node:assert/strict';
 import { beforeEach, describe, test } from 'node:test';
 import { GAME_CONFIG } from '../src/config/gameConfig.js';
 import { GameEvent } from '../src/core/GameEvent.js';
-import { BATTERY_SPOTS, CANDY_SPOTS, EXIT_DOOR, GHOST_SPOTS, GHOST_START, OBSTACLES, PLAYER_START, TILE_ROWS } from '../src/data/officeLayout.js';
+import { BATTERY_SPOTS, CANDY_SPOTS, EXIT_DOOR, FLOORS, GHOST_SPOTS, GHOST_START, PLAYER_START, TILE_SIZE } from '../src/data/officeLayout.js';
 import { GhostState } from '../src/gameplay/hostiles/GhostState.js';
 import { PickupKind } from '../src/gameplay/pickups/PickupField.js';
 import { RoundOutcome } from '../src/gameplay/round/Round.js';
 import { Simulation } from '../src/gameplay/Simulation.js';
+import { Building } from '../src/world/Building.js';
 import { SpawnTable } from '../src/world/SpawnTable.js';
-import { TileMap } from '../src/world/TileMap.js';
 import { recordingEventBus } from './helpers.js';
 
 const STAND_STILL = Object.freeze({ intent: { forward: 0, strafe: 0, turn: 0, sprint: false }, look: { x: 0, y: 0 } });
@@ -21,14 +21,14 @@ describe('Simulation', () => {
     simulation = new Simulation({
       config: GAME_CONFIG,
       events: recorder.bus,
-      tileMap: new TileMap(TILE_ROWS),
+      building: new Building(FLOORS, TILE_SIZE),
       spawnTable: new SpawnTable({ candySpots: CANDY_SPOTS, batterySpots: BATTERY_SPOTS, ghostSpots: GHOST_SPOTS }),
-      layout: { playerStart: PLAYER_START, ghostStart: GHOST_START, exitDoor: EXIT_DOOR, obstacles: OBSTACLES },
+      layout: { playerStart: PLAYER_START, ghostStart: GHOST_START, exitDoor: EXIT_DOOR },
     });
     simulation.startRound();
   });
 
-  const standAt = ({ x, z }) => Object.assign(simulation.player.position, { x, z });
+  const standAt = ({ x, y, z }) => Object.assign(simulation.player.position, { x, y, z });
 
   test('the last candy opens the exit and enrages the ghost, and reaching the exit escapes', () => {
     for (const candy of simulation.pickups.items.filter((item) => item.kind === PickupKind.CANDY)) {
@@ -39,22 +39,22 @@ describe('Simulation', () => {
     assert.equal(simulation.exitDoor.isUnlocked, true);
     assert.equal(simulation.ghost.isEnraged, true);
 
-    standAt({ x: EXIT_DOOR.centerX, z: EXIT_DOOR.trigger.minZ + 0.5 });
+    standAt({ x: EXIT_DOOR.centerX, y: 0, z: EXIT_DOOR.trigger.minZ + 0.5 });
     assert.equal(simulation.step(0.01, STAND_STILL), RoundOutcome.ESCAPED);
     assert.equal(recorder.count(GameEvent.PLAYER_ESCAPED), 1);
   });
 
   test('the ghost touching the player ends the round as caught', () => {
     simulation.step(GAME_CONFIG.round.ghostGracePeriod, STAND_STILL);
-    const { x, z } = simulation.player.position;
-    simulation.ghost.reset({ x: x + 0.4, z }, 0);
+    const { x, y, z } = simulation.player.position;
+    simulation.ghost.reset({ x: x + 0.4, y, z }, 0);
     simulation.step(0.01, STAND_STILL);
     assert.equal(simulation.step(0.01, STAND_STILL), RoundOutcome.CAUGHT);
   });
 
   test('the beam freezes the ghost only while the player looks at it', () => {
-    standAt({ x: 14, z: 12 });
-    simulation.ghost.reset({ x: 14, z: 9 }, 0);
+    standAt({ x: 16, y: 0, z: 8.5 });
+    simulation.ghost.reset({ x: 16, y: 0, z: 5.5 }, 0);
     simulation.step(0.01, STAND_STILL);
     simulation.step(0.01, STAND_STILL);
     assert.equal(simulation.ghost.state, GhostState.FROZEN);

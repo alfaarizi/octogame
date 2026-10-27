@@ -5,8 +5,8 @@ import { createBoxMeshFromBounds } from '../meshes.js';
 import { GlowingLight } from './GlowingLight.js';
 import { createLanternModel, LANTERN_FACE_GLOW } from './lanternModel.js';
 
-/** @typedef {import('../../data/officeLayout.js').GlowingFixture} GlowingFixture */
-/** @typedef {import('../../data/officeLayout.js').Lantern} Lantern */
+/** @typedef {import('../../data/office/floorKit.js').GlowingFixture} GlowingFixture */
+/** @typedef {import('../../data/office/floorKit.js').Lantern} Lantern */
 
 /** Height from the surface a lantern sits on to the pumpkin's center. */
 const LANTERN_SEAT_OFFSET = 0.13;

@@ -5,18 +5,15 @@ import {
   BATTERY_SPOTS,
   CANDY_SPOTS,
   EXIT_DOOR,
-  FURNITURE,
+  FLOORS,
   GHOST_SPOTS,
   GHOST_START,
   GLOWING_FIXTURES,
   LANTERNS,
   LOW_WALL_HEIGHT,
-  OBSTACLES,
   PLAYER_START,
-  PORTRAITS,
-  TILE_ROWS,
+  STOREY_HEIGHT,
   TILE_SIZE,
-  WALL_HEIGHT,
 } from '../data/officeLayout.js';
 import { Simulation } from '../gameplay/Simulation.js';
 import { BrowserPointerLock } from '../input/BrowserPointerLock.js';
@@ -39,8 +36,8 @@ import { PauseScreen } from '../ui/screens/PauseScreen.js';
 import { ResultScreen } from '../ui/screens/ResultScreen.js';
 import { TitleScreen } from '../ui/screens/TitleScreen.js';
 import { deepFreeze } from '../utils.js';
+import { Building } from '../world/Building.js';
 import { SpawnTable } from '../world/SpawnTable.js';
-import { TileMap } from '../world/TileMap.js';
 
 /**
  * Builds every object the game needs and connects them. This is the only place that knows
@@ -50,10 +47,10 @@ import { TileMap } from '../world/TileMap.js';
  */
 export function createGameContext({ config, isTestMode }) {
   const events = new EventBus();
-  const tileMap = new TileMap(TILE_ROWS, TILE_SIZE);
-  const layout = deepFreeze({ playerStart: PLAYER_START, ghostStart: GHOST_START, exitDoor: EXIT_DOOR, obstacles: OBSTACLES });
+  const building = new Building(FLOORS, TILE_SIZE);
+  const layout = deepFreeze({ playerStart: PLAYER_START, ghostStart: GHOST_START, exitDoor: EXIT_DOOR });
   const spawnTable = new SpawnTable({ candySpots: CANDY_SPOTS, batterySpots: BATTERY_SPOTS, ghostSpots: GHOST_SPOTS });
-  const simulation = new Simulation({ config, events, tileMap, spawnTable, layout });
+  const simulation = new Simulation({ config, events, building, spawnTable, layout });
   const render = new RenderContext(document.body, config.rendering);
   const pointerLock = isTestMode ? new SimulatedPointerLock() : new BrowserPointerLock(render.canvas);
   const store = new LocalJsonStore();
@@ -64,7 +61,7 @@ export function createGameContext({ config, isTestMode }) {
     events,
     simulation,
     render,
-    views: createViews({ config, events, tileMap, simulation, render }),
+    views: createViews({ config, events, simulation, render }),
     pointerLock,
     input: new InputController({ surface: render.canvas, pointerLock }),
     audio: new AudioDirector({ engine: new AudioEngine(config.audio), events, screamSamplePaths: config.audio.screamSamplePaths }),
@@ -73,10 +70,8 @@ export function createGameContext({ config, isTestMode }) {
   });
 }
 
-function createViews({ config, events, tileMap, simulation, render }) {
-  render.scene.add(
-    createOfficeModel(tileMap, { furniture: FURNITURE, portraits: PORTRAITS, wallHeight: WALL_HEIGHT, lowWallHeight: LOW_WALL_HEIGHT }),
-  );
+function createViews({ config, events, simulation, render }) {
+  render.scene.add(createOfficeModel(FLOORS, { tileSize: TILE_SIZE, storeyHeight: STOREY_HEIGHT, lowWallHeight: LOW_WALL_HEIGHT }));
   return Object.freeze({
     firstPerson: new FirstPersonView(render.camera, {
       eyeHeight: config.player.eyeHeight,

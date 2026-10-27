@@ -1,20 +1,20 @@
 import { GameEvent } from '../core/GameEvent.js';
 import { AmbientNoiseKind } from '../gameplay/cues/AmbientNoiseCue.js';
 import { GhostState } from '../gameplay/hostiles/GhostState.js';
-import { atHeight } from '../utils.js';
+import { above } from '../utils.js';
 import { SoundLibrary } from './SoundLibrary.js';
 import { Soundscape } from './Soundscape.js';
 
 /** @typedef {import('../gameplay/hostiles/Ghost.js').Ghost} Ghost */
-/** @typedef {import('../types.js').FloorPoint} FloorPoint */
+/** @typedef {import('../types.js').Point3} Point3 */
 /** @typedef {import('../types.js').Ray} Ray */
 
 const DroneLevel = Object.freeze({ IDLE: 0.35, ROUND: 0.55, CHASE: 0.9 });
 const GhostVoiceLevel = Object.freeze({ HUNTING: 1, NEARBY: 0.6, ABSENT: 0 });
 const GHOST_VOICE_HEIGHT = 1.4;
 
-/** @param {FloorPoint} position */
-const atVoiceHeight = (position) => atHeight(position, GHOST_VOICE_HEIGHT);
+/** @param {Point3} position */
+const atVoiceHeight = (position) => above(position, GHOST_VOICE_HEIGHT);
 
 /** @param {Ghost} ghost */
 function ghostVoiceLevel(ghost) {

@@ -1,6 +1,5 @@
 import { GameEvent } from '../core/GameEvent.js';
-import { atHeight, planarDistance } from '../utils.js';
-import { CollisionWorld } from '../world/CollisionWorld.js';
+import { above, distanceBetween, isWithinCone } from '../utils.js';
 import { ExitDoor } from '../world/ExitDoor.js';
 import { AmbientNoiseCue } from './cues/AmbientNoiseCue.js';
 import { CandyNearbyCue } from './cues/CandyNearbyCue.js';
@@ -9,23 +8,20 @@ import { Ghost } from './hostiles/Ghost.js';
 import { measureThreat, NO_THREAT } from './hostiles/threat.js';
 import { PickupField, PickupKind } from './pickups/PickupField.js';
 import { Flashlight } from './player/Flashlight.js';
-import { FlashlightBeam } from './player/FlashlightBeam.js';
 import { Player } from './player/Player.js';
 import { Round, RoundOutcome } from './round/Round.js';
 
-/** @typedef {import('../types.js').FloorPoint} FloorPoint */
 /** @typedef {import('../types.js').MovementIntent} MovementIntent */
-/** @typedef {import('../types.js').Rect} Rect */
+/** @typedef {import('../types.js').Point3} Point3 */
 /** @typedef {import('../types.js').SpawnPoint} SpawnPoint */
 /** @typedef {import('./hostiles/threat.js').Threat} Threat */
 
 /**
- * The fixed parts of the office that the rules need.
+ * Where a round starts and ends.
  * @typedef {object} SimulationLayout
  * @property {SpawnPoint} playerStart
- * @property {FloorPoint} ghostStart
+ * @property {Point3} ghostStart
  * @property {import('../world/ExitDoor.js').ExitDoorPlacement} exitDoor
- * @property {readonly Rect[]} obstacles - Furniture footprints the player bumps into.
  */
 
 /**
@@ -49,9 +45,9 @@ export class Simulation {
   /** @readonly */ pickups;
   #config;
   #events;
+  #building;
   #spawnTable;
   #layout;
-  #beam;
   #footsteps;
   #candySparkle;
   #ambientNoise;
@@ -63,22 +59,22 @@ export class Simulation {
    * @param {object} dependencies
    * @param {typeof import('../config/gameConfig.js').GAME_CONFIG} dependencies.config
    * @param {import('../core/EventBus.js').EventBus} dependencies.events
-   * @param {import('../world/TileMap.js').TileMap} dependencies.tileMap
+   * @param {import('../world/Building.js').Building} dependencies.building
    * @param {import('../world/SpawnTable.js').SpawnTable} dependencies.spawnTable
    * @param {SimulationLayout} dependencies.layout
    */
-  constructor({ config, events, tileMap, spawnTable, layout }) {
+  constructor({ config, events, building, spawnTable, layout }) {
     this.#config = config;
     this.#events = events;
+    this.#building = building;
     this.#spawnTable = spawnTable;
     this.#layout = layout;
     this.exitDoor = new ExitDoor(layout.exitDoor);
     this.round = new Round({ events, exitDoor: this.exitDoor, candiesRequired: config.round.candiesRequired });
-    this.player = new Player(config.player, new CollisionWorld(tileMap, layout.obstacles));
+    this.player = new Player(config.player, building);
     this.flashlight = new Flashlight(config.flashlight, events);
-    this.ghost = new Ghost({ config: config.ghost, tileMap, spawnTable, events });
-    this.pickups = new PickupField(config.player.pickupRadius);
-    this.#beam = new FlashlightBeam(tileMap, config.flashlight.freezeCone);
+    this.ghost = new Ghost({ config: config.ghost, building, spawnTable, events });
+    this.pickups = new PickupField(config.player);
     this.#footsteps = new FootstepCue(events, config.player);
     this.#candySparkle = new CandyNearbyCue(events, config.round);
     this.#ambientNoise = new AmbientNoiseCue(events, config.round);
@@ -132,7 +128,7 @@ export class Simulation {
     player.look(look.x, look.y);
     this.#footsteps.update(seconds, player.update(seconds, intent));
 
-    this.#threat = ghost.isPresent ? measureThreat(planarDistance(ghost.position, player.position), this.#config.ghost) : NO_THREAT;
+    this.#threat = ghost.isPresent ? measureThreat(distanceBetween(ghost.position, player.position), this.#config.ghost) : NO_THREAT;
     flashlight.update(seconds, round.elapsed, this.#threat.interference);
     ghost.update(seconds, {
       playerPosition: player.position,
@@ -153,10 +149,15 @@ export class Simulation {
     return null;
   }
 
+  /** Whether the beam's strong center is on the ghost, with no wall or floor in the way. */
   #isGhostLit() {
-    if (!this.flashlight.isEmitting || !this.ghost.isPresent) return false;
+    const { player, ghost } = this;
+    if (!this.flashlight.isEmitting || !ghost.isPresent) return false;
     const { bodyCenterHeight, bodyRadius } = this.#config.ghost;
-    return this.#beam.illuminates(this.player.sight, atHeight(this.ghost.position, bodyCenterHeight), bodyRadius);
+    return (
+      isWithinCone(player.sight, this.#config.flashlight.freezeCone, above(ghost.position, bodyCenterHeight), bodyRadius) &&
+      this.#building.hasLineOfSight(player.position, ghost.position)
+    );
   }
 
   #collectPickups() {

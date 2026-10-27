@@ -1,7 +1,7 @@
 import { GameEvent } from '../../core/GameEvent.js';
 import { atHeight, chance, Countdown, pointAlongHeading, randomInRange, weightedRandomItem } from '../../utils.js';
 
-/** @typedef {import('../../types.js').FloorPoint} FloorPoint */
+/** @typedef {import('../../types.js').Point3} Point3 */
 
 export const AmbientNoiseKind = Object.freeze({ CREAK: 'creak', THUMP: 'thump', GIGGLE: 'giggle' });
 
@@ -32,7 +32,7 @@ export class AmbientNoiseCue {
 
   /**
    * @param {number} seconds - Time since the last frame.
-   * @param {FloorPoint} playerPosition
+   * @param {Point3} playerPosition
    */
   update(seconds, playerPosition) {
     if (!this.#countdown.tick(seconds)) return;
@@ -40,7 +40,7 @@ export class AmbientNoiseCue {
     const spot = pointAlongHeading(playerPosition, Math.random() * Math.PI * 2, randomInRange(DISTANCE_FROM_PLAYER));
     this.#events.emit(GameEvent.AMBIENT_NOISE, {
       kind: weightedRandomItem(NOISE_CHOICES),
-      position: atHeight(spot, randomInRange(HEIGHT)),
+      position: atHeight(spot, playerPosition.y + randomInRange(HEIGHT)),
       flickerLanterns: chance(this.#lanternFlickerChance),
     });
   }

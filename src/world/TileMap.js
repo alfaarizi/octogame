@@ -11,15 +11,19 @@ export const Tile = Object.freeze({
   CARPORT: '_',
   PAVING: ':',
   GARDEN: ',',
-  STAIRWELL: 'o',
-  RAMP: 'v',
+  /** Part of a flight of stairs; the flight decides how high you stand on it. */
+  STAIRS: 'S',
+  /** An opening in the floor, overlooking the floor below. */
+  VOID: '*',
+  /** An opening in the floor down to somewhere out of the game, such as stairs to the street. */
+  PIT: 'v',
   OUTSIDE: ' ',
 });
 
 /** @type {ReadonlySet<string>} Tiles nothing can see through. */
 const OPAQUE_TILES = new Set([Tile.WALL, Tile.LOW_WALL, Tile.EXIT_DOOR, Tile.OUTSIDE]);
-/** @type {ReadonlySet<string>} Tiles nobody can walk on: everything opaque, plus the openings down to the basement. */
-const BLOCKING_TILES = new Set([...OPAQUE_TILES, Tile.STAIRWELL, Tile.RAMP]);
+/** @type {ReadonlySet<string>} Tiles nobody can walk on: everything opaque, plus the openings in the floor. */
+const BLOCKING_TILES = new Set([...OPAQUE_TILES, Tile.VOID, Tile.PIT]);
 const SIGHT_SAMPLE_STEP = 0.15;
 
 /** A level's tile grid: which tiles block walking or sight, and whether two points can see each other. */

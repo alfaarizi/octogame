@@ -49,12 +49,13 @@ describe('AmbientNoiseCue', () => {
     const recorder = recordingEventBus();
     const cue = new AmbientNoiseCue(recorder.bus, GAME_CONFIG.round);
     cue.reset();
-    const player = { x: 14, z: 9 };
+    const player = { x: 14, y: 3, z: 9 };
     cue.update(GAME_CONFIG.round.ambientNoiseInterval.max + 0.1, player);
     assert.equal(recorder.count(GameEvent.AMBIENT_NOISE), 1);
     const { kind, position } = recorder.emitted[0].payload;
     assert.ok(Object.values(AmbientNoiseKind).includes(kind));
     const distance = Math.hypot(position.x - player.x, position.z - player.z);
     assert.ok(distance >= 5 && distance <= 11);
+    assert.ok(position.y > player.y, 'on the same floor as the player');
   });
 });

@@ -24,16 +24,14 @@ export class CollisionWorld {
    * Moves `position` (in place) until a circle of `radius` around it overlaps nothing solid.
    * @param {FloorPoint} position
    * @param {number} radius
+   * @param {readonly Rect[]} [extraObstacles] - Solid for this call only.
    */
-  resolveCircle(position, radius) {
+  resolveCircle(position, radius, extraObstacles = []) {
     for (let pass = 0; pass < RESOLVE_PASSES; pass++) {
-      this.#resolveAgainstWalls(position, radius);
-      for (const obstacle of this.#obstacles) pushCircleOutOfRect(position, radius, obstacle);
+      for (const rects of [this.#tileMap.blockingRectsAround(position), this.#obstacles, extraObstacles]) {
+        for (const rect of rects) pushCircleOutOfRect(position, radius, rect);
+      }
     }
-  }
-
-  #resolveAgainstWalls(position, radius) {
-    for (const rect of this.#tileMap.blockingRectsAround(position)) pushCircleOutOfRect(position, radius, rect);
   }
 }
 
