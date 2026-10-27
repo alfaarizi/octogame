@@ -1,10 +1,10 @@
 import { GameEvent } from '../../core/GameEvent.js';
-import { planarDistance } from '../../core/math.js';
-import { GhostState } from '../../gameplay/GhostState.js';
-import { PickupKind } from '../../gameplay/PickupField.js';
-import { RoundOutcome } from '../../gameplay/Round.js';
-import { measureThreat, NO_THREAT } from '../../gameplay/threat.js';
-import { Action } from '../../input/KeyBindings.js';
+import { GhostState } from '../../gameplay/hostiles/GhostState.js';
+import { measureThreat, NO_THREAT } from '../../gameplay/hostiles/threat.js';
+import { PickupKind } from '../../gameplay/pickups/PickupField.js';
+import { RoundOutcome } from '../../gameplay/round/Round.js';
+import { Action } from '../../input/keyBindings.js';
+import { planarDistance } from '../../utils.js';
 
 /**
  * A round in progress. Each frame it advances the simulation, then updates what the player
@@ -28,7 +28,8 @@ export class PlayingState {
 
   enter() {
     const { audio, events, input, pointerLock, ui, world } = this.#context;
-    audio.start(); // we're inside the click or key press that started the round
+    // We're inside the click or key press that started the round
+    audio.start();
     this.#setUpRound();
     ui.hud.show();
     ui.pause.hide();
@@ -84,7 +85,8 @@ export class PlayingState {
     player.look(look.x, look.y);
     const movement = player.update(seconds, input.readMovementIntent());
     world.footstepCue.update(seconds, movement);
-    views.firstPerson.update(seconds, player, movement); // the beam check below needs the camera where the player now is
+    // The beam check below needs the camera where the player now is
+    views.firstPerson.update(seconds, player, movement);
 
     this.#threat = ghost.isPresent ? measureThreat(planarDistance(ghost.position, player.position), config.ghost) : NO_THREAT;
     flashlight.update(seconds, round.elapsed, this.#threat.interference);

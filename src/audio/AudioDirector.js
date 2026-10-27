@@ -1,7 +1,7 @@
 import { GameEvent } from '../core/GameEvent.js';
-import { AmbientNoiseKind } from '../gameplay/AmbientNoiseCue.js';
-import { Soundscape } from './Soundscape.js';
+import { AmbientNoiseKind } from '../gameplay/cues/AmbientNoiseCue.js';
 import { SoundLibrary } from './SoundLibrary.js';
+import { Soundscape } from './Soundscape.js';
 
 const DroneLevel = Object.freeze({ IDLE: 0.35, ROUND: 0.55, CHASE: 0.9 });
 const GhostVoiceLevel = Object.freeze({ HUNTING: 1, NEARBY: 0.6, ABSENT: 0 });

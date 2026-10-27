@@ -1,5 +1,5 @@
-import { STANDING_STILL } from '../../gameplay/Player.js';
-import { FlashColor } from '../../ui/ScreenEffects.js';
+import { STANDING_STILL } from '../../gameplay/player/Player.js';
+import { FlashColor } from '../../ui/hud/ScreenEffects.js';
 
 const ESCAPE_FLASH_SECONDS = 1.2;
 
@@ -19,7 +19,8 @@ export class ResultState {
     pointerLock.release();
     world.ghost.deactivate();
     views.ghost.hide();
-    views.firstPerson.update(0, world.player, STANDING_STILL); // undo any jump-scare shake
+    // Undo any jump-scare shake
+    views.firstPerson.update(0, world.player, STANDING_STILL);
     views.firstPerson.setBeamBrightness(world.flashlight.brightness);
     ui.hud.hide();
     const { rank, ranked } = persistence.scores.record(this.#result);

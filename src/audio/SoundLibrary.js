@@ -1,7 +1,9 @@
+import { randomWalk } from '../utils.js';
+
 const LAUGH = Object.freeze({ syllables: 5, spacing: 0.17, length: 0.13, pitch: 300, pitchDrop: 0.07, vowel: 800 });
 const SCREAM = Object.freeze({ duration: 1.5, release: 0.5, volume: 0.7 });
 const SCREAM_VOICES = Object.freeze([[620, 'sawtooth'], [930, 'square'], [1240, 'sawtooth'], [455, 'triangle']]);
-const CREAK = Object.freeze({ steps: 16, lowest: 50, highest: 220 });
+const CREAK_PITCH_WALK = Object.freeze({ steps: 16, min: 50, max: 220, maxStep: 40, upwardBias: 0.1 });
 
 /** Every one-off sound effect, synthesized from AudioEngine voices. Positions are { x, y, z }. */
 export class SoundLibrary {
@@ -90,7 +92,7 @@ export class SoundLibrary {
   creak(position, volume = 0.35) {
     const duration = 0.9 + Math.random() * 0.6;
     const output = position ? this.#engine.createTemporarySpatialOutput(position, duration) : this.#engine.master;
-    const pitchPath = randomWalk(CREAK.steps, 80 + Math.random() * 40, CREAK.lowest, CREAK.highest);
+    const pitchPath = randomWalk({ ...CREAK_PITCH_WALK, start: 80 + Math.random() * 40 });
     this.#engine.playTone({
       waveform: 'sawtooth',
       frequency: pitchPath[0],
@@ -162,17 +164,6 @@ export class SoundLibrary {
     engine.playNoise({ duration: 1.2, volume: 0.6, attack: 0.01, filter: { type: 'bandpass', frequency: 3000, endFrequency: 1500, resonance: 0.8 } });
     engine.playTone({ frequency: 70, endFrequency: 30, duration: 0.8, volume: 0.9 });
   }
-}
-
-/** `steps` values starting near `start`, each a small random step from the last, kept within [min, max]. */
-function randomWalk(steps, start, min, max) {
-  const values = new Float32Array(steps);
-  let value = start;
-  for (let i = 0; i < steps; i++) {
-    value = Math.max(min, Math.min(max, value + (Math.random() - 0.4) * 40));
-    values[i] = value;
-  }
-  return values;
 }
 
 function distortionCurve(amount) {

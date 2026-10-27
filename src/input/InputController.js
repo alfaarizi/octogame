@@ -1,5 +1,5 @@
-import { ListenerSet } from '../core/ListenerSet.js';
-import { Action, DEFAULT_KEY_BINDINGS, MOUSE_PRIMARY } from './KeyBindings.js';
+import { ListenerSet } from '../utils.js';
+import { Action, DEFAULT_KEY_BINDINGS, MOUSE_PRIMARY } from './keyBindings.js';
 
 /** Turns raw keyboard and mouse events into game actions, a movement intent and mouse-look deltas. */
 export class InputController {

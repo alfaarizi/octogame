@@ -1,4 +1,4 @@
-import { deepFreeze } from '../core/deepFreeze.js';
+import { deepFreeze } from '../utils.js';
 
 /*
  * The haunted house as data: the tile grid, furniture, and every spawn point.
@@ -36,7 +36,8 @@ export const GHOST_START = deepFreeze({ x: 23, z: 4.5 });
 
 export const EXIT_DOOR = deepFreeze({
   centerX: 14,
-  wallZ: 18, // inner face of the south wall
+  // Inner face of the south wall
+  wallZ: 18,
   width: 2,
   height: 2.4,
   trigger: { minZ: 16.9, halfWidth: 1.3 },
@@ -189,9 +190,12 @@ export const FIREPLACE = deepFreeze({
 
 /** Jack-o'-lanterns: where each sits, and the point its carved face turns toward. */
 export const LANTERNS = deepFreeze([
-  { x: 17.4, y: 0.85, z: 12.45, facing: { x: 14, z: 15 } }, // foyer side table
-  { x: 1.35, y: 0.96, z: 16.6, facing: { x: 5, z: 15 } }, // kitchen counter
-  { x: 8.5, y: 0.85, z: 8.3, facing: { x: 8.5, z: 10 } }, // hall table
+  // Foyer side table
+  { x: 17.4, y: 0.85, z: 12.45, facing: { x: 14, z: 15 } },
+  // Kitchen counter
+  { x: 1.35, y: 0.96, z: 16.6, facing: { x: 5, z: 15 } },
+  // Hall table
+  { x: 8.5, y: 0.85, z: 8.3, facing: { x: 8.5, z: 10 } },
 ]);
 
 /** Portraits hang on south-facing wall faces at these points. */

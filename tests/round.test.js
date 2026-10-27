@@ -1,10 +1,10 @@
 import assert from 'node:assert/strict';
 import { describe, test } from 'node:test';
 import { GameEvent } from '../src/core/GameEvent.js';
-import { compareResults, rankResults } from '../src/gameplay/leaderboardRanking.js';
-import { PickupField, PickupKind } from '../src/gameplay/PickupField.js';
-import { Round, RoundOutcome } from '../src/gameplay/Round.js';
-import { measureThreat } from '../src/gameplay/threat.js';
+import { measureThreat } from '../src/gameplay/hostiles/threat.js';
+import { PickupField, PickupKind } from '../src/gameplay/pickups/PickupField.js';
+import { compareResults, rankResults } from '../src/gameplay/round/leaderboardRanking.js';
+import { Round, RoundOutcome } from '../src/gameplay/round/Round.js';
 import { ScoreRepository } from '../src/persistence/ScoreRepository.js';
 import { ExitDoor } from '../src/world/ExitDoor.js';
 import { recordingEventBus } from './helpers.js';

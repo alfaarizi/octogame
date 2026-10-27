@@ -1,4 +1,4 @@
-import { STANDING_STILL } from '../../gameplay/Player.js';
+import { STANDING_STILL } from '../../gameplay/player/Player.js';
 
 const IDLE_LOOK = Object.freeze({ yawRate: 0.18, yawSwing: 0.7, pitch: -0.08, pitchRate: 0.11, pitchSwing: 0.05 });
 

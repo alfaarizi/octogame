@@ -1,5 +1,5 @@
-import { createGameContext } from './app/createGameContext.js';
 import { crashReporter } from './app/crashReporter.js';
+import { createGameContext } from './app/createGameContext.js';
 import { Game } from './app/Game.js';
 import { GAME_CONFIG } from './config/gameConfig.js';
 import { installTestHarness } from './debug/testHarness.js';

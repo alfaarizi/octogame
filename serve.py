@@ -4,8 +4,7 @@
 Serves this folder at http://localhost:8000 and tells the browser never to cache
 anything, so refreshing the page always loads the newest code.
 
-    python3 serve.py          # port 8000
-    python3 serve.py 8080     # another port
+Run `python3 serve.py` for port 8000, or pass a port number: `python3 serve.py 8080`.
 """
 import functools
 import http.server
@@ -24,7 +23,8 @@ class DevServer(http.server.ThreadingHTTPServer):
 
 
 class NoCacheHandler(http.server.SimpleHTTPRequestHandler):
-    protocol_version = "HTTP/1.1"  # keep-alive, so the browser reuses connections
+    # Keep-alive, so the browser reuses connections.
+    protocol_version = "HTTP/1.1"
     extensions_map = {
         **http.server.SimpleHTTPRequestHandler.extensions_map,
         ".js": "text/javascript",
@@ -36,7 +36,8 @@ class NoCacheHandler(http.server.SimpleHTTPRequestHandler):
         super().end_headers()
 
     def log_message(self, format, *args):
-        pass  # keep the terminal quiet
+        # Keep the terminal quiet.
+        pass
 
 
 if __name__ == "__main__":

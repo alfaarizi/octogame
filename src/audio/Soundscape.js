@@ -1,4 +1,4 @@
-import { Cooldown } from '../core/Cooldown.js';
+import { Cooldown } from '../utils.js';
 import { setNodePosition } from './AudioEngine.js';
 
 const DRONE_PITCHES = [55, 55.4, 82.6];

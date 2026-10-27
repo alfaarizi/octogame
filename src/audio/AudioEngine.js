@@ -1,6 +1,8 @@
 const NOISE_BUFFER_SECONDS = 2;
-const SILENCE = 0.0001; // exponential ramps can't reach exactly 0
-const TAIL_SECONDS = 0.05; // sources stop a moment after their envelope has faded
+// Exponential ramps can't reach exactly 0
+const SILENCE = 0.0001;
+// Sources stop a moment after their envelope has faded
+const TAIL_SECONDS = 0.05;
 const SPATIAL_SETTINGS = Object.freeze({ panningModel: 'HRTF', distanceModel: 'inverse', refDistance: 1.5, rolloffFactor: 1.2, maxDistance: 40 });
 
 /**

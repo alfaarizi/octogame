@@ -1,4 +1,4 @@
-import { deepFreeze } from '../core/deepFreeze.js';
+import { deepFreeze } from '../utils.js';
 
 /**
  * Every value worth tweaking after a playtest.
@@ -20,11 +20,14 @@ export const GAME_CONFIG = deepFreeze({
     sprintSpeed: 5,
     sprintDuration: 3,
     sprintRecharge: 4,
-    windedRecoveryLevel: 0.3, // stamina needed before you can sprint again after running out
+    // Stamina needed before you can sprint again after running out
+    windedRecoveryLevel: 0.3,
     collisionRadius: 0.3,
     eyeHeight: 1.6,
-    mouseSensitivity: 0.0022, // radians per pixel
-    keyboardTurnSpeed: 2.2, // radians per second
+    // Radians per pixel
+    mouseSensitivity: 0.0022,
+    // Radians per second
+    keyboardTurnSpeed: 2.2,
     maxPitch: 1.45,
     pickupRadius: 1.2,
     footstepInterval: 0.48,
@@ -32,12 +35,14 @@ export const GAME_CONFIG = deepFreeze({
   },
 
   flashlight: {
-    batteryLife: 60, // seconds of light from a full battery
+    // Seconds of light from a full battery
+    batteryLife: 60,
     batteryPickupCharge: 0.4,
     lowBatteryLevel: 0.2,
     intensity: 45,
     range: 20,
-    coneAngle: 0.45, // about 26°
+    // About 26°
+    coneAngle: 0.45,
     freezeAngleDegrees: 18,
     freezeRange: 10,
   },
@@ -48,11 +53,14 @@ export const GAME_CONFIG = deepFreeze({
     huntSpeedPerCandy: 0.2,
     enragedSpeed: 3.5,
     insideWallSpeedFactor: 0.5,
-    banishExposure: 1.5, // seconds it has to stay in the beam
+    // Seconds it has to stay in the beam
+    banishExposure: 1.5,
     respawnDelay: 6,
     enragedRespawnDelay: 2,
-    senseRadius: 5, // notices you this close, light or not
-    spotRadius: 12, // sees a lit flashlight from this far
+    // Notices you this close, light or not
+    senseRadius: 5,
+    // Sees a lit flashlight from this far
+    spotRadius: 12,
     loseInterestDistance: 14,
     loseInterestTime: 5,
     arrivalDistance: 0.3,
@@ -79,7 +87,8 @@ export const GAME_CONFIG = deepFreeze({
     fogDensity: 0.085,
     moonlightSkyColor: 0x7586b8,
     moonlightGroundColor: 0x0b0906,
-    moonlightIntensity: 1.6, // what you can see with the flashlight off
+    // What you can see with the flashlight off
+    moonlightIntensity: 1.6,
     lanternIntensity: 1.6,
     fireIntensity: 2.5,
     exitIntensity: 4,
@@ -93,7 +102,8 @@ export const GAME_CONFIG = deepFreeze({
   },
 
   ui: {
-    resultInputDelayMs: 1200, // so a panicked click after the jump scare doesn't skip the result
+    // So a panicked click after the jump scare doesn't skip the result
+    resultInputDelayMs: 1200,
     leaderboardSize: 10,
   },
 });

@@ -1,5 +1,4 @@
-import { planarDistance } from '../core/math.js';
-import { randomItem, shuffled } from '../core/random.js';
+import { planarDistance, randomItem, shuffled } from '../utils.js';
 
 const FAR_SPOT_CHOICES = 2;
 

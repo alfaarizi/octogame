@@ -40,7 +40,8 @@
   });
 
   window.addEventListener('error', function (event) {
-    if (/ResizeObserver/.test(event.message)) return; // harmless browser noise
+    // Harmless browser noise
+    if (/ResizeObserver/.test(event.message)) return;
     report(event.error && event.error.stack ? event.error.stack : event.message || 'Unknown error');
   });
 

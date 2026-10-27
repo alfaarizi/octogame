@@ -1,7 +1,7 @@
-import { formatRoundTime } from './formatRoundTime.js';
+import { formatRoundTime } from '../utils.js';
 
 /** Every piece of text the game shows during play, in one place. */
-export const Messages = Object.freeze({
+export const MESSAGES = Object.freeze({
   defaultPlayerName: 'Mystery guest',
 
   roundIntro: (candiesRequired) => `Find ${candiesRequired} candies. Click to switch your flashlight on and off.`,

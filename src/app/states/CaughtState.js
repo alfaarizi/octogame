@@ -1,8 +1,8 @@
 import { GameEvent } from '../../core/GameEvent.js';
-import { chance } from '../../core/random.js';
-import { STANDING_STILL } from '../../gameplay/Player.js';
-import { RoundOutcome } from '../../gameplay/Round.js';
-import { FlashColor } from '../../ui/ScreenEffects.js';
+import { STANDING_STILL } from '../../gameplay/player/Player.js';
+import { RoundOutcome } from '../../gameplay/round/Round.js';
+import { FlashColor } from '../../ui/hud/ScreenEffects.js';
+import { chance } from '../../utils.js';
 
 const GENTLE_FADE_SECONDS = 1.4;
 const CAUGHT_FLASH_SECONDS = 0.9;

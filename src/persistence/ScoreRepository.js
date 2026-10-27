@@ -1,4 +1,4 @@
-import { rankResults } from '../gameplay/leaderboardRanking.js';
+import { rankResults } from '../gameplay/round/leaderboardRanking.js';
 
 const STORAGE_KEY = 'flashlight-haunt-scores';
 const MAX_STORED_RESULTS = 100;

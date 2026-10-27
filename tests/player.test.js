@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { describe, test } from 'node:test';
 import { GAME_CONFIG } from '../src/config/gameConfig.js';
-import { Player } from '../src/gameplay/Player.js';
+import { Player } from '../src/gameplay/player/Player.js';
 
 const noWalls = { resolveCircle() {} };
 const intent = (overrides) => ({ forward: 0, strafe: 0, turn: 0, sprint: false, ...overrides });

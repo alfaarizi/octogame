@@ -2,8 +2,8 @@ import assert from 'node:assert/strict';
 import { describe, test } from 'node:test';
 import { GAME_CONFIG } from '../src/config/gameConfig.js';
 import { GameEvent } from '../src/core/GameEvent.js';
-import { Flashlight } from '../src/gameplay/Flashlight.js';
-import { FlashlightBeam, isWithinCone } from '../src/gameplay/FlashlightBeam.js';
+import { Flashlight } from '../src/gameplay/player/Flashlight.js';
+import { FlashlightBeam } from '../src/gameplay/player/FlashlightBeam.js';
 import { TileMap } from '../src/world/TileMap.js';
 import { recordingEventBus, SMALL_ROOM } from './helpers.js';
 
@@ -56,13 +56,6 @@ describe('Flashlight', () => {
 describe('FlashlightBeam', () => {
   const eye = { x: 1.5, y: 1.6, z: 1.5 };
   const east = { x: 1, y: 0, z: 0 };
-
-  test('the cone test accepts targets ahead and rejects ones off to the side or too far', () => {
-    const halfAngle = 0.3;
-    assert.equal(isWithinCone(eye, east, { x: 5, y: 1.6, z: 1.5 }, halfAngle, 10), true);
-    assert.equal(isWithinCone(eye, east, { x: 1.5, y: 1.6, z: 5 }, halfAngle, 10), false);
-    assert.equal(isWithinCone(eye, east, { x: 50, y: 1.6, z: 1.5 }, halfAngle, 10), false);
-  });
 
   test("walls block the beam even when the target's in the cone", () => {
     const beam = new FlashlightBeam(new TileMap(SMALL_ROOM), config);

@@ -1,4 +1,4 @@
-import { ListenerSet } from './ListenerSet.js';
+import { ListenerSet } from '../utils.js';
 
 /**
  * Publish/subscribe hub. Gameplay announces what happened (see GameEvent) without knowing
