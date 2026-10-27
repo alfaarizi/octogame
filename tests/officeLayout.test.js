@@ -4,6 +4,7 @@ import { GAME_CONFIG } from '../src/config/gameConfig.js';
 import { CANDY_SPOTS, EXIT_DOOR, FLOORS, GHOST_START, PLAYER_START, TILE_SIZE } from '../src/data/officeLayout.js';
 import { planarDistance } from '../src/utils.js';
 import { Building } from '../src/world/Building.js';
+import { StairFlight } from '../src/world/StairFlight.js';
 import { Tile, TileMap } from '../src/world/TileMap.js';
 
 const STEP = 0.1;
@@ -41,14 +42,17 @@ describe('office layout', () => {
     }
   });
 
-  test('every flight of stairs is stairs on the floor it rises from, and stairs or an opening on the floor above', () => {
+  test('stairs are stairs on the floor they rise from, and from halfway up on the floor above', () => {
+    const isStairs = (tile) => tile === Tile.STAIRS || tile === Tile.OUTDOOR_STAIRS;
     FLOORS.slice(0, -1).forEach((floor, index) => {
-      const maps = [floor, FLOORS[index + 1]].map(({ tiles }) => new TileMap(tiles, TILE_SIZE));
-      for (const { rect } of floor.stairs) {
+      const [below, above] = [floor, FLOORS[index + 1]].map(({ tiles }) => new TileMap(tiles, TILE_SIZE));
+      const halfway = (floor.elevation + FLOORS[index + 1].elevation) / 2;
+      for (const plan of floor.stairs) {
+        const { rect } = plan, flight = new StairFlight(plan);
         for (let x = rect.x0 + TILE_SIZE / 2; x < rect.x1; x += TILE_SIZE) {
           for (let z = rect.z0 + TILE_SIZE / 2; z < rect.z1; z += TILE_SIZE) {
-            assert.equal(maps[0].tileAt(x, z), Tile.STAIRS, `(${x}, ${z}) below`);
-            assert.ok([Tile.STAIRS, Tile.VOID].includes(maps[1].tileAt(x, z)), `(${x}, ${z}) above`);
+            assert.ok(isStairs(below.tileAt(x, z)), `(${x}, ${z}) below`);
+            if (flight.heightAt({ x, z }) >= halfway) assert.ok(isStairs(above.tileAt(x, z)), `(${x}, ${z}) above`);
           }
         }
       }

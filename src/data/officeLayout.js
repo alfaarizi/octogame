@@ -5,6 +5,7 @@
  */
 
 import { atHeight, deepFreeze } from '../utils.js';
+import { BASEMENT } from './office/basement.js';
 import { STOREY_HEIGHT } from './office/floorKit.js';
 import { GROUND_FLOOR } from './office/groundFloor.js';
 import { TOP_FLOOR } from './office/topFloor.js';
@@ -55,12 +56,16 @@ function placeFloor(floor, elevation) {
 }
 
 /** @type {readonly PlacedFloor[]} From the lowest up. */
-export const FLOORS = deepFreeze([placeFloor(GROUND_FLOOR, 0), placeFloor(TOP_FLOOR, STOREY_HEIGHT)]);
+export const FLOORS = deepFreeze([
+  placeFloor(BASEMENT, -STOREY_HEIGHT),
+  placeFloor(GROUND_FLOOR, 0),
+  placeFloor(TOP_FLOOR, STOREY_HEIGHT),
+]);
 
 /** @type {SpawnPoint} In the lobby, just inside the main entrance, facing into the office. */
 export const PLAYER_START = deepFreeze({ x: 8.0, y: 0, z: 8.4, yaw: 0 });
-/** @type {Point3} On the landing of the basement stairwell. */
-export const GHOST_START = deepFreeze({ x: 20.5, y: 0, z: 1.0 });
+/** @type {Point3} In the basement, between the CNC machines and the work table. */
+export const GHOST_START = deepFreeze({ x: 15.9, y: -STOREY_HEIGHT, z: 3.8 });
 
 /** @type {import('../world/ExitDoor.js').ExitDoorPlacement & { wallZ: number, width: number, height: number }} */
 export const EXIT_DOOR = deepFreeze({

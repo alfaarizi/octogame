@@ -26,13 +26,13 @@ describe('TileMap', () => {
   });
 
   test('openings in the floor block walking but not sight; stairs block neither', () => {
-    const withOpenings = new TileMap(['#######', '#.v*S.#', '#######']);
+    const withOpenings = new TileMap(['########', '#.v*Ss.#', '########']);
     for (const x of [2.5, 3.5]) {
       assert.equal(withOpenings.isBlocked(x, 1.5), true);
       assert.equal(withOpenings.isOpaque(x, 1.5), false);
     }
-    assert.equal(withOpenings.isBlocked(4.5, 1.5), false);
-    assert.equal(withOpenings.hasLineOfSight({ x: 1.5, z: 1.5 }, { x: 5.5, z: 1.5 }), true);
+    for (const x of [4.5, 5.5]) assert.equal(withOpenings.isBlocked(x, 1.5), false);
+    assert.equal(withOpenings.hasLineOfSight({ x: 1.5, z: 1.5 }, { x: 6.5, z: 1.5 }), true);
   });
 
   test('a finer grid is measured in meters', () => {

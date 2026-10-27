@@ -13,6 +13,8 @@ export const Tile = Object.freeze({
   GARDEN: ',',
   /** Part of a flight of stairs; the flight decides how high you stand on it. */
   STAIRS: 'S',
+  /** Stairs with nothing overhead. */
+  OUTDOOR_STAIRS: 's',
   /** An opening in the floor, overlooking the floor below. */
   VOID: '*',
   /** An opening in the floor down to somewhere out of the game, such as stairs to the street. */

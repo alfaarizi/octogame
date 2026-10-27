@@ -141,9 +141,10 @@ function hasCeiling(tile, tileAbove) {
   return FLOOR_TILES.includes(tileAbove);
 }
 
+/** A floor or ceiling. It casts shadows so the flashlight can't shine through it onto the next floor. */
 function createSurface(rects, y, facesUp, material) {
   const surface = new THREE.Mesh(createFlatSurfaceGeometry(rects, y, { facesUp, textureMeters: TEXTURE_METERS }), material);
-  surface.receiveShadow = true;
+  surface.castShadow = surface.receiveShadow = true;
   return surface;
 }
 
