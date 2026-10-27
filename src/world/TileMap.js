@@ -1,3 +1,5 @@
+/** @typedef {import('../types.js').FloorPoint} FloorPoint */
+
 export const Tile = Object.freeze({ WALL: '#', FLOOR: '.', EXIT_DOOR: 'E' });
 
 const BLOCKING_TILES = new Set([Tile.WALL, Tile.EXIT_DOOR]);
@@ -38,7 +40,11 @@ export class TileMap {
     this.#rows.forEach((row, z) => [...row].forEach((tile, x) => visit(tile, x, z)));
   }
 
-  /** True when no solid tile lies on the straight line between two floor points. */
+  /**
+   * @param {FloorPoint} from
+   * @param {FloorPoint} to
+   * @returns {boolean} Whether no solid tile lies on the straight line between the points.
+   */
   hasLineOfSight(from, to) {
     const dx = to.x - from.x, dz = to.z - from.z;
     const samples = Math.ceil(Math.hypot(dx, dz) / SIGHT_SAMPLE_STEP);

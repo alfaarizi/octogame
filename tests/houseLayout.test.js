@@ -4,20 +4,20 @@ import { GAME_CONFIG } from '../src/config/gameConfig.js';
 import {
   BATTERY_SPOTS,
   CANDY_SPOTS,
-  FURNITURE,
   GHOST_SPOTS,
   GHOST_START,
+  OBSTACLES,
   PLAYER_START,
   TILE_ROWS,
 } from '../src/data/houseLayout.js';
+import { planarDistance, pointAlongHeading } from '../src/utils.js';
 import { CollisionWorld } from '../src/world/CollisionWorld.js';
 import { TileMap } from '../src/world/TileMap.js';
 
 // Guards against level-design mistakes: things placed inside walls, or candy you can't reach.
 describe('house layout', () => {
   const map = new TileMap(TILE_ROWS);
-  const obstacles = FURNITURE.map((piece) => piece.footprint).filter(Boolean);
-  const collision = new CollisionWorld(map, obstacles);
+  const collision = new CollisionWorld(map, OBSTACLES);
   const { collisionRadius, pickupRadius } = GAME_CONFIG.player;
 
   test('every spawn point is on a floor tile', () => {
@@ -35,11 +35,11 @@ describe('house layout', () => {
     for (const spot of [...CANDY_SPOTS, ...BATTERY_SPOTS]) {
       const reachable = [0, 1, 2, 3, 4, 5, 6, 7].some((step) => {
         const angle = (step / 8) * Math.PI * 2;
-        const standAt = { x: spot.x + Math.cos(angle) * pickupRadius * 0.9, z: spot.z + Math.sin(angle) * pickupRadius * 0.9 };
+        const standAt = pointAlongHeading(spot, angle, pickupRadius * 0.9);
         if (map.isBlocked(standAt.x, standAt.z)) return false;
         const pushed = { ...standAt };
         collision.resolveCircle(pushed, collisionRadius);
-        return Math.hypot(pushed.x - spot.x, pushed.z - spot.z) < pickupRadius;
+        return planarDistance(pushed, spot) < pickupRadius;
       });
       assert.ok(reachable, `${JSON.stringify(spot)} can't be reached`);
     }

@@ -1,5 +1,7 @@
 import { GameEvent } from '../../core/GameEvent.js';
-import { Cooldown } from '../../utils.js';
+import { Countdown } from '../../utils.js';
+
+/** @typedef {import('../../types.js').Movement} Movement */
 
 const FIRST_STEP_DELAY = 0.1;
 
@@ -8,7 +10,7 @@ export class FootstepCue {
   #events;
   #interval;
   #sprintRate;
-  #cooldown = new Cooldown(FIRST_STEP_DELAY);
+  #countdown = new Countdown(FIRST_STEP_DELAY);
 
   constructor(events, { footstepInterval, sprintFootstepRate }) {
     this.#events = events;
@@ -17,20 +19,20 @@ export class FootstepCue {
   }
 
   reset() {
-    this.#cooldown.restart(FIRST_STEP_DELAY);
+    this.#countdown.restart(FIRST_STEP_DELAY);
   }
 
   /**
    * @param {number} seconds - Time since the last frame.
-   * @param {{ moving: boolean, sprinting: boolean }} movement - The result of Player.update().
+   * @param {Movement} movement
    */
   update(seconds, { moving, sprinting }) {
     if (!moving) {
       this.reset();
       return;
     }
-    if (!this.#cooldown.tick(seconds * (sprinting ? this.#sprintRate : 1))) return;
-    this.#cooldown.restart(this.#interval);
+    if (!this.#countdown.tick(seconds * (sprinting ? this.#sprintRate : 1))) return;
+    this.#countdown.restart(this.#interval);
     this.#events.emit(GameEvent.PLAYER_STEPPED, { sprinting });
   }
 }

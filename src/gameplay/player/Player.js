@@ -1,12 +1,20 @@
-import { clamp } from '../../utils.js';
+import { atHeight, clamp } from '../../utils.js';
 
+/** @typedef {import('../../types.js').FloorPoint} FloorPoint */
+/** @typedef {import('../../types.js').Movement} Movement */
+/** @typedef {import('../../types.js').MovementIntent} MovementIntent */
+/** @typedef {import('../../types.js').Ray} Ray */
+/** @typedef {import('../../types.js').SpawnPoint} SpawnPoint */
+
+/** @type {Movement} */
 export const STANDING_STILL = Object.freeze({ moving: false, sprinting: false });
 
 /**
  * The player's body: where they stand, where they look, and how much sprint is left.
- * Yaw 0 looks down -z; positive yaw turns left.
+ * Satisfies the Pose type; yaw 0 looks down -z and positive yaw turns left.
  */
 export class Player {
+  /** @type {FloorPoint} */
   position = { x: 0, z: 0 };
   yaw = 0;
   pitch = 0;
@@ -14,6 +22,7 @@ export class Player {
   #collisionWorld;
   #stamina = 1;
   #isWinded = false;
+  /** @type {Movement} */
   #movement = STANDING_STILL;
 
   constructor(config, collisionWorld) {
@@ -26,10 +35,21 @@ export class Player {
     return this.#stamina;
   }
 
+  /** How the player moved in the last update. */
   get movement() {
     return this.#movement;
   }
 
+  /** @returns {Ray} The player's line of sight, from eye height along the view direction. */
+  get sight() {
+    const horizontal = Math.cos(this.pitch);
+    return {
+      origin: atHeight(this.position, this.#config.eyeHeight),
+      direction: { x: -Math.sin(this.yaw) * horizontal, y: Math.sin(this.pitch), z: -Math.cos(this.yaw) * horizontal },
+    };
+  }
+
+  /** @param {SpawnPoint} spawn */
   respawn({ x, z, yaw }) {
     this.position.x = x;
     this.position.z = z;
@@ -49,9 +69,8 @@ export class Player {
 
   /**
    * @param {number} seconds - Time since the last frame.
-   * @param {{ forward: number, strafe: number, turn: number, sprint: boolean }} intent - What the player is asking for.
-   *   `forward`, `strafe` and `turn` are -1, 0 or 1 (strafe +1 is right, turn +1 is left).
-   * @returns {{ moving: boolean, sprinting: boolean }} How the player actually moved.
+   * @param {MovementIntent} intent
+   * @returns {Movement}
    */
   update(seconds, intent) {
     this.yaw += intent.turn * this.#config.keyboardTurnSpeed * seconds;

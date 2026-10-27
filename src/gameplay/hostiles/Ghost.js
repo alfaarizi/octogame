@@ -1,11 +1,14 @@
 import { GameEvent } from '../../core/GameEvent.js';
-import { headingTo, planarDistance } from '../../utils.js';
+import { Countdown, headingTo, planarDistance } from '../../utils.js';
 import { GhostState, PRESENT_GHOST_STATES } from './GhostState.js';
+
+/** @typedef {import('../../types.js').FloorPoint} FloorPoint */
+/** @typedef {import('./GhostState.js').GhostStateName} GhostStateName */
 
 /**
  * What the ghost needs to know each frame.
  * @typedef {object} GhostSituation
- * @property {{ x: number, z: number }} playerPosition - Where the player stands on the floor plan.
+ * @property {FloorPoint} playerPosition
  * @property {boolean} playerLightOn - Whether the flashlight is lit; a lit one can be seen from much farther away.
  * @property {boolean} isLit - Whether the beam is on the ghost right now.
  * @property {number} candiesCollected - Candies found so far; each one makes the ghost hunt faster.
@@ -18,6 +21,7 @@ import { GhostState, PRESENT_GHOST_STATES } from './GhostState.js';
  *   DORMANT --wake--> WANDERING <-> HUNTING <-> FROZEN --enough light--> BANISHED --respawn--> WANDERING / HUNTING
  */
 export class Ghost {
+  /** @type {FloorPoint} */
   position = { x: 0, z: 0 };
   /** Direction it last drifted, in radians (0 faces +z). */
   heading = 0;
@@ -25,13 +29,15 @@ export class Ghost {
   #tileMap;
   #spawnTable;
   #events;
+  /** @type {GhostStateName} */
   #state = GhostState.DORMANT;
-  /** Seconds until DORMANT wakes or BANISHED respawns. */
-  #stateCountdown = Infinity;
+  /** Runs while DORMANT (until it wakes) and while BANISHED (until it respawns). */
+  #stateTimer = new Countdown(Infinity);
   /** Seconds spent in the beam; drains while unlit. */
   #exposure = 0;
   #outOfSightTime = 0;
   #isEnraged = false;
+  /** @type {FloorPoint} */
   #wanderTarget = { x: 0, z: 0 };
 
   constructor({ config, tileMap, spawnTable, events }) {
@@ -54,27 +60,24 @@ export class Ghost {
     return this.#isEnraged;
   }
 
+  /** Puts the ghost to sleep at `spawnPoint` until `dormantSeconds` have passed. */
   reset(spawnPoint, dormantSeconds) {
-    this.position.x = spawnPoint.x;
-    this.position.z = spawnPoint.z;
-    this.#state = GhostState.DORMANT;
-    this.#stateCountdown = dormantSeconds;
-    this.#exposure = 0;
-    this.#outOfSightTime = 0;
+    this.#appearAt(spawnPoint, GhostState.DORMANT);
+    this.#stateTimer.restart(dormantSeconds);
     this.#isEnraged = false;
   }
 
   /** Takes the ghost out of play between rounds. */
   deactivate() {
     this.#state = GhostState.DORMANT;
-    this.#stateCountdown = Infinity;
+    this.#stateTimer.restart(Infinity);
   }
 
   /** After the last candy: faster, never gives up, and comes back sooner if it's away. */
   enrage() {
     this.#isEnraged = true;
     if (this.#state === GhostState.DORMANT || this.#state === GhostState.BANISHED) {
-      this.#stateCountdown = Math.min(this.#stateCountdown, this.#config.enragedRespawnDelay);
+      this.#stateTimer.restart(Math.min(this.#stateTimer.remaining, this.#config.enragedRespawnDelay));
     } else if (this.#state === GhostState.WANDERING) {
       this.#state = GhostState.HUNTING;
     }
@@ -91,16 +94,16 @@ export class Ghost {
   }
 
   #updateDormant(seconds) {
-    if (!this.#countDown(seconds)) return;
+    if (!this.#stateTimer.tick(seconds)) return;
     this.#appearAt(this.position, GhostState.WANDERING);
-    this.#events.emit(GameEvent.GHOST_WOKE, { position: { ...this.position } });
+    this.#announce(GameEvent.GHOST_WOKE);
   }
 
   #updateBanished(seconds, situation) {
-    if (!this.#countDown(seconds)) return;
+    if (!this.#stateTimer.tick(seconds)) return;
     const spot = this.#spawnTable.ghostSpotFarFrom(situation.playerPosition);
     this.#appearAt(spot, this.#isEnraged ? GhostState.HUNTING : GhostState.WANDERING);
-    this.#events.emit(GameEvent.GHOST_RESPAWNED);
+    this.#announce(GameEvent.GHOST_RESPAWNED);
   }
 
   #updatePresent(seconds, situation) {
@@ -109,12 +112,6 @@ export class Ghost {
     if (this.#state === GhostState.WANDERING) this.#wander(seconds, situation, distance);
     if (this.#state === GhostState.HUNTING) this.#hunt(seconds, situation, distance);
     if (distance < this.#config.catchDistance) this.#events.emit(GameEvent.PLAYER_CAUGHT);
-  }
-
-  /** Returns true once the state countdown has run out. */
-  #countDown(seconds) {
-    this.#stateCountdown -= seconds;
-    return this.#stateCountdown <= 0;
   }
 
   /** Freezes while lit and builds up exposure. Returns true if the light just banished it. */
@@ -128,8 +125,8 @@ export class Ghost {
     this.#exposure += seconds;
     if (this.#exposure < this.#config.banishExposure) return false;
     this.#state = GhostState.BANISHED;
-    this.#stateCountdown = this.#config.respawnDelay;
-    this.#events.emit(GameEvent.GHOST_BANISHED, { position: { ...this.position } });
+    this.#stateTimer.restart(this.#config.respawnDelay);
+    this.#announce(GameEvent.GHOST_BANISHED);
     return true;
   }
 
@@ -150,7 +147,7 @@ export class Ghost {
   #startHunting() {
     this.#state = GhostState.HUNTING;
     this.#outOfSightTime = 0;
-    this.#events.emit(GameEvent.GHOST_SPOTTED_PLAYER, { position: { ...this.position } });
+    this.#announce(GameEvent.GHOST_SPOTTED_PLAYER);
   }
 
   #hunt(seconds, situation, distance) {
@@ -193,5 +190,10 @@ export class Ghost {
     this.#exposure = 0;
     this.#outOfSightTime = 0;
     this.#wanderTarget = this.#spawnTable.randomGhostSpot();
+  }
+
+  /** Emits `type` with a copy of where the ghost is now. */
+  #announce(type) {
+    this.#events.emit(type, { position: { ...this.position } });
   }
 }

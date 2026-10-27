@@ -1,11 +1,19 @@
 import { randomWalk } from '../utils.js';
 
+/** @typedef {import('../types.js').Point3} Point3 */
+
 const LAUGH = Object.freeze({ syllables: 5, spacing: 0.17, length: 0.13, pitch: 300, pitchDrop: 0.07, vowel: 800 });
 const SCREAM = Object.freeze({ duration: 1.5, release: 0.5, volume: 0.7 });
-const SCREAM_VOICES = Object.freeze([[620, 'sawtooth'], [930, 'square'], [1240, 'sawtooth'], [455, 'triangle']]);
+/** @type {readonly { frequency: number, waveform: OscillatorType }[]} */
+const SCREAM_VOICES = Object.freeze([
+  { frequency: 620, waveform: 'sawtooth' },
+  { frequency: 930, waveform: 'square' },
+  { frequency: 1240, waveform: 'sawtooth' },
+  { frequency: 455, waveform: 'triangle' },
+]);
 const CREAK_PITCH_WALK = Object.freeze({ steps: 16, min: 50, max: 220, maxStep: 40, upwardBias: 0.1 });
 
-/** Every one-off sound effect, synthesized from AudioEngine voices. Positions are { x, y, z }. */
+/** Every one-off sound effect, synthesized from AudioEngine voices. Every `position` is a Point3. */
 export class SoundLibrary {
   #engine;
   #screamSample = null;
@@ -148,7 +156,7 @@ export class SoundLibrary {
     });
     distortion.connect(envelope).connect(engine.master);
 
-    for (const [baseFrequency, waveform] of SCREAM_VOICES) {
+    for (const { frequency: baseFrequency, waveform } of SCREAM_VOICES) {
       const voice = engine.createOscillator(waveform, baseFrequency);
       voice.frequency.setValueAtTime(baseFrequency * 0.7, startTime);
       voice.frequency.exponentialRampToValueAtTime(baseFrequency * 1.25, startTime + 0.25);

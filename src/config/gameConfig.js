@@ -1,8 +1,8 @@
-import { deepFreeze } from '../utils.js';
+import { deepFreeze, degreesToRadians } from '../utils.js';
 
 /**
  * Every value worth tweaking after a playtest.
- * Distances are meters (one map tile is 1 m), durations are seconds, angles are radians unless named otherwise.
+ * Distances are meters (one map tile is 1 m), durations are seconds and angles are radians.
  */
 export const GAME_CONFIG = deepFreeze({
   round: {
@@ -40,11 +40,10 @@ export const GAME_CONFIG = deepFreeze({
     batteryPickupCharge: 0.4,
     lowBatteryLevel: 0.2,
     intensity: 45,
-    range: 20,
-    /** About 26 degrees. */
-    coneAngle: 0.45,
-    freezeAngleDegrees: 18,
-    freezeRange: 10,
+    /** How wide and far the light reaches (about 26 degrees from the center). */
+    beamCone: { halfAngle: 0.45, range: 20 },
+    /** Where the light is strong enough to freeze the ghost. */
+    freezeCone: { halfAngle: degreesToRadians(18), range: 10 },
   },
 
   ghost: {
@@ -103,7 +102,7 @@ export const GAME_CONFIG = deepFreeze({
 
   ui: {
     /** So a panicked click after the jump scare doesn't skip the result. */
-    resultInputDelayMs: 1200,
+    resultInputDelay: 1.2,
     leaderboardSize: 10,
   },
 });

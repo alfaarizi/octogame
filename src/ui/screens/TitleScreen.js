@@ -4,12 +4,14 @@ import { UiPanel } from '../UiPanel.js';
 import { LeaderboardList } from './LeaderboardList.js';
 
 /** @typedef {import('../../gameplay/round/Round.js').RoundResult} RoundResult */
+/** @typedef {import('../../types.js').Session} Session */
 
 /** Name entry, chicken mode, how-to-play and the leaderboard. */
 export class TitleScreen extends UiPanel {
-  #nameInput = requireElement('name');
-  #chickenModeToggle = requireElement('chicken');
+  #nameInput = /** @type {HTMLInputElement} */ (requireElement('name'));
+  #chickenModeToggle = /** @type {HTMLInputElement} */ (requireElement('chicken'));
   #leaderboard;
+  /** @type {(session: Session) => void} */
   #onStart = () => {};
 
   constructor({ candiesRequired, leaderboardSize }) {
@@ -24,20 +26,21 @@ export class TitleScreen extends UiPanel {
     });
   }
 
-  /** @param {(session: { playerName: string, chickenMode: boolean }) => void} listener - Called when a round should start. */
+  /** @param {(session: Session) => void} listener - Called when a round should start. */
   onStart(listener) {
     this.#onStart = listener;
   }
 
   /**
-   * @param {{ playerName?: string, chickenMode?: boolean }} prefill - Values to put in the form.
+   * Fills in the form and the leaderboard, then shows the screen.
+   * @param {Partial<Session>} prefill - Values to put in the form.
    * @param {RoundResult[]} rankedResults - The leaderboard, best first.
    */
-  show({ playerName = '', chickenMode = false }, rankedResults) {
+  open({ playerName = '', chickenMode = false }, rankedResults) {
     this.#nameInput.value = playerName;
     this.#chickenModeToggle.checked = chickenMode;
     this.#leaderboard.render(rankedResults);
-    super.show();
+    this.show();
     this.#nameInput.focus();
   }
 }

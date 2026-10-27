@@ -1,5 +1,9 @@
 import { planarDistance, randomItem, shuffled } from '../utils.js';
 
+/** @typedef {import('../types.js').CandySpot} CandySpot */
+/** @typedef {import('../types.js').FloorPoint} FloorPoint */
+/** @typedef {import('../types.js').Point3} Point3 */
+
 const FAR_SPOT_CHOICES = 2;
 
 /** Chooses where candies, batteries and the ghost appear each round. */
@@ -9,6 +13,13 @@ export class SpawnTable {
   #ghostSpots;
   #maxCandiesPerRoom;
 
+  /**
+   * @param {object} spots
+   * @param {readonly CandySpot[]} spots.candySpots
+   * @param {readonly Point3[]} spots.batterySpots
+   * @param {readonly FloorPoint[]} spots.ghostSpots
+   * @param {number} [spots.maxCandiesPerRoom]
+   */
   constructor({ candySpots, batterySpots, ghostSpots, maxCandiesPerRoom = 2 }) {
     this.#candySpots = candySpots;
     this.#batterySpots = batterySpots;
@@ -38,7 +49,11 @@ export class SpawnTable {
     return randomItem(this.#ghostSpots);
   }
 
-  /** One of the ghost spots farthest from `position`, picked at random so respawns aren't predictable. */
+  /**
+   * One of the ghost spots farthest from `position`, picked at random so respawns aren't predictable.
+   * @param {FloorPoint} position
+   * @returns {FloorPoint}
+   */
   ghostSpotFarFrom(position) {
     const farthestFirst = [...this.#ghostSpots].sort((a, b) => planarDistance(b, position) - planarDistance(a, position));
     return randomItem(farthestFirst.slice(0, FAR_SPOT_CHOICES));

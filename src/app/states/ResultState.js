@@ -20,16 +20,16 @@ export class ResultState {
   }
 
   enter() {
-    const { persistence, pointerLock, ui, views, world } = this.#context;
+    const { persistence, pointerLock, simulation, ui, views } = this.#context;
     pointerLock.release();
-    world.ghost.deactivate();
+    simulation.endRound();
     views.ghost.hide();
     // Undo any jump-scare shake.
-    views.firstPerson.update(0, world.player, STANDING_STILL);
-    views.firstPerson.setBeamBrightness(world.flashlight.brightness);
+    views.firstPerson.update(0, simulation.player, STANDING_STILL);
+    views.firstPerson.setBeamBrightness(simulation.flashlight.brightness);
     ui.hud.hide();
     const { rank, ranked } = persistence.scores.record(this.#result);
-    ui.result.show(this.#result, rank, ranked);
+    ui.result.open(this.#result, rank, ranked);
     if (this.#result.escaped) ui.effects.flash(FlashColor.ESCAPED, ESCAPE_FLASH_SECONDS);
   }
 

@@ -1,3 +1,5 @@
+/** @typedef {import('../types.js').Session} Session */
+
 const STORAGE_KEY = 'flashlight-haunt-prefs';
 
 /**
@@ -11,7 +13,7 @@ export class PreferencesRepository {
     this.#store = store;
   }
 
-  /** @returns {{ playerName: string, chickenMode: boolean }} */
+  /** @returns {Session} */
   load() {
     const stored = this.#store.read(STORAGE_KEY, {});
     const isObject = stored && typeof stored === 'object';
@@ -21,6 +23,7 @@ export class PreferencesRepository {
     };
   }
 
+  /** @param {Session} session */
   save({ playerName, chickenMode }) {
     this.#store.write(STORAGE_KEY, { name: playerName, chicken: chickenMode });
   }

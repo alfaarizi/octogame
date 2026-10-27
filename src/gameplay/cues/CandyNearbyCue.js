@@ -1,12 +1,14 @@
 import { GameEvent } from '../../core/GameEvent.js';
-import { Cooldown } from '../../utils.js';
+import { Countdown } from '../../utils.js';
+
+/** @typedef {import('../pickups/PickupField.js').NearestPickup} NearestPickup */
 
 /** While the player is close to a candy, announces it every so often (heard as a sparkle). */
 export class CandyNearbyCue {
   #events;
   #range;
   #interval;
-  #cooldown = new Cooldown();
+  #countdown = new Countdown();
 
   constructor(events, { candySparkleRange, candySparkleInterval }) {
     this.#events = events;
@@ -15,17 +17,17 @@ export class CandyNearbyCue {
   }
 
   reset() {
-    this.#cooldown.restart(0);
+    this.#countdown.restart(0);
   }
 
   /**
    * @param {number} seconds - Time since the last frame.
-   * @param {{ item: object, distance: number } | null} nearestCandy - The result of PickupField.nearest().
+   * @param {NearestPickup | null} nearestCandy - The result of PickupField.nearest().
    */
   update(seconds, nearestCandy) {
     if (!nearestCandy || nearestCandy.distance >= this.#range) return;
-    if (!this.#cooldown.tick(seconds)) return;
-    this.#cooldown.restart(this.#interval);
+    if (!this.#countdown.tick(seconds)) return;
+    this.#countdown.restart(this.#interval);
     this.#events.emit(GameEvent.CANDY_NEARBY, { position: nearestCandy.item.position });
   }
 }

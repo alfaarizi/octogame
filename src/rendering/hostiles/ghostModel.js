@@ -7,6 +7,7 @@ export const GHOST_PROFILE = Object.freeze([
 export const GHOST_SEGMENTS = 32;
 export const GHOST_EYE_HEIGHT = 1.46;
 export const GHOST_OPACITY = 0.85;
+export const GHOST_GLOW_COLOR = 0x9fb4cc;
 export const MOUTH_HEIGHT = Object.freeze({ resting: 1.6, frozen: 2.3, screaming: 2.6 });
 
 /**
@@ -21,7 +22,7 @@ export function createGhostModel(glow) {
   const bodyGeometry = new THREE.LatheGeometry(GHOST_PROFILE.map(([radius, y]) => new THREE.Vector2(radius, y)), GHOST_SEGMENTS);
   const bodyMaterial = new THREE.MeshStandardMaterial({
     color: 0xe9eef6,
-    emissive: 0x9fb4cc,
+    emissive: GHOST_GLOW_COLOR,
     emissiveIntensity: glow,
     roughness: 0.6,
     transparent: true,

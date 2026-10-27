@@ -1,3 +1,6 @@
+/** @typedef {import('../types.js').Point3} Point3 */
+/** @typedef {import('../types.js').Ray} Ray */
+
 const NOISE_BUFFER_SECONDS = 2;
 /** Exponential ramps can't reach exactly 0, so they ramp to this instead. */
 const SILENCE = 0.0001;
@@ -73,28 +76,32 @@ export class AudioEngine {
     this.#context?.resume();
   }
 
-  setListenerPose(position, forward) {
+  /** @param {Ray} ears - Where the listener is and which way they face. */
+  setListener({ origin, direction }) {
     const listener = this.#context.listener;
     if (listener.positionX) {
-      listener.positionX.value = position.x;
-      listener.positionY.value = position.y;
-      listener.positionZ.value = position.z;
-      listener.forwardX.value = forward.x;
-      listener.forwardY.value = forward.y;
-      listener.forwardZ.value = forward.z;
+      listener.positionX.value = origin.x;
+      listener.positionY.value = origin.y;
+      listener.positionZ.value = origin.z;
+      listener.forwardX.value = direction.x;
+      listener.forwardY.value = direction.y;
+      listener.forwardZ.value = direction.z;
       listener.upX.value = 0;
       listener.upY.value = 1;
       listener.upZ.value = 0;
     } else {
       // Older Safari only has the deprecated setters.
-      listener.setPosition(position.x, position.y, position.z);
-      listener.setOrientation(forward.x, forward.y, forward.z, 0, 1, 0);
+      listener.setPosition(origin.x, origin.y, origin.z);
+      listener.setOrientation(direction.x, direction.y, direction.z, 0, 1, 0);
     }
   }
 
   // ---- Nodes ----
 
-  /** A 3D output at `position` (or wherever it's moved later) that sounds can be routed into. */
+  /**
+   * A 3D output at `position` (or wherever it's moved later) that sounds can be routed into.
+   * @param {Point3 | null} [position]
+   */
   createSpatialOutput(position = null) {
     const panner = this.#context.createPanner();
     Object.assign(panner, SPATIAL_SETTINGS);
@@ -103,7 +110,11 @@ export class AudioEngine {
     return panner;
   }
 
-  /** A 3D output for a one-off sound, disconnected once the sound is over. */
+  /**
+   * A 3D output for a one-off sound, disconnected once the sound is over.
+   * @param {Point3} position
+   * @param {number} lifetimeSeconds
+   */
   createTemporarySpatialOutput(position, lifetimeSeconds) {
     const panner = this.createSpatialOutput(position);
     setTimeout(() => panner.disconnect(), (lifetimeSeconds + 0.5) * 1000);
@@ -168,11 +179,10 @@ export class AudioEngine {
    * @param {SoundShape & { waveform?: OscillatorType, frequency: number, endFrequency?: number, frequencyCurve?: Float32Array }} sound
    */
   playTone({ waveform = 'sine', frequency, endFrequency = frequency, frequencyCurve = null, ...shape }) {
-    const startTime = this.now + (shape.delay ?? 0);
     const oscillator = this.createOscillator(waveform, frequency);
+    const startTime = this.#schedule(oscillator, shape);
     if (frequencyCurve) oscillator.frequency.setValueCurveAtTime(frequencyCurve, startTime, shape.duration);
     else glide(oscillator.frequency, frequency, endFrequency, startTime, shape.duration);
-    this.#schedule(oscillator, startTime, shape);
   }
 
   /**
@@ -180,8 +190,7 @@ export class AudioEngine {
    * @param {SoundShape} shape - How the noise is played.
    */
   playNoise(shape) {
-    const startTime = this.now + (shape.delay ?? 0);
-    this.#schedule(this.#createNoiseSource(), startTime, shape, Math.random());
+    this.#schedule(this.#createNoiseSource(), shape, Math.random());
   }
 
   /** Loads the first of `paths` that exists and decodes. Resolves to null if none do. */
@@ -205,8 +214,16 @@ export class AudioEngine {
     source.start();
   }
 
-  /** Wires source -> (filter) -> envelope -> output, starts it at `startTime` and stops it once faded. */
-  #schedule(source, startTime, { duration, volume = 0.3, attack = 0.005, filter = null, output = this.#master }, startOffset = 0) {
+  /**
+   * Wires source -> (filter) -> envelope -> output, starts it after the shape's delay and stops it once faded.
+   * @param {OscillatorNode | AudioBufferSourceNode} source
+   * @param {SoundShape} shape
+   * @param {number} [startOffset] - Seconds into a buffer source to start from.
+   * @returns {number} The context time the sound starts at.
+   */
+  #schedule(source, { duration, volume = 0.3, attack = 0.005, delay = 0, filter = null, output = this.#master }, startOffset = 0) {
+    const startTime = this.now + delay;
+    /** @type {AudioNode} */
     let signal = source;
     if (filter) {
       const { type, frequency, endFrequency = frequency, resonance = 1 } = filter;
@@ -217,6 +234,7 @@ export class AudioEngine {
     signal.connect(this.createEnvelope(startTime, { volume, attack, duration })).connect(output);
     source.start(startTime, startOffset);
     source.stop(startTime + duration + TAIL_SECONDS);
+    return startTime;
   }
 
   #createNoiseSource() {
@@ -240,6 +258,10 @@ function glide(param, from, to, startTime, duration) {
   if (to !== from) param.exponentialRampToValueAtTime(to, startTime + duration);
 }
 
+/**
+ * @param {PannerNode} node
+ * @param {Point3} position
+ */
 export function setNodePosition(node, { x, y, z }) {
   if (node.positionX) {
     node.positionX.value = x;

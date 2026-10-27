@@ -6,6 +6,26 @@
 
 import { deepFreeze } from '../utils.js';
 
+/** @typedef {import('../types.js').Box} Box */
+/** @typedef {import('../types.js').CandySpot} CandySpot */
+/** @typedef {import('../types.js').FloorPoint} FloorPoint */
+/** @typedef {import('../types.js').Point3} Point3 */
+/** @typedef {import('../types.js').Rect} Rect */
+/** @typedef {import('../types.js').SpawnPoint} SpawnPoint */
+
+/** @typedef {Box & { color: number }} FurniturePart */
+
+/**
+ * A piece of furniture: its `footprint` is what the player bumps into (null for flat things like rugs),
+ * and its `parts` are the boxes it's drawn with.
+ * @typedef {{ name: string, footprint: Rect | null, parts: FurniturePart[] }} FurniturePiece
+ */
+
+/**
+ * A jack-o'-lantern: where it sits, and the point its carved face turns toward.
+ * @typedef {Point3 & { facing: FloorPoint }} Lantern
+ */
+
 export const WALL_HEIGHT = 2.8;
 
 /** One character per tile: # wall, . floor, E front door (solid; you escape by reaching it once it unlocks). */
@@ -31,9 +51,12 @@ export const TILE_ROWS = deepFreeze([
   '#############EE#############',
 ]);
 
+/** @type {SpawnPoint} */
 export const PLAYER_START = deepFreeze({ x: 14, z: 16.6, yaw: 0 });
+/** @type {FloorPoint} */
 export const GHOST_START = deepFreeze({ x: 23, z: 4.5 });
 
+/** @type {import('../world/ExitDoor.js').ExitDoorPlacement & { wallZ: number, width: number, height: number }} */
 export const EXIT_DOOR = deepFreeze({
   centerX: 14,
   /** Inner face of the south wall. */
@@ -70,10 +93,16 @@ const Color = deepFreeze({
   LIVING_RUG: 0x1f2a3a,
 });
 
-/** A box spanning x0 to x1 and z0 to z1 on the floor plan, and y0 to y1 in height. */
+/**
+ * A box spanning x0 to x1 and z0 to z1 on the floor plan, and y0 to y1 in height.
+ * @returns {FurniturePart}
+ */
 const box = (x0, z0, x1, z1, y0, y1, color) => ({ x0, z0, x1, z1, y0, y1, color });
 
-/** A floor-plan rectangle: what the player bumps into. */
+/**
+ * A floor-plan rectangle: what the player bumps into.
+ * @returns {Rect}
+ */
 const area = (x0, z0, x1, z1) => ({ x0, z0, x1, z1 });
 
 /** A table top on four legs. */
@@ -89,7 +118,7 @@ function table(x0, z0, x1, z1, height, color) {
   ];
 }
 
-/** Each piece: a name, its `footprint` (null for flat things like rugs) and the boxes it's drawn with. */
+/** @type {readonly FurniturePiece[]} */
 export const FURNITURE = deepFreeze([
   // Bedroom
   { name: 'bed', footprint: area(1.1, 1.0, 3.5, 3.6), parts: [
@@ -183,12 +212,16 @@ export const FURNITURE = deepFreeze([
   { name: 'living room rug', footprint: null, parts: [box(20.5, 13.2, 25.5, 16.4, 0, 0.012, Color.LIVING_RUG)] },
 ]);
 
+/** @type {readonly Rect[]} */
+export const OBSTACLES = deepFreeze(FURNITURE.map((piece) => piece.footprint).filter(Boolean));
+
+/** @type {{ embers: Box, light: Point3 }} */
 export const FIREPLACE = deepFreeze({
-  embers: { x: 26.2, y: 0.11, z: 14.5, width: 0.16, height: 0.12, depth: 0.7 },
+  embers: { x0: 26.12, z0: 14.15, x1: 26.28, z1: 14.85, y0: 0.05, y1: 0.17 },
   light: { x: 25.85, y: 0.45, z: 14.5 },
 });
 
-/** Jack-o'-lanterns: where each sits, and the point its carved face turns toward. */
+/** @type {readonly Lantern[]} */
 export const LANTERNS = deepFreeze([
   // Foyer side table
   { x: 17.4, y: 0.85, z: 12.45, facing: { x: 14, z: 15 } },
@@ -198,10 +231,16 @@ export const LANTERNS = deepFreeze([
   { x: 8.5, y: 0.85, z: 8.3, facing: { x: 8.5, z: 10 } },
 ]);
 
-/** Portraits hang on south-facing wall faces at these points. */
+/**
+ * Portraits hang on south-facing wall faces at these points.
+ * @type {readonly FloorPoint[]}
+ */
 export const PORTRAITS = deepFreeze([{ x: 11, z: 8.0 }, { x: 20.5, z: 8.0 }, { x: 11.5, z: 12.0 }]);
 
-/** Candy hiding spots; each round picks a few, at most two per room. `y` is the height it floats at. */
+/**
+ * Candy hiding spots; each round picks a few, at most two per room. `y` is the height it floats at.
+ * @type {readonly CandySpot[]}
+ */
 export const CANDY_SPOTS = deepFreeze([
   { room: 'bedroom', x: 3.1, y: 0.64, z: 2.8 },
   { room: 'bedroom', x: 4.0, y: 0.68, z: 1.3 },
@@ -219,6 +258,7 @@ export const CANDY_SPOTS = deepFreeze([
   { room: 'living room', x: 26.55, y: 1.38, z: 14.0 },
 ]);
 
+/** @type {readonly Point3[]} */
 export const BATTERY_SPOTS = deepFreeze([
   { x: 7.0, y: 0.25, z: 17.3 },
   { x: 6.5, y: 0.25, z: 5.5 },
@@ -228,7 +268,10 @@ export const BATTERY_SPOTS = deepFreeze([
   { x: 20.0, y: 0.25, z: 13.0 },
 ]);
 
-/** Where the ghost can appear and drift between. None are in the foyer, where you start. */
+/**
+ * Where the ghost can appear and drift between. None are in the foyer, where you start.
+ * @type {readonly FloorPoint[]}
+ */
 export const GHOST_SPOTS = deepFreeze([
   { x: 5, z: 4.5 },
   { x: 14, z: 4 },

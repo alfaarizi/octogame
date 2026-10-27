@@ -6,7 +6,7 @@ export function installTestHarness(game, context) {
   window.__test = Object.freeze({
     game,
     context,
-    world: context.world,
+    simulation: context.simulation,
     startRound: (playerName = 'Tester', chickenMode = false) => game.startRound({ playerName, chickenMode }),
   });
 }

@@ -54,12 +54,11 @@ describe('Flashlight', () => {
 });
 
 describe('FlashlightBeam', () => {
-  const eye = { x: 1.5, y: 1.6, z: 1.5 };
-  const east = { x: 1, y: 0, z: 0 };
+  const lookingEast = (z) => ({ origin: { x: 1.5, y: 1.6, z }, direction: { x: 1, y: 0, z: 0 } });
 
   test("walls block the beam even when the target's in the cone", () => {
-    const beam = new FlashlightBeam(new TileMap(SMALL_ROOM), config);
-    assert.equal(beam.illuminates(eye, east, { x: 6.5, y: 1.3, z: 1.5 }, 0.35), true);
-    assert.equal(beam.illuminates({ ...eye, z: 2.5 }, east, { x: 6.5, y: 1.3, z: 2.5 }, 0.35), false);
+    const beam = new FlashlightBeam(new TileMap(SMALL_ROOM), config.freezeCone);
+    assert.equal(beam.illuminates(lookingEast(1.5), { x: 6.5, y: 1.3, z: 1.5 }, 0.35), true);
+    assert.equal(beam.illuminates(lookingEast(2.5), { x: 6.5, y: 1.3, z: 2.5 }, 0.35), false);
   });
 });

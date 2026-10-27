@@ -1,8 +1,11 @@
 import { ListenerSet } from '../utils.js';
 
+/** @typedef {import('../types.js').PointerLock} PointerLock */
+
 /**
  * Stand-in for BrowserPointerLock in automated browser tests, where real pointer lock is refused.
  * Requests are granted at once, and release() plays the part of the player pressing Esc.
+ * @implements {PointerLock}
  */
 export class SimulatedPointerLock {
   #isLocked = false;

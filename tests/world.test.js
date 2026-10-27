@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import { describe, test } from 'node:test';
+import { EXIT_DOOR } from '../src/data/houseLayout.js';
 import { CollisionWorld } from '../src/world/CollisionWorld.js';
 import { ExitDoor } from '../src/world/ExitDoor.js';
 import { SpawnTable } from '../src/world/SpawnTable.js';
@@ -76,7 +77,7 @@ describe('SpawnTable', () => {
 
 describe('ExitDoor', () => {
   test('only counts as reached once unlocked', () => {
-    const door = new ExitDoor({ centerX: 14, trigger: { minZ: 16.9, halfWidth: 1.3 } });
+    const door = new ExitDoor(EXIT_DOOR);
     const atDoor = { x: 14, z: 17.5 };
     assert.equal(door.isReachedBy(atDoor), false);
     door.unlock();

@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { describe, test } from 'node:test';
 import { GameEvent } from '../src/core/GameEvent.js';
+import { EXIT_DOOR } from '../src/data/houseLayout.js';
 import { measureThreat } from '../src/gameplay/hostiles/threat.js';
 import { PickupField, PickupKind } from '../src/gameplay/pickups/PickupField.js';
 import { compareResults, rankResults } from '../src/gameplay/round/leaderboardRanking.js';
@@ -12,7 +13,7 @@ import { recordingEventBus } from './helpers.js';
 describe('Round', () => {
   test('opens the exit exactly once, when the last candy is collected', () => {
     const recorder = recordingEventBus();
-    const exitDoor = new ExitDoor({ centerX: 14, trigger: { minZ: 16.9, halfWidth: 1.3 } });
+    const exitDoor = new ExitDoor(EXIT_DOOR);
     const round = new Round({ events: recorder.bus, exitDoor, candiesRequired: 3 });
     round.start();
     round.recordCandy();
@@ -25,7 +26,7 @@ describe('Round', () => {
   });
 
   test('starting a new round relocks the door and resets the count', () => {
-    const exitDoor = new ExitDoor({ centerX: 14, trigger: { minZ: 16.9, halfWidth: 1.3 } });
+    const exitDoor = new ExitDoor(EXIT_DOOR);
     const round = new Round({ events: recordingEventBus().bus, exitDoor, candiesRequired: 1 });
     round.start();
     round.recordCandy();
@@ -37,7 +38,7 @@ describe('Round', () => {
   });
 
   test('summarizes the outcome', () => {
-    const exitDoor = new ExitDoor({ centerX: 14, trigger: { minZ: 16.9, halfWidth: 1.3 } });
+    const exitDoor = new ExitDoor(EXIT_DOOR);
     const round = new Round({ events: recordingEventBus().bus, exitDoor, candiesRequired: 5 });
     round.start();
     round.tick(42);

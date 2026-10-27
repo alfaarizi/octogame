@@ -1,3 +1,6 @@
+/** @typedef {import('../types.js').FloorPoint} FloorPoint */
+/** @typedef {import('../types.js').Rect} Rect */
+
 const RESOLVE_PASSES = 2;
 
 /** Keeps round bodies (the player) out of walls and furniture by pushing them back out. */
@@ -7,14 +10,18 @@ export class CollisionWorld {
 
   /**
    * @param {import('./TileMap.js').TileMap} tileMap - The house's walls.
-   * @param {{ x0: number, z0: number, x1: number, z1: number }[]} obstacles - Floor-plan rectangles, such as furniture.
+   * @param {readonly Rect[]} obstacles - Floor-plan rectangles, such as furniture.
    */
   constructor(tileMap, obstacles) {
     this.#tileMap = tileMap;
     this.#obstacles = obstacles;
   }
 
-  /** Moves `position` (in place) until a circle of `radius` around it overlaps nothing solid. */
+  /**
+   * Moves `position` (in place) until a circle of `radius` around it overlaps nothing solid.
+   * @param {FloorPoint} position
+   * @param {number} radius
+   */
   resolveCircle(position, radius) {
     for (let pass = 0; pass < RESOLVE_PASSES; pass++) {
       this.#resolveAgainstWalls(position, radius);
@@ -34,6 +41,11 @@ export class CollisionWorld {
   }
 }
 
+/**
+ * @param {FloorPoint} position - Moved in place.
+ * @param {number} radius
+ * @param {Rect} rect
+ */
 function pushCircleOutOfRect(position, radius, { x0, z0, x1, z1 }) {
   const nearestX = Math.max(x0, Math.min(position.x, x1));
   const nearestZ = Math.max(z0, Math.min(position.z, z1));

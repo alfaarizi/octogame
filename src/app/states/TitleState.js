@@ -1,5 +1,8 @@
 import { STANDING_STILL } from '../../gameplay/player/Player.js';
 
+/** @typedef {import('../../types.js').Pose} Pose */
+/** @typedef {import('../../types.js').Session} Session */
+
 const IDLE_LOOK = Object.freeze({ yawRate: 0.18, yawSwing: 0.7, pitch: -0.08, pitchRate: 0.11, pitchSwing: 0.05 });
 
 /** The title screen, over the dark foyer with the camera slowly looking around. */
@@ -10,7 +13,7 @@ export class TitleState {
 
   /**
    * @param {object} context - The objects built by createGameContext().
-   * @param {{ playerName: string, chickenMode: boolean }} prefill - Values to put in the form.
+   * @param {Session} prefill - Values to put in the form.
    */
   constructor(context, prefill) {
     this.#context = context;
@@ -18,14 +21,12 @@ export class TitleState {
   }
 
   enter() {
-    const { persistence, ui, views, world } = this.#context;
-    world.ghost.deactivate();
-    world.pickups.clear();
-    world.exitDoor.lock();
+    const { persistence, simulation, ui, views } = this.#context;
+    simulation.clear();
     views.ghost.hide();
     views.pickups.sync();
     ui.hud.hide();
-    ui.title.show(this.#prefill, persistence.scores.loadRanked());
+    ui.title.open(this.#prefill, persistence.scores.loadRanked());
   }
 
   exit() {
@@ -35,6 +36,7 @@ export class TitleState {
   update(seconds) {
     this.#elapsed += seconds;
     const { layout, views } = this.#context;
+    /** @type {Pose} */
     const idlePose = {
       position: layout.playerStart,
       yaw: Math.sin(this.#elapsed * IDLE_LOOK.yawRate) * IDLE_LOOK.yawSwing,

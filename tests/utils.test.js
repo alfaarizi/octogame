@@ -1,11 +1,15 @@
 import assert from 'node:assert/strict';
 import { describe, test } from 'node:test';
 import {
-  Cooldown,
+  atHeight,
+  Countdown,
   deepFreeze,
+  easeToward,
   formatRoundTime,
+  headingTo,
   isWithinCone,
   ListenerSet,
+  pointAlongHeading,
   randomInRange,
   randomWalk,
   rotateToward,
@@ -20,21 +24,32 @@ describe('math', () => {
     assert.ok(Math.abs(wrapAngle(rotateToward(0, almostFull, 1)) + 0.1) < 1e-9);
   });
 
+  test('easeToward closes the given share of the gap, without overshooting', () => {
+    assert.equal(easeToward(0, 10, 0.25), 2.5);
+    assert.equal(easeToward(0, 10, 3), 10);
+  });
+
   test('isWithinCone accepts targets ahead and rejects ones off to the side or too far', () => {
-    const eye = { x: 1.5, y: 1.6, z: 1.5 };
-    const east = { x: 1, y: 0, z: 0 };
-    const halfAngle = 0.3;
-    assert.equal(isWithinCone(eye, east, { x: 5, y: 1.6, z: 1.5 }, halfAngle, 10), true);
-    assert.equal(isWithinCone(eye, east, { x: 1.5, y: 1.6, z: 5 }, halfAngle, 10), false);
-    assert.equal(isWithinCone(eye, east, { x: 50, y: 1.6, z: 1.5 }, halfAngle, 10), false);
+    const ray = { origin: { x: 1.5, y: 1.6, z: 1.5 }, direction: { x: 1, y: 0, z: 0 } };
+    const cone = { halfAngle: 0.3, range: 10 };
+    assert.equal(isWithinCone(ray, cone, { x: 5, y: 1.6, z: 1.5 }), true);
+    assert.equal(isWithinCone(ray, cone, { x: 1.5, y: 1.6, z: 5 }), false);
+    assert.equal(isWithinCone(ray, cone, { x: 50, y: 1.6, z: 1.5 }), false);
   });
 
   test('isWithinCone widens for big targets up close', () => {
-    const eye = { x: 0, y: 0, z: 0 };
-    const east = { x: 1, y: 0, z: 0 };
+    const ray = { origin: { x: 0, y: 0, z: 0 }, direction: { x: 1, y: 0, z: 0 } };
+    const cone = { halfAngle: 0.2, range: 10 };
     const offToTheSide = { x: 1, y: 0, z: 0.5 };
-    assert.equal(isWithinCone(eye, east, offToTheSide, 0.2, 10), false);
-    assert.equal(isWithinCone(eye, east, offToTheSide, 0.2, 10, 0.4), true);
+    assert.equal(isWithinCone(ray, cone, offToTheSide), false);
+    assert.equal(isWithinCone(ray, cone, offToTheSide, 0.4), true);
+  });
+
+  test('pointAlongHeading walks the way headingTo points', () => {
+    const from = { x: 2, z: 3 };
+    const to = pointAlongHeading(from, headingTo(from, { x: 5, z: 7 }), 5);
+    assert.ok(Math.abs(to.x - 5) < 1e-9 && Math.abs(to.z - 7) < 1e-9);
+    assert.deepEqual(atHeight(from, 1.5), { x: 2, y: 1.5, z: 3 });
   });
 });
 
@@ -78,13 +93,14 @@ describe('formatRoundTime', () => {
   });
 });
 
-describe('Cooldown', () => {
-  test('reports ready once the time has passed', () => {
-    const cooldown = new Cooldown(1);
-    assert.equal(cooldown.tick(0.6), false);
-    assert.equal(cooldown.tick(0.6), true);
-    cooldown.restart(2);
-    assert.equal(cooldown.tick(1), false);
+describe('Countdown', () => {
+  test('reports when the time has run out, and can be restarted', () => {
+    const countdown = new Countdown(1);
+    assert.equal(countdown.tick(0.6), false);
+    assert.equal(countdown.tick(0.6), true);
+    countdown.restart(2);
+    assert.equal(countdown.tick(1), false);
+    assert.equal(countdown.remaining, 1);
   });
 });
 

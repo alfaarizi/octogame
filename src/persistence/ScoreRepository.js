@@ -1,5 +1,7 @@
 import { rankResults } from '../gameplay/round/leaderboardRanking.js';
 
+/** @typedef {import('../gameplay/round/Round.js').RoundResult} RoundResult */
+
 const STORAGE_KEY = 'flashlight-haunt-scores';
 const MAX_STORED_RESULTS = 100;
 
@@ -30,13 +32,17 @@ export class ScoreRepository {
     this.#store = store;
   }
 
-  /** Every saved result, best first. */
+  /** @returns {RoundResult[]} Every saved result, best first. */
   loadRanked() {
     const stored = this.#store.read(STORAGE_KEY, []);
     return Array.isArray(stored) ? rankResults(stored.filter(isStoredResult).map(fromStored)) : [];
   }
 
-  /** Saves a result. Returns its 1-based rank and the updated leaderboard (which contains `result` itself). */
+  /**
+   * Saves a result.
+   * @param {RoundResult} result
+   * @returns {{ rank: number, ranked: RoundResult[] }} Its 1-based rank, and the updated leaderboard (which contains `result` itself).
+   */
   record(result) {
     const ranked = rankResults([...this.loadRanked(), result]);
     this.#store.write(STORAGE_KEY, ranked.slice(0, MAX_STORED_RESULTS).map(toStored));

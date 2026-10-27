@@ -1,5 +1,7 @@
-import { Cooldown } from '../utils.js';
+import { Countdown } from '../utils.js';
 import { setNodePosition } from './AudioEngine.js';
+
+/** @typedef {import('../types.js').Point3} Point3 */
 
 const DRONE_PITCHES = [55, 55.4, 82.6];
 const GHOST_VOICE_SMOOTHING = 0.3;
@@ -13,7 +15,7 @@ export class Soundscape {
   #ghostOutput = null;
   #ghostLevel = null;
   #shudder = null;
-  #heartbeat = new Cooldown();
+  #heartbeat = new Countdown();
 
   constructor(engine) {
     this.#engine = engine;
@@ -34,8 +36,7 @@ export class Soundscape {
   }
 
   /**
-   * @param {{ x: number, y: number, z: number } | null} position - Where the voice comes from, or null to leave it
-   *   where it is.
+   * @param {Point3 | null} position - Where the voice comes from, or null to leave it where it is.
    * @param {number} level - How loud the voice is.
    * @param {boolean} isFrozen - Whether to add the shudder the ghost makes while frozen.
    */

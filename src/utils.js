@@ -3,6 +3,12 @@
  * the page, Three.js or Web Audio, so all of it also runs in the Node unit tests.
  */
 
+/** @typedef {import('./types.js').Cone} Cone */
+/** @typedef {import('./types.js').FloorPoint} FloorPoint */
+/** @typedef {import('./types.js').Point3} Point3 */
+/** @typedef {import('./types.js').Range} Range */
+/** @typedef {import('./types.js').Ray} Ray */
+
 // ---- Math ----
 
 export const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
@@ -11,27 +17,63 @@ export const clamp01 = (value) => clamp(value, 0, 1);
 
 export const degreesToRadians = (degrees) => (degrees * Math.PI) / 180;
 
+/** Moves `current` toward `target` by `fraction` of the gap, never past it. */
+export const easeToward = (current, target, fraction) => current + (target - current) * Math.min(1, fraction);
+
 /** Maps any angle into the range (-Math.PI, Math.PI]. */
 export const wrapAngle = (angle) => Math.atan2(Math.sin(angle), Math.cos(angle));
 
 /** Turns `current` toward `target` the short way round, by `fraction` (0 to 1) of the gap. */
 export const rotateToward = (current, target, fraction) => current + wrapAngle(target - current) * Math.min(1, fraction);
 
-/** Distance between two points on the floor plan ({ x, z }), ignoring height. */
+// ---- Geometry ----
+
+/**
+ * @param {FloorPoint} a
+ * @param {FloorPoint} b
+ * @returns {number} The distance between the points, ignoring height.
+ */
 export const planarDistance = (a, b) => Math.hypot(a.x - b.x, a.z - b.z);
 
-/** Heading from one floor point to another, in radians, where 0 faces +z. */
+/**
+ * @param {FloorPoint} from
+ * @param {FloorPoint} to
+ * @returns {number} The heading from one point to the other, in radians, where 0 faces +z.
+ */
 export const headingTo = (from, to) => Math.atan2(to.x - from.x, to.z - from.z);
+
+/**
+ * @param {FloorPoint} origin
+ * @param {number} heading - Radians, where 0 faces +z.
+ * @param {number} distance
+ * @returns {FloorPoint} The point `distance` away from `origin` along `heading`.
+ */
+export const pointAlongHeading = (origin, heading, distance) => ({
+  x: origin.x + Math.sin(heading) * distance,
+  z: origin.z + Math.cos(heading) * distance,
+});
+
+/**
+ * @param {FloorPoint} point
+ * @param {number} y
+ * @returns {Point3} The floor point raised to height `y`.
+ */
+export const atHeight = ({ x, z }, y) => ({ x, y, z });
 
 /** Closer than this, a target's width stops widening the cone any further. */
 const MIN_WIDTH_DISTANCE = 0.1;
 
 /**
- * True when `target` is within `halfAngle` of `direction` as seen from `eye`, and no farther than `range`.
- * `targetRadius` widens the cone for big targets, which matters most up close. Points are { x, y, z }.
+ * Whether `target` lies inside `cone` around `ray`. `targetRadius` widens the cone for big targets,
+ * which matters most up close.
+ * @param {Ray} ray
+ * @param {Cone} cone
+ * @param {Point3} target
+ * @param {number} [targetRadius]
+ * @returns {boolean}
  */
-export function isWithinCone(eye, direction, target, halfAngle, range, targetRadius = 0) {
-  const tx = target.x - eye.x, ty = target.y - eye.y, tz = target.z - eye.z;
+export function isWithinCone({ origin, direction }, { halfAngle, range }, target, targetRadius = 0) {
+  const tx = target.x - origin.x, ty = target.y - origin.y, tz = target.z - origin.z;
   const distance = Math.hypot(tx, ty, tz);
   if (distance > range) return false;
   if (distance < 1e-6) return true;
@@ -44,7 +86,7 @@ export function isWithinCone(eye, direction, target, halfAngle, range, targetRad
 // ---- Randomness ----
 // Where a `random` argument is accepted, pass a function returning values in [0, 1) to make results predictable in tests.
 
-/** A random number within `range` ({ min, max }). */
+/** @param {Range} range */
 export const randomInRange = ({ min, max }, random = Math.random) => min + random() * (max - min);
 
 /** A random value in [-amount, amount]. */
@@ -54,7 +96,11 @@ export const randomItem = (items) => items[Math.floor(Math.random() * items.leng
 
 export const chance = (probability) => Math.random() < probability;
 
-/** One option's `value`, picked with probability proportional to its `weight`. */
+/**
+ * @template T
+ * @param {readonly { value: T, weight: number }[]} options
+ * @returns {T} One option's `value`, picked with probability proportional to its `weight`.
+ */
 export function weightedRandomItem(options) {
   let roll = Math.random() * options.reduce((total, option) => total + option.weight, 0);
   for (const option of options) {
@@ -109,12 +155,17 @@ export function formatRoundTime(totalSeconds) {
 
 // ---- Timing ----
 
-/** A countdown for things that repeat at a rate, such as footsteps or a heartbeat. */
-export class Cooldown {
+/** Counts seconds down to zero, for anything that waits or repeats: footsteps, a heartbeat, a respawn. */
+export class Countdown {
   #remaining;
 
-  constructor(initialSeconds = 0) {
-    this.#remaining = initialSeconds;
+  constructor(seconds = 0) {
+    this.#remaining = seconds;
+  }
+
+  /** Seconds left; zero or less once it has run out. */
+  get remaining() {
+    return this.#remaining;
   }
 
   /** Advances the countdown and reports whether it has run out. Call restart() after acting on it. */

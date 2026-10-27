@@ -3,6 +3,9 @@ import { Tile } from '../../world/TileMap.js';
 import { createBoxMesh, createBoxMeshFromBounds } from '../meshes.js';
 import { createFloorTexture, createPortraitTexture, createWallpaperTexture } from './textures.js';
 
+/** @typedef {import('../../data/houseLayout.js').FurniturePiece} FurniturePiece */
+/** @typedef {import('../../types.js').FloorPoint} FloorPoint */
+
 const FLOOR_TEXTURE_METERS = 2;
 /** Rugs and other parts this thin don't cast shadows. */
 const FLAT_PART_HEIGHT = 0.05;
@@ -13,6 +16,14 @@ export class HouseView {
   #scene;
   #wallMaterial;
 
+  /**
+   * @param {THREE.Scene} scene
+   * @param {import('../../world/TileMap.js').TileMap} tileMap
+   * @param {object} house
+   * @param {readonly FurniturePiece[]} house.furniture
+   * @param {readonly FloorPoint[]} house.portraits
+   * @param {number} house.wallHeight
+   */
   constructor(scene, tileMap, { furniture, portraits, wallHeight }) {
     this.#scene = scene;
     this.#wallMaterial = new THREE.MeshStandardMaterial({ map: createWallpaperTexture(wallHeight), roughness: 0.95 });
@@ -37,43 +48,45 @@ export class HouseView {
     this.#scene.add(walls);
   }
 
-  #buildFloorAndCeiling(tileMap, wallHeight) {
-    const { width, depth } = tileMap;
+  #buildFloorAndCeiling({ width, depth }, wallHeight) {
     const floorTexture = createFloorTexture();
     floorTexture.repeat.set(width / FLOOR_TEXTURE_METERS, depth / FLOOR_TEXTURE_METERS);
-    const floor = new THREE.Mesh(new THREE.PlaneGeometry(width, depth), new THREE.MeshStandardMaterial({ map: floorTexture, roughness: 0.8 }));
-    floor.rotation.x = -Math.PI / 2;
-    floor.position.set(width / 2, 0, depth / 2);
-    floor.receiveShadow = true;
-
-    const ceiling = new THREE.Mesh(new THREE.PlaneGeometry(width, depth), new THREE.MeshStandardMaterial({ color: 0x1d1714, roughness: 1 }));
-    ceiling.rotation.x = Math.PI / 2;
-    ceiling.position.set(width / 2, wallHeight, depth / 2);
-    ceiling.receiveShadow = true;
-    this.#scene.add(floor, ceiling);
+    this.#addHorizontalPlane(width, depth, 0, new THREE.MeshStandardMaterial({ map: floorTexture, roughness: 0.8 }), true);
+    this.#addHorizontalPlane(width, depth, wallHeight, new THREE.MeshStandardMaterial({ color: 0x1d1714, roughness: 1 }), false);
   }
 
+  /** A plane covering the whole house at height `y`, facing up (a floor) or down (a ceiling). */
+  #addHorizontalPlane(width, depth, y, material, facesUp) {
+    const plane = new THREE.Mesh(new THREE.PlaneGeometry(width, depth), material);
+    plane.rotation.x = facesUp ? -Math.PI / 2 : Math.PI / 2;
+    plane.position.set(width / 2, y, depth / 2);
+    plane.receiveShadow = true;
+    this.#scene.add(plane);
+  }
+
+  /** @param {readonly FurniturePiece[]} furniture */
   #buildFurniture(furniture) {
     const materialsByColor = new Map();
     const materialFor = (color) => {
       if (!materialsByColor.has(color)) materialsByColor.set(color, new THREE.MeshStandardMaterial({ color, roughness: 0.85 }));
       return materialsByColor.get(color);
     };
-    for (const piece of furniture) {
-      for (const part of piece.parts) {
-        const mesh = createBoxMeshFromBounds(part, materialFor(part.color));
-        mesh.castShadow = part.y1 - part.y0 > FLAT_PART_HEIGHT;
-        mesh.receiveShadow = true;
-        this.#scene.add(mesh);
-      }
+    for (const part of furniture.flatMap((piece) => piece.parts)) {
+      const mesh = createBoxMeshFromBounds(part, materialFor(part.color));
+      mesh.castShadow = part.y1 - part.y0 > FLAT_PART_HEIGHT;
+      mesh.receiveShadow = true;
+      this.#scene.add(mesh);
     }
   }
 
-  /** A framed portrait hanging on the south-facing wall face at (x, z). */
+  /**
+   * A framed portrait hanging on the south-facing wall face at (x, z).
+   * @param {FloorPoint} spot
+   */
   #buildPortrait({ x, z }) {
     const frame = createBoxMesh(
-      [PORTRAIT.frameWidth, PORTRAIT.frameHeight, PORTRAIT.frameDepth],
-      [x, PORTRAIT.centerHeight, z + PORTRAIT.frameDepth / 2],
+      { width: PORTRAIT.frameWidth, height: PORTRAIT.frameHeight, depth: PORTRAIT.frameDepth },
+      { x, y: PORTRAIT.centerHeight, z: z + PORTRAIT.frameDepth / 2 },
       new THREE.MeshStandardMaterial({ color: 0x4a3514, roughness: 0.5, metalness: 0.4 }),
     );
     const picture = new THREE.Mesh(

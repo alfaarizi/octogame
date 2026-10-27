@@ -35,6 +35,7 @@ export const GameEvent = Object.freeze({
   GHOST_SPOTTED_PLAYER: 'ghost-spotted-player',
   /** Payload: { position } */
   GHOST_BANISHED: 'ghost-banished',
+  /** Payload: { position } */
   GHOST_RESPAWNED: 'ghost-respawned',
 
   /** Payload: { kind: AmbientNoiseKind, position: { x, y, z }, flickerLanterns } */

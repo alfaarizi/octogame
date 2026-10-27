@@ -7,6 +7,7 @@ import { ResultState } from './states/ResultState.js';
 import { TitleState } from './states/TitleState.js';
 
 /** @typedef {import('../gameplay/round/Round.js').RoundResult} RoundResult */
+/** @typedef {import('../types.js').Session} Session */
 
 /**
  * The top level. Owns the frame loop and the state machine, and moves between
@@ -41,12 +42,12 @@ export class Game {
     this.#loop.stop();
   }
 
-  /** @param {{ playerName: string, chickenMode: boolean }} prefill - Values to put in the form. */
+  /** @param {Session} prefill - Values to put in the form. */
   showTitle(prefill) {
     this.#states.transition(new TitleState(this.#context, prefill));
   }
 
-  /** @param {{ playerName: string, chickenMode: boolean }} session - The player's choices, kept for "Play again". */
+  /** @param {Session} session - The player's choices, kept for "Play again". */
   startRound(session) {
     this.#session = session;
     this.#states.transition(new PlayingState(this.#context, this, session));

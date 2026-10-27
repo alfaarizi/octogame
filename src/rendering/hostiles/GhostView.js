@@ -4,13 +4,18 @@ import { GhostState, PRESENT_GHOST_STATES } from '../../gameplay/hostiles/GhostS
 import {
   createGhostModel,
   GHOST_EYE_HEIGHT,
+  GHOST_GLOW_COLOR,
   GHOST_OPACITY,
   GHOST_PROFILE,
   GHOST_SEGMENTS,
   MOUTH_HEIGHT,
 } from './ghostModel.js';
 
-const PALE_GLOW = new THREE.Color(0x9fb4cc);
+/** @typedef {import('../../gameplay/hostiles/GhostState.js').GhostStateName} GhostStateName */
+/** @typedef {import('../../types.js').FloorPoint} FloorPoint */
+/** @typedef {import('../../types.js').Ray} Ray */
+
+const PALE_GLOW = new THREE.Color(GHOST_GLOW_COLOR);
 const ENRAGED_GLOW = new THREE.Color(0xc01818);
 const HOVER = Object.freeze({ base: 0.22, amplitude: 0.07, rate: 1.8 });
 const LEAN = Object.freeze({ hunting: 0.14, resting: 0.03 });
@@ -30,9 +35,15 @@ export class GhostView {
   #time = 0;
   #fadeIn = 0;
   #vanishTime = 0;
+  /** @type {GhostStateName} */
   #previousState = GhostState.DORMANT;
   #lookDirection = new THREE.Vector3();
 
+  /**
+   * @param {THREE.Scene} scene
+   * @param {import('../../gameplay/hostiles/Ghost.js').Ghost} ghost
+   * @param {{ glow: number }} appearance - `glow` is the body's resting emissive intensity.
+   */
   constructor(scene, ghost, { glow }) {
     this.#ghost = ghost;
     this.#glow = glow;
@@ -46,6 +57,10 @@ export class GhostView {
     this.#previousState = GhostState.DORMANT;
   }
 
+  /**
+   * @param {number} seconds - Time since the last frame.
+   * @param {FloorPoint} playerPosition - Where it stares while hunting.
+   */
   update(seconds, playerPosition) {
     this.#time += seconds;
     this.#noteStateChange();
@@ -55,20 +70,23 @@ export class GhostView {
     else this.#animatePresence(seconds, playerPosition);
   }
 
-  /** Puts the ghost's face right in front of the camera, filling the screen. */
-  showJumpScare(camera, elapsed, seconds) {
+  /**
+   * Puts the ghost's face right in front of the viewer, filling the screen.
+   * @param {Ray} sight - Where the viewer is and where they look.
+   * @param {number} elapsed - Seconds since the jump scare started.
+   * @param {number} seconds - Time since the last frame.
+   */
+  showJumpScare({ origin, direction }, elapsed, seconds) {
     this.#time += seconds;
-    camera.getWorldDirection(this.#lookDirection);
-    this.#lookDirection.y = 0;
-    this.#lookDirection.normalize();
+    this.#lookDirection.set(direction.x, 0, direction.z).normalize();
     const { object, bodyMaterial, mouth, pupils } = this.#parts;
     const scale = 1 + Math.min(elapsed, 1) * JUMP_SCARE.growth;
     object.visible = true;
     object.scale.setScalar(scale);
     object.position.set(
-      camera.position.x + this.#lookDirection.x * JUMP_SCARE.distance,
-      camera.position.y - GHOST_EYE_HEIGHT * scale,
-      camera.position.z + this.#lookDirection.z * JUMP_SCARE.distance,
+      origin.x + this.#lookDirection.x * JUMP_SCARE.distance,
+      origin.y - GHOST_EYE_HEIGHT * scale,
+      origin.z + this.#lookDirection.z * JUMP_SCARE.distance,
     );
     object.rotation.set(0, Math.atan2(-this.#lookDirection.x, -this.#lookDirection.z), 0);
     bodyMaterial.opacity = JUMP_SCARE.opacity;

@@ -40,6 +40,18 @@ describe('Player', () => {
     assert.ok(sprintSpeed > walkSpeed);
   });
 
+  test('sight starts at eye height and looks the way the player faces', () => {
+    const player = new Player(GAME_CONFIG.player, noWalls);
+    player.respawn({ x: 3, z: 4, yaw: 0 });
+    assert.deepEqual(player.sight.origin, { x: 3, y: GAME_CONFIG.player.eyeHeight, z: 4 });
+    assert.ok(Math.abs(player.sight.direction.z + 1) < 1e-9, 'yaw 0 looks along -z');
+    player.yaw = -Math.PI / 2;
+    player.pitch = Math.PI / 6;
+    const { direction } = player.sight;
+    assert.ok(direction.x > 0.8 && Math.abs(direction.y - 0.5) < 1e-9, 'turned right and looking up');
+    assert.ok(Math.abs(Math.hypot(direction.x, direction.y, direction.z) - 1) < 1e-9);
+  });
+
   test('looking up and down stops at the pitch limit', () => {
     const player = new Player(GAME_CONFIG.player, noWalls);
     player.look(0, -1e6);

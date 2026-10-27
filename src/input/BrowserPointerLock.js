@@ -1,9 +1,10 @@
 import { ListenerSet } from '../utils.js';
 
+/** @typedef {import('../types.js').PointerLock} PointerLock */
+
 /**
  * Captures the mouse for mouse-look, using the browser's Pointer Lock API.
- * Shares its shape with SimulatedPointerLock: isLocked, request(), release(), and onChange(listener),
- * which returns an unsubscribe function.
+ * @implements {PointerLock}
  */
 export class BrowserPointerLock {
   #element;

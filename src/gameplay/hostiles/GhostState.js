@@ -6,5 +6,10 @@ export const GhostState = Object.freeze({
   BANISHED: 'banished',
 });
 
-/** States in which the ghost is in the house and can be seen, lit or touched. */
-export const PRESENT_GHOST_STATES = Object.freeze(new Set([GhostState.WANDERING, GhostState.HUNTING, GhostState.FROZEN]));
+/** @typedef {(typeof GhostState)[keyof typeof GhostState]} GhostStateName */
+
+/**
+ * States in which the ghost is in the house and can be seen, lit or touched.
+ * @type {ReadonlySet<GhostStateName>}
+ */
+export const PRESENT_GHOST_STATES = new Set([GhostState.WANDERING, GhostState.HUNTING, GhostState.FROZEN]);

@@ -16,7 +16,7 @@ export class ScreenEffects {
 
   /** @param {number} level - Vignette opacity, from 0 to 1. */
   setVignette(level) {
-    this.#shown.applyIfChanged('vignette', Math.round(level * 100) / 100, (opacity) => (this.#vignette.style.opacity = opacity));
+    this.#shown.applyIfChanged('vignette', Math.round(level * 100) / 100, (opacity) => (this.#vignette.style.opacity = String(opacity)));
   }
 
   /** Fills the screen with `color`, then fades it out over `seconds`. */
@@ -24,11 +24,11 @@ export class ScreenEffects {
     const overlay = this.#flash;
     overlay.style.transition = 'none';
     overlay.style.background = color;
-    overlay.style.opacity = 1;
+    overlay.style.opacity = '1';
     // Forces a reflow so the solid color applies before the fade starts.
     void overlay.offsetWidth;
     overlay.style.transition = `opacity ${seconds}s ease-out`;
-    overlay.style.opacity = 0;
+    overlay.style.opacity = '0';
   }
 
   clear() {

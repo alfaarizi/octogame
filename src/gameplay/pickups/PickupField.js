@@ -1,13 +1,30 @@
 import { planarDistance } from '../../utils.js';
 
+/** @typedef {import('../../types.js').FloorPoint} FloorPoint */
+/** @typedef {import('../../types.js').Point3} Point3 */
+
 export const PickupKind = Object.freeze({ CANDY: 'candy', BATTERY: 'battery' });
 
 /**
- * The candies and batteries lying around this round.
- * Each item is { id, kind, position: { x, y, z } }; ids let views keep track of their meshes.
+ * A candy or battery lying in the house. Its id lets views keep track of its mesh.
+ * @typedef {object} Pickup
+ * @property {number} id
+ * @property {string} kind - A PickupKind value.
+ * @property {Point3} position
  */
+
+/**
+ * @typedef {object} NearestPickup
+ * @property {Pickup} item
+ * @property {number} distance
+ */
+
+const NO_PICKUPS = Object.freeze([]);
+
+/** The candies and batteries lying around this round. */
 export class PickupField {
-  #items = [];
+  /** @type {readonly Pickup[]} */
+  #items = NO_PICKUPS;
   #nextId = 1;
   #pickupRadius;
 
@@ -15,28 +32,39 @@ export class PickupField {
     this.#pickupRadius = pickupRadius;
   }
 
+  /** The items in the field. Never changed in place: any change replaces the whole array. */
   get items() {
     return this.#items;
   }
 
+  /** @param {{ candySpots: Point3[], batterySpots: Point3[] }} spots */
   populate({ candySpots, batterySpots }) {
-    this.clear();
-    for (const spot of candySpots) this.#add(PickupKind.CANDY, spot);
-    for (const spot of batterySpots) this.#add(PickupKind.BATTERY, spot);
+    this.#items = Object.freeze([
+      ...candySpots.map((spot) => this.#createItem(PickupKind.CANDY, spot)),
+      ...batterySpots.map((spot) => this.#createItem(PickupKind.BATTERY, spot)),
+    ]);
   }
 
   clear() {
-    this.#items = [];
+    this.#items = NO_PICKUPS;
   }
 
-  /** Removes and returns every item within reach of `position`. */
+  /**
+   * Removes and returns every item within reach of `position`.
+   * @param {FloorPoint} position
+   * @returns {Pickup[]}
+   */
   collectWithinReach(position) {
     const reached = this.#items.filter((item) => planarDistance(item.position, position) < this.#pickupRadius);
-    if (reached.length > 0) this.#items = this.#items.filter((item) => !reached.includes(item));
+    if (reached.length > 0) this.#items = Object.freeze(this.#items.filter((item) => !reached.includes(item)));
     return reached;
   }
 
-  /** The closest item of `kind`, as { item, distance }, or null if there are none. */
+  /**
+   * @param {string} kind - A PickupKind value.
+   * @param {FloorPoint} position
+   * @returns {NearestPickup | null} The closest item of `kind`, or null if there are none.
+   */
   nearest(kind, position) {
     let closest = null;
     for (const item of this.#items) {
@@ -47,7 +75,8 @@ export class PickupField {
     return closest;
   }
 
-  #add(kind, { x, y, z }) {
-    this.#items.push(Object.freeze({ id: this.#nextId++, kind, position: Object.freeze({ x, y, z }) }));
+  /** @returns {Pickup} */
+  #createItem(kind, { x, y, z }) {
+    return Object.freeze({ id: this.#nextId++, kind, position: Object.freeze({ x, y, z }) });
   }
 }

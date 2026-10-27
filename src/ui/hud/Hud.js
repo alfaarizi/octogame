@@ -54,6 +54,6 @@ export class Hud extends UiPanel {
     this.#hint.textContent = text;
     this.#hint.classList.add('show');
     clearTimeout(this.#hintTimeout);
-    this.#hintTimeout = setTimeout(() => this.#hint.classList.remove('show'), seconds * 1000);
+    this.#hintTimeout = window.setTimeout(() => this.#hint.classList.remove('show'), seconds * 1000);
   }
 }

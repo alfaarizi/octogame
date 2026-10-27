@@ -1,5 +1,7 @@
 import { GameEvent } from '../../core/GameEvent.js';
-import { chance, Cooldown, randomInRange, weightedRandomItem } from '../../utils.js';
+import { atHeight, chance, Countdown, pointAlongHeading, randomInRange, weightedRandomItem } from '../../utils.js';
+
+/** @typedef {import('../../types.js').FloorPoint} FloorPoint */
 
 export const AmbientNoiseKind = Object.freeze({ CREAK: 'creak', THUMP: 'thump', GIGGLE: 'giggle' });
 
@@ -16,7 +18,7 @@ export class AmbientNoiseCue {
   #events;
   #interval;
   #lanternFlickerChance;
-  #cooldown = new Cooldown();
+  #countdown = new Countdown();
 
   constructor(events, { ambientNoiseInterval, ambientNoiseLanternFlickerChance }) {
     this.#events = events;
@@ -25,21 +27,20 @@ export class AmbientNoiseCue {
   }
 
   reset() {
-    this.#cooldown.restart(randomInRange(this.#interval));
+    this.#countdown.restart(randomInRange(this.#interval));
   }
 
+  /**
+   * @param {number} seconds - Time since the last frame.
+   * @param {FloorPoint} playerPosition
+   */
   update(seconds, playerPosition) {
-    if (!this.#cooldown.tick(seconds)) return;
+    if (!this.#countdown.tick(seconds)) return;
     this.reset();
-    const angle = Math.random() * Math.PI * 2;
-    const distance = randomInRange(DISTANCE_FROM_PLAYER);
+    const spot = pointAlongHeading(playerPosition, Math.random() * Math.PI * 2, randomInRange(DISTANCE_FROM_PLAYER));
     this.#events.emit(GameEvent.AMBIENT_NOISE, {
       kind: weightedRandomItem(NOISE_CHOICES),
-      position: {
-        x: playerPosition.x + Math.cos(angle) * distance,
-        y: randomInRange(HEIGHT),
-        z: playerPosition.z + Math.sin(angle) * distance,
-      },
+      position: atHeight(spot, randomInRange(HEIGHT)),
       flickerLanterns: chance(this.#lanternFlickerChance),
     });
   }
