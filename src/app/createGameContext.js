@@ -5,17 +5,19 @@ import {
   BATTERY_SPOTS,
   CANDY_SPOTS,
   EXIT_DOOR,
-  FIREPLACE,
   FURNITURE,
   GHOST_SPOTS,
   GHOST_START,
+  GLOWING_FIXTURES,
   LANTERNS,
+  LOW_WALL_HEIGHT,
   OBSTACLES,
   PLAYER_START,
   PORTRAITS,
   TILE_ROWS,
+  TILE_SIZE,
   WALL_HEIGHT,
-} from '../data/houseLayout.js';
+} from '../data/officeLayout.js';
 import { Simulation } from '../gameplay/Simulation.js';
 import { BrowserPointerLock } from '../input/BrowserPointerLock.js';
 import { InputController } from '../input/InputController.js';
@@ -24,9 +26,9 @@ import { LocalJsonStore } from '../persistence/LocalJsonStore.js';
 import { PreferencesRepository } from '../persistence/PreferencesRepository.js';
 import { ScoreRepository } from '../persistence/ScoreRepository.js';
 import { GhostView } from '../rendering/hostiles/GhostView.js';
-import { ExitDoorView } from '../rendering/house/ExitDoorView.js';
-import { HouseLightingView } from '../rendering/house/HouseLightingView.js';
-import { HouseView } from '../rendering/house/HouseView.js';
+import { ExitDoorView } from '../rendering/office/ExitDoorView.js';
+import { OfficeLightingView } from '../rendering/office/OfficeLightingView.js';
+import { createOfficeModel } from '../rendering/office/officeModel.js';
 import { PickupView } from '../rendering/pickups/PickupView.js';
 import { FirstPersonView } from '../rendering/player/FirstPersonView.js';
 import { RenderContext } from '../rendering/RenderContext.js';
@@ -48,7 +50,7 @@ import { TileMap } from '../world/TileMap.js';
  */
 export function createGameContext({ config, isTestMode }) {
   const events = new EventBus();
-  const tileMap = new TileMap(TILE_ROWS);
+  const tileMap = new TileMap(TILE_ROWS, TILE_SIZE);
   const layout = deepFreeze({ playerStart: PLAYER_START, ghostStart: GHOST_START, exitDoor: EXIT_DOOR, obstacles: OBSTACLES });
   const spawnTable = new SpawnTable({ candySpots: CANDY_SPOTS, batterySpots: BATTERY_SPOTS, ghostSpots: GHOST_SPOTS });
   const simulation = new Simulation({ config, events, tileMap, spawnTable, layout });
@@ -72,24 +74,22 @@ export function createGameContext({ config, isTestMode }) {
 }
 
 function createViews({ config, events, tileMap, simulation, render }) {
-  const house = new HouseView(render.scene, tileMap, { furniture: FURNITURE, portraits: PORTRAITS, wallHeight: WALL_HEIGHT });
+  render.scene.add(
+    createOfficeModel(tileMap, { furniture: FURNITURE, portraits: PORTRAITS, wallHeight: WALL_HEIGHT, lowWallHeight: LOW_WALL_HEIGHT }),
+  );
   return Object.freeze({
     firstPerson: new FirstPersonView(render.camera, {
       eyeHeight: config.player.eyeHeight,
       flashlight: config.flashlight,
       shadowMapSize: config.rendering.shadowMapSize,
     }),
-    lighting: new HouseLightingView(render.scene, events, {
+    lighting: new OfficeLightingView(render.scene, events, {
       lanterns: LANTERNS,
-      fireplace: FIREPLACE,
+      fixtures: GLOWING_FIXTURES,
       lanternIntensity: config.rendering.lanternIntensity,
-      fireIntensity: config.rendering.fireIntensity,
+      fixtureIntensity: config.rendering.fixtureIntensity,
     }),
-    exitDoor: new ExitDoorView(render.scene, simulation.exitDoor, EXIT_DOOR, {
-      wallMaterial: house.wallMaterial,
-      wallHeight: WALL_HEIGHT,
-      lightIntensity: config.rendering.exitIntensity,
-    }),
+    exitDoor: new ExitDoorView(render.scene, simulation.exitDoor, EXIT_DOOR, config.rendering.exitIntensity),
     ghost: new GhostView(render.scene, simulation.ghost, config.ghost),
     pickups: new PickupView(render.scene, simulation.pickups, config.flashlight.beamCone),
   });

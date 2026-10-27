@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { describe, test } from 'node:test';
 import { GameEvent } from '../src/core/GameEvent.js';
-import { EXIT_DOOR } from '../src/data/houseLayout.js';
+import { EXIT_DOOR } from '../src/data/officeLayout.js';
 import { measureThreat } from '../src/gameplay/hostiles/threat.js';
 import { PickupField, PickupKind } from '../src/gameplay/pickups/PickupField.js';
 import { compareResults, rankResults } from '../src/gameplay/round/leaderboardRanking.js';

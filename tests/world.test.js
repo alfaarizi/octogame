@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { describe, test } from 'node:test';
-import { EXIT_DOOR } from '../src/data/houseLayout.js';
+import { EXIT_DOOR } from '../src/data/officeLayout.js';
 import { CollisionWorld } from '../src/world/CollisionWorld.js';
 import { ExitDoor } from '../src/world/ExitDoor.js';
 import { SpawnTable } from '../src/world/SpawnTable.js';
@@ -21,6 +21,21 @@ describe('TileMap', () => {
   test('line of sight is blocked by a wall between the points', () => {
     assert.equal(map.hasLineOfSight({ x: 1.5, z: 2.5 }, { x: 7.5, z: 2.5 }), false);
     assert.equal(map.hasLineOfSight({ x: 1.5, z: 1.5 }, { x: 7.5, z: 1.5 }), true);
+  });
+
+  test('openings down to the basement block walking but not sight', () => {
+    const withOpening = new TileMap(['#####', '#.v.#', '#####']);
+    assert.equal(withOpening.isBlocked(2.5, 1.5), true);
+    assert.equal(withOpening.isOpaque(2.5, 1.5), false);
+    assert.equal(withOpening.hasLineOfSight({ x: 1.5, z: 1.5 }, { x: 3.5, z: 1.5 }), true);
+  });
+
+  test('a finer grid is measured in meters', () => {
+    const fine = new TileMap(SMALL_ROOM, 0.5);
+    assert.equal(fine.width, 4.5);
+    assert.equal(fine.isBlocked(0.75, 0.75), false);
+    assert.equal(fine.isBlocked(0.25, 0.75), true);
+    assert.deepEqual(fine.blockingRectsAround({ x: 0.75, z: 0.75 }).length, 5);
   });
 
   test('rejects rows of different lengths', () => {
@@ -78,10 +93,11 @@ describe('SpawnTable', () => {
 describe('ExitDoor', () => {
   test('only counts as reached once unlocked', () => {
     const door = new ExitDoor(EXIT_DOOR);
-    const atDoor = { x: 14, z: 17.5 };
+    const { centerX, trigger } = EXIT_DOOR;
+    const atDoor = { x: centerX, z: trigger.minZ + 0.2 };
     assert.equal(door.isReachedBy(atDoor), false);
     door.unlock();
     assert.equal(door.isReachedBy(atDoor), true);
-    assert.equal(door.isReachedBy({ x: 10, z: 17.5 }), false);
+    assert.equal(door.isReachedBy({ ...atDoor, x: centerX - trigger.halfWidth - 1 }), false);
   });
 });

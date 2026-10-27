@@ -3,13 +3,16 @@
 
 const RESOLVE_PASSES = 2;
 
-/** Keeps round bodies (the player) out of walls and furniture by pushing them back out. */
+/**
+ * Keeps round bodies (the player) out of walls and furniture by pushing them back out.
+ * Only the tiles next to a body's center are checked, so its radius must be smaller than a tile.
+ */
 export class CollisionWorld {
   #tileMap;
   #obstacles;
 
   /**
-   * @param {import('./TileMap.js').TileMap} tileMap - The house's walls.
+   * @param {import('./TileMap.js').TileMap} tileMap - The level's walls.
    * @param {readonly Rect[]} obstacles - Floor-plan rectangles, such as furniture.
    */
   constructor(tileMap, obstacles) {
@@ -30,14 +33,7 @@ export class CollisionWorld {
   }
 
   #resolveAgainstWalls(position, radius) {
-    const column = Math.floor(position.x), row = Math.floor(position.z);
-    for (let z = row - 1; z <= row + 1; z++) {
-      for (let x = column - 1; x <= column + 1; x++) {
-        if (this.#tileMap.isBlocked(x + 0.5, z + 0.5)) {
-          pushCircleOutOfRect(position, radius, { x0: x, z0: z, x1: x + 1, z1: z + 1 });
-        }
-      }
-    }
+    for (const rect of this.#tileMap.blockingRectsAround(position)) pushCircleOutOfRect(position, radius, rect);
   }
 }
 

@@ -5,27 +5,26 @@ import { createBoxMeshFromBounds } from '../meshes.js';
 import { GlowingLight } from './GlowingLight.js';
 import { createLanternModel, LANTERN_FACE_GLOW } from './lanternModel.js';
 
-/** @typedef {import('../../data/houseLayout.js').Lantern} Lantern */
-/** @typedef {import('../../types.js').Box} Box */
-/** @typedef {import('../../types.js').Point3} Point3 */
+/** @typedef {import('../../data/officeLayout.js').GlowingFixture} GlowingFixture */
+/** @typedef {import('../../data/officeLayout.js').Lantern} Lantern */
 
 /** Height from the surface a lantern sits on to the pumpkin's center. */
 const LANTERN_SEAT_OFFSET = 0.13;
 const LANTERN_LIGHT = Object.freeze({ color: 0xff8a2a, range: 4.5, forwardOffset: 0.25, heightOffset: 0.25 });
-const FIRE_LIGHT = Object.freeze({ color: 0xff5014, range: 5 });
-const EMBER_GLOW = 1.2;
-/** Each flame's strength is `base + swing * sin(rate1 * t) * sin(rate2 * t)`, offset per flame so they don't sync up. */
+const FIXTURE_LIGHT_RANGE = 4.5;
+const FIXTURE_GLOW = 1.4;
+/** Each light's strength is `base + swing * sin(rate1 * t) * sin(rate2 * t)`, offset per light so they don't sync up. */
 const FLICKER = Object.freeze({ base: 0.85, swing: 0.15, rates: [8.3, 13.1], phaseSteps: [2.1, 5.3] });
 const STUTTER = Object.freeze({ dropChance: 0.45, dropped: 0.05, flare: 1.5 });
 const StutterDuration = Object.freeze({ EXIT_UNLOCKED: 1.6, AMBIENT_NOISE: 0.4 });
 
 /**
- * The jack-o'-lanterns and the fireplace: warm lights that flicker, and all stutter at once
- * when the exit opens or a spooky noise asks for it.
+ * The jack-o'-lanterns and the things that glow on their own (server lights, a monitor, a neon sign): warm or
+ * cold lights that flicker, and all stutter at once when the exit opens or a spooky noise asks for it.
  */
-export class HouseLightingView {
+export class OfficeLightingView {
   #scene;
-  #flames = [];
+  #lights = [];
   #stutter = new Countdown();
 
   /**
@@ -33,14 +32,14 @@ export class HouseLightingView {
    * @param {import('../../core/EventBus.js').EventBus} events
    * @param {object} setup
    * @param {readonly Lantern[]} setup.lanterns
-   * @param {{ embers: Box, light: Point3 }} setup.fireplace
+   * @param {readonly GlowingFixture[]} setup.fixtures
    * @param {number} setup.lanternIntensity
-   * @param {number} setup.fireIntensity
+   * @param {number} setup.fixtureIntensity
    */
-  constructor(scene, events, { lanterns, fireplace, lanternIntensity, fireIntensity }) {
+  constructor(scene, events, { lanterns, fixtures, lanternIntensity, fixtureIntensity }) {
     this.#scene = scene;
     for (const lantern of lanterns) this.#addLantern(lantern, lanternIntensity);
-    this.#addFireplace(fireplace, fireIntensity);
+    for (const fixture of fixtures) this.#addFixture(fixture, fixtureIntensity);
     events.on(GameEvent.EXIT_UNLOCKED, () => this.stutterAll(StutterDuration.EXIT_UNLOCKED));
     events.on(GameEvent.AMBIENT_NOISE, ({ flickerLanterns }) => flickerLanterns && this.stutterAll(StutterDuration.AMBIENT_NOISE));
   }
@@ -53,10 +52,10 @@ export class HouseLightingView {
   update(seconds, time) {
     const isStuttering = !this.#stutter.tick(seconds);
     const [rate1, rate2] = FLICKER.rates, [phaseStep1, phaseStep2] = FLICKER.phaseSteps;
-    this.#flames.forEach((flame, index) => {
+    this.#lights.forEach((light, index) => {
       let strength = FLICKER.base + FLICKER.swing * Math.sin(time * rate1 + index * phaseStep1) * Math.sin(time * rate2 + index * phaseStep2);
       if (isStuttering) strength *= chance(STUTTER.dropChance) ? STUTTER.dropped : STUTTER.flare;
-      flame.setStrength(strength);
+      light.setStrength(strength);
     });
   }
 
@@ -67,17 +66,18 @@ export class HouseLightingView {
     object.position.set(x, y + LANTERN_SEAT_OFFSET, z);
     object.rotation.y = heading;
     const lightPosition = atHeight(pointAlongHeading({ x, z }, heading, LANTERN_LIGHT.forwardOffset), y + LANTERN_LIGHT.heightOffset);
-    this.#addFlame(object, new GlowingLight({ ...LANTERN_LIGHT, intensity, position: lightPosition }, glowMaterial, LANTERN_FACE_GLOW));
+    this.#addLight(object, new GlowingLight({ ...LANTERN_LIGHT, intensity, position: lightPosition }, glowMaterial, LANTERN_FACE_GLOW));
   }
 
-  #addFireplace({ embers, light }, intensity) {
-    const emberMaterial = new THREE.MeshStandardMaterial({ color: 0x1a0a04, emissive: 0xff4010 });
-    const emberMesh = createBoxMeshFromBounds(embers, emberMaterial);
-    this.#addFlame(emberMesh, new GlowingLight({ ...FIRE_LIGHT, intensity, position: light }, emberMaterial, EMBER_GLOW));
+  /** @param {GlowingFixture} fixture */
+  #addFixture({ box, color, light }, intensity) {
+    const material = new THREE.MeshStandardMaterial({ color: 0x0b0b0b, emissive: color });
+    const glow = new GlowingLight({ color, intensity, range: FIXTURE_LIGHT_RANGE, position: light }, material, FIXTURE_GLOW);
+    this.#addLight(createBoxMeshFromBounds(box, material), glow);
   }
 
-  #addFlame(object, flame) {
-    this.#scene.add(object, flame.light);
-    this.#flames.push(flame);
+  #addLight(object, light) {
+    this.#scene.add(object, light.light);
+    this.#lights.push(light);
   }
 }

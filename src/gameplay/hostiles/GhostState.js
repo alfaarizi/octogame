@@ -9,7 +9,7 @@ export const GhostState = Object.freeze({
 /** @typedef {(typeof GhostState)[keyof typeof GhostState]} GhostStateName */
 
 /**
- * States in which the ghost is in the house and can be seen, lit or touched.
+ * States in which the ghost is in the office and can be seen, lit or touched.
  * @type {ReadonlySet<GhostStateName>}
  */
 export const PRESENT_GHOST_STATES = new Set([GhostState.WANDERING, GhostState.HUNTING, GhostState.FROZEN]);

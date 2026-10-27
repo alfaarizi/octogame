@@ -2,7 +2,7 @@ import { deepFreeze, degreesToRadians } from '../utils.js';
 
 /**
  * Every value worth tweaking after a playtest.
- * Distances are meters (one map tile is 1 m), durations are seconds and angles are radians.
+ * Distances are meters, durations are seconds and angles are radians.
  */
 export const GAME_CONFIG = deepFreeze({
   round: {
@@ -89,7 +89,8 @@ export const GAME_CONFIG = deepFreeze({
     /** How much you can see with the flashlight off. */
     moonlightIntensity: 1.6,
     lanternIntensity: 1.6,
-    fireIntensity: 2.5,
+    /** Server lights, the CCTV monitor and the neon sign. */
+    fixtureIntensity: 1.5,
     exitIntensity: 4,
     shadowMapSize: 1024,
   },

@@ -6,7 +6,7 @@ export const MESSAGES = Object.freeze({
 
   roundIntro: (candiesRequired) => `Find ${candiesRequired} candies. Click to switch your flashlight on and off.`,
   candiesRemaining: (count) => `${count} more to go`,
-  exitOpen: 'The front door is open. RUN!',
+  exitOpen: 'The main gate is open. RUN!',
   batteryCollected: '+ Battery',
   batteryLow: 'Battery low',
   flashlightDepleted: 'Your flashlight died…',

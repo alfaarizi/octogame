@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { beforeEach, describe, test } from 'node:test';
 import { GAME_CONFIG } from '../src/config/gameConfig.js';
 import { GameEvent } from '../src/core/GameEvent.js';
-import { BATTERY_SPOTS, CANDY_SPOTS, EXIT_DOOR, GHOST_SPOTS, GHOST_START, OBSTACLES, PLAYER_START, TILE_ROWS } from '../src/data/houseLayout.js';
+import { BATTERY_SPOTS, CANDY_SPOTS, EXIT_DOOR, GHOST_SPOTS, GHOST_START, OBSTACLES, PLAYER_START, TILE_ROWS } from '../src/data/officeLayout.js';
 import { GhostState } from '../src/gameplay/hostiles/GhostState.js';
 import { PickupKind } from '../src/gameplay/pickups/PickupField.js';
 import { RoundOutcome } from '../src/gameplay/round/Round.js';
@@ -64,7 +64,7 @@ describe('Simulation', () => {
     assert.notEqual(simulation.ghost.state, GhostState.FROZEN);
   });
 
-  test('clearing empties the house and relocks the door', () => {
+  test('clearing empties the office and relocks the exit', () => {
     simulation.exitDoor.unlock();
     simulation.clear();
     assert.equal(simulation.pickups.items.length, 0);

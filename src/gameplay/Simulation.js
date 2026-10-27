@@ -20,7 +20,7 @@ import { Round, RoundOutcome } from './round/Round.js';
 /** @typedef {import('./hostiles/threat.js').Threat} Threat */
 
 /**
- * The fixed parts of the house that the rules need.
+ * The fixed parts of the office that the rules need.
  * @typedef {object} SimulationLayout
  * @property {SpawnPoint} playerStart
  * @property {FloorPoint} ghostStart
@@ -113,7 +113,7 @@ export class Simulation {
     this.ghost.deactivate();
   }
 
-  /** Empties the house between players: no ghost, no pickups, and the front door locked. */
+  /** Empties the office between players: no ghost, no pickups, and the exit locked. */
   clear() {
     this.endRound();
     this.pickups.clear();

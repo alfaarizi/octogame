@@ -51,7 +51,7 @@ export class Ghost {
     return this.#state;
   }
 
-  /** In the house: visible, lightable and dangerous. */
+  /** In the office: visible, lightable and dangerous. */
   get isPresent() {
     return PRESENT_GHOST_STATES.has(this.#state);
   }
@@ -171,7 +171,7 @@ export class Ghost {
   #driftToward(target, speed, seconds) {
     const distance = planarDistance(this.position, target);
     if (distance < 1e-3) return 0;
-    const isInsideWall = this.#tileMap.isBlocked(this.position.x, this.position.z);
+    const isInsideWall = this.#tileMap.isOpaque(this.position.x, this.position.z);
     const step = Math.min(distance, speed * seconds * (isInsideWall ? this.#config.insideWallSpeedFactor : 1));
     this.heading = headingTo(this.position, target);
     this.position.x += ((target.x - this.position.x) / distance) * step;

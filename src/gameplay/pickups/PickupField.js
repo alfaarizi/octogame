@@ -6,7 +6,7 @@ import { planarDistance } from '../../utils.js';
 export const PickupKind = Object.freeze({ CANDY: 'candy', BATTERY: 'battery' });
 
 /**
- * A candy or battery lying in the house. Its id lets views keep track of its mesh.
+ * A candy or battery lying in the office. Its id lets views keep track of its mesh.
  * @typedef {object} Pickup
  * @property {number} id
  * @property {string} kind - A PickupKind value.
