@@ -2,9 +2,9 @@ import assert from 'node:assert/strict';
 import { describe, test } from 'node:test';
 import { GAME_CONFIG } from '../src/config/gameConfig.js';
 import { GameEvent } from '../src/core/GameEvent.js';
-import { AmbientNoiseCue, AmbientNoiseKind } from '../src/gameplay/cues/AmbientNoiseCue.js';
-import { CandyNearbyCue } from '../src/gameplay/cues/CandyNearbyCue.js';
-import { FootstepCue } from '../src/gameplay/cues/FootstepCue.js';
+import { AmbientNoiseCue, AmbientNoiseKind } from '../src/models/cues/AmbientNoiseCue.js';
+import { CandyNearbyCue } from '../src/models/cues/CandyNearbyCue.js';
+import { FootstepCue } from '../src/models/cues/FootstepCue.js';
 import { recordingEventBus } from './helpers.js';
 
 describe('FootstepCue', () => {

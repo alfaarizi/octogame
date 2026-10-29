@@ -2,14 +2,14 @@ import assert from 'node:assert/strict';
 import { beforeEach, describe, test } from 'node:test';
 import { GAME_CONFIG } from '../src/config/gameConfig.js';
 import { GameEvent } from '../src/core/GameEvent.js';
-import { BATTERY_SPOTS, CANDY_SPOTS, EXIT_DOOR, FLOORS, GHOST_SPOTS, GHOST_START, PLAYER_START, TILE_SIZE } from '../src/data/officeLayout.js';
-import { GhostState } from '../src/gameplay/hostiles/GhostState.js';
-import { PickupKind } from '../src/gameplay/pickups/PickupField.js';
-import { RoundOutcome } from '../src/gameplay/round/Round.js';
-import { Simulation } from '../src/gameplay/Simulation.js';
-import { Building } from '../src/world/Building.js';
-import { SpawnTable } from '../src/world/SpawnTable.js';
+import { GhostState } from '../src/models/hostiles/GhostState.js';
+import { PickupKind } from '../src/models/pickups/PickupField.js';
+import { RoundOutcome } from '../src/models/round/Round.js';
+import { Simulation } from '../src/models/Simulation.js';
+import { Building } from '../src/models/world/Building.js';
+import { SpawnTable } from '../src/models/world/SpawnTable.js';
 import { recordingEventBus } from './helpers.js';
+import { OFFICE } from './office.js';
 
 const STAND_STILL = Object.freeze({ intent: { forward: 0, strafe: 0, turn: 0, sprint: false }, look: { x: 0, y: 0 } });
 
@@ -21,9 +21,9 @@ describe('Simulation', () => {
     simulation = new Simulation({
       config: GAME_CONFIG,
       events: recorder.bus,
-      building: new Building(FLOORS, TILE_SIZE),
-      spawnTable: new SpawnTable({ candySpots: CANDY_SPOTS, batterySpots: BATTERY_SPOTS, ghostSpots: GHOST_SPOTS }),
-      layout: { playerStart: PLAYER_START, ghostStart: GHOST_START, exitDoor: EXIT_DOOR },
+      building: new Building(OFFICE.floors, OFFICE.tileSize),
+      spawnTable: new SpawnTable({ candySpots: OFFICE.candySpots, batterySpots: OFFICE.batterySpots, ghostSpots: OFFICE.ghostSpots }),
+      layout: { playerStart: OFFICE.playerStart, ghostStart: OFFICE.ghostStart, exitDoor: OFFICE.exitDoor },
     });
     simulation.startRound();
   });
@@ -39,7 +39,7 @@ describe('Simulation', () => {
     assert.equal(simulation.exitDoor.isUnlocked, true);
     assert.equal(simulation.ghost.isEnraged, true);
 
-    standAt({ x: EXIT_DOOR.centerX, y: 0, z: EXIT_DOOR.trigger.minZ + 0.5 });
+    standAt({ x: OFFICE.exitDoor.centerX, y: 0, z: OFFICE.exitDoor.trigger.minZ + 0.5 });
     assert.equal(simulation.step(0.01, STAND_STILL), RoundOutcome.ESCAPED);
     assert.equal(recorder.count(GameEvent.PLAYER_ESCAPED), 1);
   });

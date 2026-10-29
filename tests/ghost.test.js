@@ -2,8 +2,8 @@ import assert from 'node:assert/strict';
 import { beforeEach, describe, test } from 'node:test';
 import { GAME_CONFIG } from '../src/config/gameConfig.js';
 import { GameEvent } from '../src/core/GameEvent.js';
-import { Ghost } from '../src/gameplay/hostiles/Ghost.js';
-import { GhostState } from '../src/gameplay/hostiles/GhostState.js';
+import { Ghost } from '../src/models/hostiles/Ghost.js';
+import { GhostState } from '../src/models/hostiles/GhostState.js';
 import { singleFloorBuilding } from './helpers.js';
 
 const config = GAME_CONFIG.ghost;

@@ -1,19 +1,19 @@
 import assert from 'node:assert/strict';
 import { describe, test } from 'node:test';
 import { GameEvent } from '../src/core/GameEvent.js';
-import { EXIT_DOOR } from '../src/data/officeLayout.js';
-import { measureThreat } from '../src/gameplay/hostiles/threat.js';
-import { PickupField, PickupKind } from '../src/gameplay/pickups/PickupField.js';
-import { compareResults, rankResults } from '../src/gameplay/round/leaderboardRanking.js';
-import { Round, RoundOutcome } from '../src/gameplay/round/Round.js';
-import { ScoreRepository } from '../src/persistence/ScoreRepository.js';
-import { ExitDoor } from '../src/world/ExitDoor.js';
+import { measureThreat } from '../src/models/hostiles/threat.js';
+import { ScoreRepository } from '../src/models/persistence/ScoreRepository.js';
+import { PickupField, PickupKind } from '../src/models/pickups/PickupField.js';
+import { compareResults, rankResults } from '../src/models/round/leaderboardRanking.js';
+import { Round, RoundOutcome } from '../src/models/round/Round.js';
+import { ExitDoor } from '../src/models/world/ExitDoor.js';
 import { recordingEventBus } from './helpers.js';
+import { OFFICE } from './office.js';
 
 describe('Round', () => {
   test('opens the exit exactly once, when the last candy is collected', () => {
     const recorder = recordingEventBus();
-    const exitDoor = new ExitDoor(EXIT_DOOR);
+    const exitDoor = new ExitDoor(OFFICE.exitDoor);
     const round = new Round({ events: recorder.bus, exitDoor, candiesRequired: 3 });
     round.start();
     round.recordCandy();
@@ -26,7 +26,7 @@ describe('Round', () => {
   });
 
   test('starting a new round relocks the door and resets the count', () => {
-    const exitDoor = new ExitDoor(EXIT_DOOR);
+    const exitDoor = new ExitDoor(OFFICE.exitDoor);
     const round = new Round({ events: recordingEventBus().bus, exitDoor, candiesRequired: 1 });
     round.start();
     round.recordCandy();
@@ -38,7 +38,7 @@ describe('Round', () => {
   });
 
   test('summarizes the outcome', () => {
-    const exitDoor = new ExitDoor(EXIT_DOOR);
+    const exitDoor = new ExitDoor(OFFICE.exitDoor);
     const round = new Round({ events: recordingEventBus().bus, exitDoor, candiesRequired: 5 });
     round.start();
     round.tick(42);

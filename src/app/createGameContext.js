@@ -1,67 +1,57 @@
-import { AudioDirector } from '../audio/AudioDirector.js';
-import { AudioEngine } from '../audio/AudioEngine.js';
+import { BrowserPointerLock } from '../controllers/input/BrowserPointerLock.js';
+import { InputController } from '../controllers/input/InputController.js';
+import { SimulatedPointerLock } from '../controllers/input/SimulatedPointerLock.js';
 import { EventBus } from '../core/EventBus.js';
-import {
-  BATTERY_SPOTS,
-  CANDY_SPOTS,
-  EXIT_DOOR,
-  FLOORS,
-  GHOST_SPOTS,
-  GHOST_START,
-  GLOWING_FIXTURES,
-  LANTERNS,
-  LOW_WALL_HEIGHT,
-  PLAYER_START,
-  STOREY_HEIGHT,
-  TILE_SIZE,
-} from '../data/officeLayout.js';
-import { Simulation } from '../gameplay/Simulation.js';
-import { BrowserPointerLock } from '../input/BrowserPointerLock.js';
-import { InputController } from '../input/InputController.js';
-import { SimulatedPointerLock } from '../input/SimulatedPointerLock.js';
-import { LocalJsonStore } from '../persistence/LocalJsonStore.js';
-import { PreferencesRepository } from '../persistence/PreferencesRepository.js';
-import { ScoreRepository } from '../persistence/ScoreRepository.js';
-import { GhostView } from '../rendering/hostiles/GhostView.js';
-import { ExitDoorView } from '../rendering/office/ExitDoorView.js';
-import { OfficeLightingView } from '../rendering/office/OfficeLightingView.js';
-import { createOfficeModel } from '../rendering/office/officeModel.js';
-import { PickupView } from '../rendering/pickups/PickupView.js';
-import { FirstPersonView } from '../rendering/player/FirstPersonView.js';
-import { RenderContext } from '../rendering/RenderContext.js';
-import { Hud } from '../ui/hud/Hud.js';
-import { HudDirector } from '../ui/hud/HudDirector.js';
-import { ScreenEffects } from '../ui/hud/ScreenEffects.js';
-import { PauseScreen } from '../ui/screens/PauseScreen.js';
-import { ResultScreen } from '../ui/screens/ResultScreen.js';
-import { TitleScreen } from '../ui/screens/TitleScreen.js';
-import { deepFreeze } from '../utils.js';
-import { Building } from '../world/Building.js';
-import { SpawnTable } from '../world/SpawnTable.js';
+import { LocalJsonStore } from '../models/persistence/LocalJsonStore.js';
+import { PreferencesRepository } from '../models/persistence/PreferencesRepository.js';
+import { ScoreRepository } from '../models/persistence/ScoreRepository.js';
+import { Simulation } from '../models/Simulation.js';
+import { Building } from '../models/world/Building.js';
+import { SpawnTable } from '../models/world/SpawnTable.js';
+import { AudioDirector } from '../views/audio/AudioDirector.js';
+import { AudioEngine } from '../views/audio/AudioEngine.js';
+import { GhostView } from '../views/scene/hostiles/GhostView.js';
+import { ExitDoorView } from '../views/scene/office/ExitDoorView.js';
+import { OfficeLightingView } from '../views/scene/office/OfficeLightingView.js';
+import { createOfficeModel } from '../views/scene/office/officeModel.js';
+import { PickupView } from '../views/scene/pickups/PickupView.js';
+import { FirstPersonView } from '../views/scene/player/FirstPersonView.js';
+import { RenderContext } from '../views/scene/RenderContext.js';
+import { Hud } from '../views/ui/hud/Hud.js';
+import { HudDirector } from '../views/ui/hud/HudDirector.js';
+import { ScreenEffects } from '../views/ui/hud/ScreenEffects.js';
+import { PauseScreen } from '../views/ui/screens/PauseScreen.js';
+import { ResultScreen } from '../views/ui/screens/ResultScreen.js';
+import { TitleScreen } from '../views/ui/screens/TitleScreen.js';
+
+/** @typedef {import('../models/level/parseLevel.js').Level} Level */
 
 /**
- * Builds every object the game needs and connects them. This is the only place that knows
- * the concrete classes; everything else receives what it needs through its constructor.
+ * Builds every object the game needs and connects them: the models, the views that show them, and the
+ * input and persistence the controllers use. This is the only place that knows the concrete classes;
+ * everything else receives what it needs through its constructor.
  *
- * @param {{ config: typeof import('../config/gameConfig.js').GAME_CONFIG, isTestMode: boolean }} options
+ * @param {object} options
+ * @param {typeof import('../config/gameConfig.js').GAME_CONFIG} options.config
+ * @param {Level} options.level - The building to play in, loaded from data/.
+ * @param {boolean} options.isTestMode
  */
-export function createGameContext({ config, isTestMode }) {
+export function createGameContext({ config, level, isTestMode }) {
   const events = new EventBus();
-  const building = new Building(FLOORS, TILE_SIZE);
-  const layout = deepFreeze({ playerStart: PLAYER_START, ghostStart: GHOST_START, exitDoor: EXIT_DOOR });
-  const spawnTable = new SpawnTable({ candySpots: CANDY_SPOTS, batterySpots: BATTERY_SPOTS, ghostSpots: GHOST_SPOTS });
-  const simulation = new Simulation({ config, events, building, spawnTable, layout });
+  const building = new Building(level.floors, level.tileSize);
+  const spawnTable = new SpawnTable(level);
+  const simulation = new Simulation({ config, events, building, spawnTable, layout: level });
   const render = new RenderContext(document.body, config.rendering);
   const pointerLock = isTestMode ? new SimulatedPointerLock() : new BrowserPointerLock(render.canvas);
   const store = new LocalJsonStore();
 
   return Object.freeze({
     config,
-    layout,
+    level,
     events,
     simulation,
     render,
-    views: createViews({ config, events, simulation, render }),
+    views: createViews({ config, events, level, building, simulation, render }),
     pointerLock,
     input: new InputController({ surface: render.canvas, pointerLock }),
     audio: new AudioDirector({ engine: new AudioEngine(config.audio), events, screamSamplePaths: config.audio.screamSamplePaths }),
@@ -70,8 +60,8 @@ export function createGameContext({ config, isTestMode }) {
   });
 }
 
-function createViews({ config, events, simulation, render }) {
-  render.scene.add(createOfficeModel(FLOORS, { tileSize: TILE_SIZE, storeyHeight: STOREY_HEIGHT, lowWallHeight: LOW_WALL_HEIGHT }));
+function createViews({ config, events, level, building, simulation, render }) {
+  render.scene.add(createOfficeModel(level, building.tileMaps));
   return Object.freeze({
     firstPerson: new FirstPersonView(render.camera, {
       eyeHeight: config.player.eyeHeight,
@@ -79,12 +69,12 @@ function createViews({ config, events, simulation, render }) {
       shadowMapSize: config.rendering.shadowMapSize,
     }),
     lighting: new OfficeLightingView(render.scene, events, {
-      lanterns: LANTERNS,
-      fixtures: GLOWING_FIXTURES,
+      lanterns: level.lanterns,
+      fixtures: level.fixtures,
       lanternIntensity: config.rendering.lanternIntensity,
       fixtureIntensity: config.rendering.fixtureIntensity,
     }),
-    exitDoor: new ExitDoorView(render.scene, simulation.exitDoor, EXIT_DOOR, config.rendering.exitIntensity),
+    exitDoor: new ExitDoorView(render.scene, simulation.exitDoor, level.exitDoor, config.rendering.exitIntensity),
     ghost: new GhostView(render.scene, simulation.ghost, config.ghost),
     pickups: new PickupView(render.scene, simulation.pickups, config.flashlight.beamCone),
   });

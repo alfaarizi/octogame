@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { describe, test } from 'node:test';
 import { GAME_CONFIG } from '../src/config/gameConfig.js';
 import { GameEvent } from '../src/core/GameEvent.js';
-import { Flashlight } from '../src/gameplay/player/Flashlight.js';
+import { Flashlight } from '../src/models/player/Flashlight.js';
 import { recordingEventBus } from './helpers.js';
 
 const config = GAME_CONFIG.flashlight;

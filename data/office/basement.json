@@ -1,0 +1,85 @@
+{
+  "name": "basement",
+  "description": "A workshop under the north-east of the building, with the CNC machines, a few desks and a storage room. Stairs lead up to the ground floor's workshop, and out to the front yard.",
+  "tiles": [
+    "                                                ",
+    "                                                ",
+    "                                       ######   ",
+    "                          ##############SS###   ",
+    "                          #............#SS###   ",
+    "                          #............#SS###   ",
+    "                          #............#SS###   ",
+    "                          #............#SS###   ",
+    "                          #............#SS###   ",
+    "                          #............#SS###   ",
+    "                          #................#    ",
+    "                          #................#    ",
+    "                          #...............##    ",
+    "                          #.......#########     ",
+    "                          #.......#.......#     ",
+    "                          #.......#.......#     ",
+    "                          #.......#.......#     ",
+    "                          #.......#.......#     ",
+    "                          #####...#..######     ",
+    "                              #SSSSSS#          ",
+    "                              #SSSSSS#          ",
+    "                              #SSSSSS#          ",
+    "                              #SSSSSS#          ",
+    "                              #SSSSSS#          ",
+    "                              #SSSSSS#          ",
+    "                              #SSSSSS#          ",
+    "                              #SSSSSS#          ",
+    "                              ########          "
+  ],
+  "furniture": {
+    "workshop": [
+      { "name": "CNC machine (old)", "parts": [{ "box": [13.55, 2.05, 14.75, 3.3, 0, 1], "color": "appliance" }, { "box": [13.65, 2.15, 14.65, 3.2, 1, 1.05], "color": "gym" }, { "box": [13.6, 2.5, 14.7, 2.65, 1.05, 1.5], "color": "gym" }] },
+      { "name": "CNC machine (new)", "parts": [{ "box": [15, 2.05, 16.2, 3.3, 0, 1], "color": "appliance" }, { "box": [15.1, 2.15, 16.1, 3.2, 1, 1.05], "color": "gym" }, { "box": [15.05, 2.5, 16.15, 2.65, 1.05, 1.5], "color": "gym" }] },
+      { "name": "desk (Ajeng)", "parts": [{ "desk": [16.4, 2, 17.6, 2.6] }, { "chair": { "x": 17, "z": 2.9 }, "facing": "north" }] },
+      { "name": "desk (Ferry)", "parts": [{ "desk": [17.6, 2, 18.8, 2.6] }, { "chair": { "x": 18.2, "z": 2.9 }, "facing": "north" }] },
+      { "name": "column", "parts": [{ "box": [18.8, 3.15, 19.25, 3.6, 0, 3], "color": "pillar" }] },
+      { "name": "desk (Rafidal)", "parts": [{ "desk": [17.9, 3.95, 18.6, 5] }, { "chair": { "x": 17.6, "z": 4.45 }, "facing": "east" }] },
+      { "name": "work table", "parts": [{ "table": [14.3, 3.9, 15.4, 6.2], "height": 0.76, "color": "wood" }, { "stool": { "x": 14, "z": 4.4 }, "height": 0.48, "color": "chair" }, { "stool": { "x": 14, "z": 5.6 }, "height": 0.48, "color": "chair" }, { "stool": { "x": 15.7, "z": 4.4 }, "height": 0.48, "color": "chair" }, { "stool": { "x": 15.7, "z": 5.6 }, "height": 0.48, "color": "chair" }] },
+      { "name": "workbench", "parts": [{ "table": [18, 5.95, 20.9, 6.5], "height": 0.76, "color": "wood" }] },
+      { "name": "table", "parts": [{ "table": [14.3, 7.4, 15.5, 8.2], "height": 0.76, "color": "wood" }] },
+      { "name": "bench", "parts": [{ "box": [13.5, 8.55, 15.4, 9, 0, 0.45], "color": "cabinet" }] },
+      { "name": "tall cabinet", "parts": [{ "box": [16.6, 6.6, 17, 8.4, 0, 1.8], "color": "cabinet" }] }
+    ],
+    "storage room": [
+      { "name": "storage shelves", "parts": [{ "box": [17.6, 7, 20.7, 7.4, 0, 1.9], "color": "shelf" }] },
+      { "name": "stack of crates", "parts": [{ "box": [20.2, 8.3, 20.8, 8.9, 0, 0.55], "color": "crate" }, { "box": [20.25, 8.35, 20.75, 8.85, 0.55, 1.05], "color": "crate" }] }
+    ]
+  },
+  "lanterns": [
+    { "name": "on the work table, facing the stairs from the front yard", "x": 14.85, "y": 0.76, "z": 5.6, "lookAt": { "x": 16.2, "z": 9 } }
+  ],
+  "fixtures": [
+    { "name": "CNC control panel", "box": [16.2, 2.35, 16.23, 2.85, 0.6, 0.95], "color": "#ffa040", "light": { "x": 16.6, "y": 0.9, "z": 2.6 } }
+  ],
+  "portraits": [],
+  "candySpots": [
+    { "room": "CNC corner", "x": 14.15, "y": 1.58, "z": 2.7 },
+    { "room": "CNC corner", "x": 16.6, "y": 0.08, "z": 3.5 },
+    { "room": "basement desks", "x": 17, "y": 0.84, "z": 2.3 },
+    { "room": "basement desks", "x": 18.25, "y": 0.84, "z": 4.5 },
+    { "room": "basement workshop", "x": 14.85, "y": 0.84, "z": 4.4 },
+    { "room": "basement workshop", "x": 14.9, "y": 0.84, "z": 7.8 },
+    { "room": "storage room", "x": 19.2, "y": 0.08, "z": 8.6 },
+    { "room": "storage room", "x": 20.5, "y": 1.13, "z": 8.6 }
+  ],
+  "batterySpots": [
+    { "x": 13.8, "y": 0.25, "z": 6.8 },
+    { "x": 20.6, "y": 0.25, "z": 5.5 },
+    { "x": 18, "y": 0.25, "z": 8.6 }
+  ],
+  "ghostSpots": [
+    { "x": 15.9, "z": 3.8 },
+    { "x": 16, "z": 7.6 },
+    { "x": 19.6, "z": 8.2 },
+    { "x": 20.6, "z": 5.4 }
+  ],
+  "stairs": [
+    { "name": "workshop stairwell, up to the ground floor's workshop", "rect": [20, 1.5, 21, 5], "rises": "north", "low": 0, "high": 3, "rails": [] },
+    { "name": "yard stairs, up to the front yard", "rect": [15.5, 9.5, 18.5, 13.5], "rises": "south", "low": 0, "high": 3, "rails": ["east"] }
+  ]
+}

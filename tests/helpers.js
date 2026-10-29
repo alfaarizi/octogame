@@ -1,5 +1,5 @@
 import { EventBus } from '../src/core/EventBus.js';
-import { Building } from '../src/world/Building.js';
+import { Building } from '../src/models/world/Building.js';
 
 /** An EventBus that also remembers every event emitted, for assertions. */
 export function recordingEventBus() {

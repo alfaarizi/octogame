@@ -1,13 +1,13 @@
 import assert from 'node:assert/strict';
 import { describe, test } from 'node:test';
-import { EXIT_DOOR } from '../src/data/officeLayout.js';
+import { Building } from '../src/models/world/Building.js';
+import { CollisionWorld } from '../src/models/world/CollisionWorld.js';
+import { ExitDoor } from '../src/models/world/ExitDoor.js';
+import { SpawnTable } from '../src/models/world/SpawnTable.js';
+import { TileMap } from '../src/models/world/TileMap.js';
 import { Compass } from '../src/utils.js';
-import { Building } from '../src/world/Building.js';
-import { CollisionWorld } from '../src/world/CollisionWorld.js';
-import { ExitDoor } from '../src/world/ExitDoor.js';
-import { SpawnTable } from '../src/world/SpawnTable.js';
-import { TileMap } from '../src/world/TileMap.js';
 import { SMALL_ROOM } from './helpers.js';
+import { OFFICE } from './office.js';
 
 describe('TileMap', () => {
   const map = new TileMap(SMALL_ROOM);
@@ -142,8 +142,8 @@ describe('SpawnTable', () => {
 
 describe('ExitDoor', () => {
   test('only counts as reached once unlocked', () => {
-    const door = new ExitDoor(EXIT_DOOR);
-    const { centerX, trigger } = EXIT_DOOR;
+    const door = new ExitDoor(OFFICE.exitDoor);
+    const { centerX, trigger } = OFFICE.exitDoor;
     const atDoor = { x: centerX, z: trigger.minZ + 0.2 };
     assert.equal(door.isReachedBy(atDoor), false);
     door.unlock();

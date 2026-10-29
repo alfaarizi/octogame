@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { describe, test } from 'node:test';
 import { GAME_CONFIG } from '../src/config/gameConfig.js';
-import { Player } from '../src/gameplay/player/Player.js';
+import { Player } from '../src/models/player/Player.js';
 
 const noWalls = {
   move(position, dx, dz) {

@@ -1,0 +1,65 @@
+import { GameEvent } from '../core/GameEvent.js';
+import { STANDING_STILL } from '../models/player/Player.js';
+import { RoundOutcome } from '../models/round/Round.js';
+import { chance } from '../utils.js';
+import { FlashColor } from '../views/ui/hud/ScreenEffects.js';
+
+/** @typedef {import('../types.js').Session} Session */
+
+const GENTLE_FADE_SECONDS = 1.4;
+const CAUGHT_FLASH_SECONDS = 0.9;
+const BEAM_STROBE = Object.freeze({ chance: 0.3, dim: 0.15 });
+
+/** The ghost got you: the jump scare (or a gentle fade in chicken mode), then the result. */
+export class JumpScareController {
+  #context;
+  #game;
+  #session;
+  #elapsed = 0;
+  #hasFlashed = false;
+
+  /**
+   * @param {object} context - The objects built by createGameContext().
+   * @param {import('./GameController.js').GameController} game - Asked to move on via showResult().
+   * @param {Session} session - The current player's choices.
+   */
+  constructor(context, game, session) {
+    this.#context = context;
+    this.#game = game;
+    this.#session = session;
+  }
+
+  enter() {
+    const { events, ui, views } = this.#context;
+    ui.hud.hide();
+    events.emit(GameEvent.JUMP_SCARE_STARTED, { gentle: this.#session.chickenMode, listenerPosition: { ...views.firstPerson.sight.origin } });
+    if (this.#session.chickenMode) {
+      views.ghost.hide();
+      ui.effects.flash(FlashColor.FADE_TO_BLACK, GENTLE_FADE_SECONDS);
+    }
+  }
+
+  update(seconds) {
+    this.#elapsed += seconds;
+    const { config, simulation } = this.#context;
+    if (!this.#session.chickenMode) this.#playJumpScare(seconds, config.jumpScare);
+    const duration = this.#session.chickenMode ? config.jumpScare.gentleDuration : config.jumpScare.duration;
+    if (this.#elapsed > duration) {
+      this.#game.showResult(simulation.round.summarize(this.#session.playerName, RoundOutcome.CAUGHT));
+    }
+  }
+
+  /** Face in the camera, screen shaking, beam strobing, then a red flash. */
+  #playJumpScare(seconds, { shakeAmount, shakeFadeTime, flashAt }) {
+    const { simulation, ui, views } = this.#context;
+    const { firstPerson } = views;
+    firstPerson.update(seconds, simulation.player, STANDING_STILL);
+    views.ghost.showJumpScare(firstPerson.sight, this.#elapsed, seconds);
+    firstPerson.shake(shakeAmount * Math.max(0, 1 - this.#elapsed / shakeFadeTime));
+    firstPerson.setBeamBrightness(chance(BEAM_STROBE.chance) ? BEAM_STROBE.dim : 1);
+    if (!this.#hasFlashed && this.#elapsed > flashAt) {
+      this.#hasFlashed = true;
+      ui.effects.flash(FlashColor.CAUGHT, CAUGHT_FLASH_SECONDS);
+    }
+  }
+}
