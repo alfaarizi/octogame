@@ -1,6 +1,6 @@
 import { crashReporter } from './app/crashReporter.js';
 import { createGameContext } from './app/createGameContext.js';
-import { fetchJson } from './app/fetchJson.js';
+import { fetchText } from './app/fetchText.js';
 import { GAME_CONFIG } from './config/gameConfig.js';
 import { GameController } from './controllers/GameController.js';
 import { installTestHarness } from './debug/testHarness.js';
@@ -10,7 +10,7 @@ const LEVEL_URL = new URL('data/office/building.json', document.baseURI);
 
 async function start() {
   const isTestMode = new URLSearchParams(window.location.search).has('test');
-  const level = await loadLevel(LEVEL_URL, fetchJson);
+  const level = await loadLevel(LEVEL_URL, fetchText);
   const context = createGameContext({ config: GAME_CONFIG, level, isTestMode });
   const game = new GameController(context);
 

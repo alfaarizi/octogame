@@ -3,7 +3,7 @@ import { describe, test } from 'node:test';
 import { GAME_CONFIG } from '../src/config/gameConfig.js';
 import { Building } from '../src/models/world/Building.js';
 import { StairFlight } from '../src/models/world/StairFlight.js';
-import { Tile, TileMap } from '../src/models/world/TileMap.js';
+import { Tile } from '../src/models/world/TileMap.js';
 import { planarDistance } from '../src/utils.js';
 import { OFFICE } from './office.js';
 
@@ -32,20 +32,20 @@ function reachablePoints(building, radius, start) {
 // Guards against level-design mistakes: things placed inside walls, stairs that don't line up, or places you can't get to.
 describe('office layout', () => {
   const { collisionRadius, pickupRadius, reachHeight } = GAME_CONFIG.player;
-  const reachable = reachablePoints(new Building(OFFICE.floors, OFFICE.tileSize), collisionRadius, OFFICE.playerStart);
-  const floorAt = (y) => OFFICE.floors.findLast((floor) => floor.elevation <= y + 1e-9);
+  const building = new Building(OFFICE.floors, OFFICE.tileSize);
+  const reachable = reachablePoints(building, collisionRadius, OFFICE.playerStart);
+  const tileMapAt = (y) => building.tileMaps[OFFICE.floors.findLastIndex((floor) => floor.elevation <= y + 1e-9)];
 
   test('every spawn point is on a tile you can walk on', () => {
     for (const spot of [OFFICE.playerStart, OFFICE.ghostStart, ...OFFICE.floors.flatMap((floor) => [...floor.candySpots, ...floor.batterySpots, ...floor.ghostSpots])]) {
-      const map = new TileMap(floorAt(spot.y).tiles, OFFICE.tileSize);
-      assert.equal(map.isBlocked(spot.x, spot.z), false, `${JSON.stringify(spot)} is inside a wall`);
+      assert.equal(tileMapAt(spot.y).isBlocked(spot.x, spot.z), false, `${JSON.stringify(spot)} is inside a wall`);
     }
   });
 
   test('stairs are stairs on the floor they rise from, and from halfway up on the floor above', () => {
     const isStairs = (tile) => tile === Tile.STAIRS || tile === Tile.OUTDOOR_STAIRS;
     OFFICE.floors.slice(0, -1).forEach((floor, index) => {
-      const [below, above] = [floor, OFFICE.floors[index + 1]].map(({ tiles }) => new TileMap(tiles, OFFICE.tileSize));
+      const [below, above] = [building.tileMaps[index], building.tileMaps[index + 1]];
       const halfway = (floor.elevation + OFFICE.floors[index + 1].elevation) / 2;
       for (const plan of floor.stairs) {
         const { rect } = plan, flight = new StairFlight(plan);

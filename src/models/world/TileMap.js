@@ -32,21 +32,29 @@ const SIGHT_SAMPLE_STEP = 0.15;
 export class TileMap {
   #rows;
   #tileSize;
+  #origin;
 
   /**
    * @param {readonly string[]} rows - One string per row of tiles, one character per tile (see Tile).
    * @param {number} [tileSize] - The width of a tile, in meters.
+   * @param {FloorPoint} [origin] - Where the map's top-left corner (its first row's first tile) lies.
    */
-  constructor(rows, tileSize = 1) {
+  constructor(rows, tileSize = 1, origin = { x: 0, z: 0 }) {
     if (rows.length === 0 || rows.some((row) => row.length !== rows[0].length)) {
       throw new Error('TileMap rows must be non-empty and all the same length');
     }
     this.#rows = rows;
     this.#tileSize = tileSize;
+    this.#origin = origin;
   }
 
   get tileSize() {
     return this.#tileSize;
+  }
+
+  /** @returns {FloorPoint} Where the map's top-left corner lies. */
+  get origin() {
+    return this.#origin;
   }
 
   /** The map's extent along x, in meters. */
@@ -61,7 +69,7 @@ export class TileMap {
 
   /** The tile under a point in meters, or undefined outside the map. */
   tileAt(x, z) {
-    return this.#tileIn(Math.floor(x / this.#tileSize), Math.floor(z / this.#tileSize));
+    return this.#tileIn(this.#columnAt(x), this.#rowAt(z));
   }
 
   /** Whether nobody can walk at this point. Everything outside the map counts as blocked. */
@@ -88,7 +96,7 @@ export class TileMap {
    * @returns {Rect[]} The blocking tiles among the 3 x 3 tiles around `point`, including any outside the map.
    */
   blockingRectsAround({ x, z }) {
-    const column = Math.floor(x / this.#tileSize), row = Math.floor(z / this.#tileSize);
+    const column = this.#columnAt(x), row = this.#rowAt(z);
     const rects = [];
     for (let r = row - 1; r <= row + 1; r++) {
       for (let c = column - 1; c <= column + 1; c++) {
@@ -113,14 +121,22 @@ export class TileMap {
     return true;
   }
 
+  #columnAt(x) {
+    return Math.floor((x - this.#origin.x) / this.#tileSize);
+  }
+
+  #rowAt(z) {
+    return Math.floor((z - this.#origin.z) / this.#tileSize);
+  }
+
   #tileIn(column, row) {
     return this.#rows[row]?.[column];
   }
 
   /** @returns {Rect} */
   #rectOf(column, row) {
-    const size = this.#tileSize;
-    return { x0: column * size, z0: row * size, x1: (column + 1) * size, z1: (row + 1) * size };
+    const size = this.#tileSize, { x, z } = this.#origin;
+    return { x0: x + column * size, z0: z + row * size, x1: x + (column + 1) * size, z1: z + (row + 1) * size };
   }
 }
 

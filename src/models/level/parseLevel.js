@@ -49,6 +49,8 @@ import {
  * @property {string} name
  * @property {number} elevation - Height of the floor's surface.
  * @property {readonly string[]} tiles - One character per tile (see Tile in world/TileMap.js).
+ * @property {FloorPoint} tilesOrigin - Where the first row's first tile lies, so a floor's tile map only needs to
+ *   cover the floor itself.
  * @property {readonly FurniturePiece[]} furniture
  * @property {readonly Rect[]} obstacles - The furniture footprints the player bumps into.
  * @property {readonly Lantern[]} lanterns
@@ -84,11 +86,18 @@ import {
  */
 
 /**
- * The JSON a level is made of.
+ * One floor's files: its JSON, and the text of the tile map it names.
+ * @typedef {object} FloorSource
+ * @property {unknown} data - The floor's JSON.
+ * @property {string} tiles - The contents of its tiles file.
+ */
+
+/**
+ * What a level is made of.
  * @typedef {object} LevelSources
  * @property {unknown} building - The contents of building.json.
  * @property {unknown} palette - The palette file it names.
- * @property {unknown[]} floors - The floor files it names, in the same order.
+ * @property {FloorSource[]} floors - The floors it names, in the same order.
  */
 
 const BUILDING_FILE = 'building.json';
@@ -108,20 +117,32 @@ export function filesOf(buildingJson) {
 }
 
 /**
+ * @param {unknown} floorJson - A floor's JSON.
+ * @param {string} file - The floor file's name, for error messages.
+ * @returns {string} The floor's tiles file, relative to the floor file.
+ */
+export function tilesFileOf(floorJson, file) {
+  return text(object(floorJson, file).tiles, `${file} tiles`);
+}
+
+/**
  * @param {LevelSources} sources
  * @returns {Level}
  * @throws {LevelFormatError} If anything in the files is missing or malformed.
  */
-export function parseLevel({ building: buildingJson, palette, floors: floorJsons }) {
+export function parseLevel({ building: buildingJson, palette, floors: floorSources }) {
   const building = object(buildingJson, BUILDING_FILE);
   const files = filesOf(building);
   const paint = createPaint(palette, files.palette);
+  const tileSize = positiveNumber(building.tileSize, `${BUILDING_FILE} tileSize`);
   const storeyHeight = positiveNumber(building.storeyHeight, `${BUILDING_FILE} storeyHeight`);
   const elevations = readElevations(building.floors, storeyHeight);
-  if (floorJsons.length !== elevations.length) {
-    throw new LevelFormatError(`${BUILDING_FILE} floors`, `names ${elevations.length} floor files, but ${floorJsons.length} were loaded`);
+  if (floorSources.length !== elevations.length) {
+    throw new LevelFormatError(`${BUILDING_FILE} floors`, `names ${elevations.length} floor files, but ${floorSources.length} were loaded`);
   }
-  const floors = elevations.map((elevation, index) => placeFloor(readFloor(floorJsons[index], files.floors[index], paint), elevation));
+  const floors = elevations.map((elevation, index) =>
+    placeFloor(readFloor(floorSources[index], files.floors[index], { paint, tileSize }), elevation),
+  );
   const spawnAt = (json, path) => {
     const spawn = object(json, path);
     return { x: number(spawn.x, `${path}.x`), y: integer(spawn.storey, `${path}.storey`) * storeyHeight, z: number(spawn.z, `${path}.z`) };
@@ -130,7 +151,7 @@ export function parseLevel({ building: buildingJson, palette, floors: floorJsons
 
   return deepFreeze({
     name: text(building.name, `${BUILDING_FILE} name`),
-    tileSize: positiveNumber(building.tileSize, `${BUILDING_FILE} tileSize`),
+    tileSize,
     storeyHeight,
     lowWallHeight: positiveNumber(building.lowWallHeight, `${BUILDING_FILE} lowWallHeight`),
     floors,
@@ -167,16 +188,19 @@ function createPaint(paletteJson, file) {
 }
 
 /**
- * One floor as its file describes it, at height 0.
- * @param {Paint} paint
+ * One floor as its files describe it, at height 0.
+ * @param {FloorSource} source
+ * @param {string} file - The floor file's name, for error messages.
+ * @param {{ paint: Paint, tileSize: number }} building
  * @returns {Omit<PlacedFloor, 'elevation' | 'obstacles'>}
  */
-function readFloor(json, file, paint) {
-  const floor = object(json, file);
+function readFloor({ data, tiles }, file, { paint, tileSize }) {
+  const floor = object(data, file);
   const sections = object(floor.furniture, `${file} furniture`);
   return {
     name: text(floor.name, `${file} name`),
-    tiles: readTiles(floor.tiles, `${file} tiles`),
+    tiles: readTiles(tiles, tilesFileOf(floor, file)),
+    tilesOrigin: floor.tilesOrigin === undefined ? { x: 0, z: 0 } : readTilesOrigin(floor.tilesOrigin, `${file} tilesOrigin`, tileSize),
     furniture: Object.entries(sections).flatMap(([section, pieces]) =>
       list(pieces, `${file} furniture.${section}`, (piece, path) => readFurniturePiece(piece, path, paint)),
     ),
@@ -190,15 +214,40 @@ function readFloor(json, file, paint) {
   };
 }
 
-/** @returns {string[]} */
-function readTiles(json, path) {
-  const rows = list(json, path, text);
-  rows.forEach((row, index) => {
-    if (row.length !== rows[0].length) throw new LevelFormatError(`${path}[${index}]`, `is ${row.length} tiles long, but the first row is ${rows[0].length}`);
-    const unknown = [...row].find((tile) => !KNOWN_TILES.has(tile));
-    if (unknown !== undefined) throw new LevelFormatError(`${path}[${index}]`, `"${unknown}" isn't a tile (see Tile in models/world/TileMap.js)`);
+/**
+ * Reads a tile map drawn as text: one line per row of tiles, one character per tile. A line shorter than the
+ * longest is padded with outside tiles, since editors often strip the trailing spaces that stand for outside.
+ * @param {string} contents
+ * @param {string} file - The tiles file's name, for error messages.
+ * @returns {string[]} The rows, all the same length.
+ */
+function readTiles(contents, file) {
+  const lines = contents.replace(/\r\n?/g, '\n').split('\n');
+  while (lines.length > 0 && lines[lines.length - 1] === '') lines.pop();
+  if (lines.length === 0) throw new LevelFormatError(file, 'has no rows of tiles');
+  lines.forEach((line, index) => {
+    const column = [...line].findIndex((tile) => !KNOWN_TILES.has(tile));
+    if (column !== -1) {
+      throw new LevelFormatError(`${file} line ${index + 1}, column ${column + 1}`, `"${line[column]}" isn't a tile (see Tile in models/world/TileMap.js)`);
+    }
   });
-  return rows;
+  const width = Math.max(...lines.map((line) => line.length));
+  return lines.map((line) => line.padEnd(width, Tile.OUTSIDE));
+}
+
+/**
+ * @returns {FloorPoint} Where a tile map's top-left corner lies, which must be a whole number of tiles from the
+ *   corner of the grounds so every floor's tiles line up with the others'.
+ */
+function readTilesOrigin(json, path, tileSize) {
+  const origin = floorPoint(json, path);
+  for (const axis of /** @type {const} */ (['x', 'z'])) {
+    const tiles = origin[axis] / tileSize;
+    if (Math.abs(tiles - Math.round(tiles)) > 1e-9) {
+      throw new LevelFormatError(`${path}.${axis}`, `must be a whole number of tiles (${tileSize} m each), found ${origin[axis]}`);
+    }
+  }
+  return origin;
 }
 
 /** @returns {Lantern} */

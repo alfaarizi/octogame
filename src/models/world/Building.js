@@ -10,6 +10,7 @@ import { TileMap } from './TileMap.js';
  * @typedef {object} FloorPlan
  * @property {number} elevation - Height of the floor's surface.
  * @property {readonly string[]} tiles - One string per row (see TileMap).
+ * @property {import('../../types.js').FloorPoint} [tilesOrigin] - Where the first row's first tile lies; the corner of the grounds if not given.
  * @property {readonly Rect[]} obstacles - Furniture footprints.
  * @property {readonly import('./StairFlight.js').StairFlightPlan[]} stairs - The flights up to the next floor.
  */
@@ -40,7 +41,7 @@ export class Building {
   constructor(floors, tileSize) {
     const flightsUp = floors.map((floor) => floor.stairs.map((plan) => new StairFlight(plan)));
     this.#floors = floors.map((floor, index) => {
-      const tileMap = new TileMap(floor.tiles, tileSize);
+      const tileMap = new TileMap(floor.tiles, tileSize, floor.tilesOrigin);
       const stairs = [...flightsUp[index], ...(flightsUp[index - 1] ?? [])];
       const obstacles = [...floor.obstacles, ...stairs.flatMap((flight) => flight.rails)];
       return { elevation: floor.elevation, tileMap, stairs, collisions: new CollisionWorld(tileMap, obstacles) };

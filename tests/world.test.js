@@ -25,6 +25,15 @@ describe('TileMap', () => {
     assert.equal(map.hasLineOfSight({ x: 1.5, z: 1.5 }, { x: 7.5, z: 1.5 }), true);
   });
 
+  test('a map with an origin covers only its own part of the grounds', () => {
+    const shifted = new TileMap(SMALL_ROOM, 1, { x: 10, z: 20 });
+    assert.equal(shifted.isBlocked(11.5, 21.5), false, 'its first floor tile');
+    assert.equal(shifted.isBlocked(1.5, 1.5), true, 'where the unshifted map has floor');
+    const rects = [];
+    shifted.forEachTile((tile, rect) => tile === '.' && rects.push(rect));
+    assert.deepEqual(rects[0], { x0: 11, z0: 21, x1: 12, z1: 22 });
+  });
+
   test('openings in the floor block walking but not sight; stairs block neither', () => {
     const withOpenings = new TileMap(['########', '#.v*Ss.#', '########']);
     for (const x of [2.5, 3.5]) {
