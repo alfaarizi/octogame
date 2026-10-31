@@ -28,8 +28,10 @@ export class ResultController {
     views.firstPerson.update(0, simulation.player, STANDING_STILL);
     views.firstPerson.setBeamBrightness(simulation.flashlight.brightness);
     ui.hud.hide();
-    const { rank, ranked } = persistence.scores.record(this.#result);
-    ui.result.open(this.#result, rank, ranked);
+    const { rank, ranked } = simulation.isPracticeRound
+      ? { rank: null, ranked: persistence.scores.loadRanked() }
+      : persistence.scores.record(this.#result);
+    ui.result.open(this.#result, rank, ranked, simulation.isPracticeRound);
     if (this.#result.escaped) ui.effects.flash(FlashColor.ESCAPED, ESCAPE_FLASH_SECONDS);
   }
 

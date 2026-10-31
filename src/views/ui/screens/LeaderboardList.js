@@ -5,12 +5,12 @@ import { MESSAGES } from '../messages.js';
 /** Renders ranked round results into an <ol>. Names go in as text, never as HTML. */
 export class LeaderboardList {
   #list;
-  #candiesRequired;
+  #evidenceRequired;
   #size;
 
-  constructor(listElement, { candiesRequired, size }) {
+  constructor(listElement, { evidenceRequired, size }) {
     this.#list = listElement;
-    this.#candiesRequired = candiesRequired;
+    this.#evidenceRequired = evidenceRequired;
     this.#size = size;
   }
 
@@ -40,7 +40,7 @@ export class LeaderboardList {
     const name = document.createElement('span');
     name.textContent = `${place}. ${result.playerName}`;
     const outcome = document.createElement('span');
-    outcome.textContent = result.escaped ? MESSAGES.leaderboardEscaped(result) : MESSAGES.leaderboardCaught(result, this.#candiesRequired);
+    outcome.textContent = result.escaped ? MESSAGES.leaderboardEscaped(result) : MESSAGES.leaderboardCaught(result, this.#evidenceRequired);
     row.append(name, outcome);
     return row;
   }

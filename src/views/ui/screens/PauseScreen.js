@@ -1,18 +1,18 @@
 import { requireElement } from '../dom.js';
 import { UiPanel } from '../UiPanel.js';
 
-/** Shown while the mouse is released mid-round. Clicking anywhere (except Quit) resumes. */
+/** Pause and case file; explicit resume leaves photo download links usable. */
 export class PauseScreen extends UiPanel {
   #onResume = () => {};
   #onQuit = () => {};
+  #onNoHostilesChange = () => {};
 
   constructor() {
     super('pause');
     const quitButton = requireElement('quit');
-    this.root.addEventListener('click', (event) => {
-      if (event.target !== quitButton) this.#onResume();
-    });
+    requireElement('resume').addEventListener('click', () => this.#onResume());
     quitButton.addEventListener('click', () => this.#onQuit());
+    requireElement('pause-no-hostiles').addEventListener('change', (event) => this.#onNoHostilesChange(event.target.checked));
   }
 
   onResume(listener) {
@@ -22,4 +22,7 @@ export class PauseScreen extends UiPanel {
   onQuit(listener) {
     this.#onQuit = listener;
   }
+
+  onNoHostilesChange(listener) { this.#onNoHostilesChange = listener; }
+  setNoHostiles(disabled) { requireElement('pause-no-hostiles').checked = disabled; }
 }

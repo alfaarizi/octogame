@@ -34,7 +34,8 @@ export class HudDirector {
    * @param {number} frame.elapsed - Round time, in seconds.
    * @param {number} frame.threatCloseness - How close the ghost is, from 0 to 1.
    */
-  update({ batteryCharge, batteryLow, stamina, elapsed, threatCloseness }) {
+  update({ batteryCharge, batteryLow, stamina, elapsed, threatCloseness, ...equipment }) {
+    this.#hud.setEquipment(equipment);
     this.#hud.setBattery(batteryCharge, batteryLow);
     this.#hud.setStamina(stamina);
     this.#hud.setTimer(elapsed);
@@ -42,16 +43,17 @@ export class HudDirector {
   }
 
   #subscribe(events) {
+    events.on(GameEvent.FEEDBACK, ({ text, seconds }) => this.#hud.showHint(text, seconds));
     const hint = (type, text, seconds) => events.on(type, () => this.#hud.showHint(text, seconds));
 
-    events.on(GameEvent.ROUND_STARTED, ({ candiesRequired }) => {
+    events.on(GameEvent.ROUND_STARTED, ({ evidenceRequired }) => {
       this.#hud.reset();
-      this.#hud.setCandies(0, candiesRequired);
-      this.#hud.showHint(MESSAGES.roundIntro(candiesRequired), HintDuration.INTRO);
+      this.#hud.setEvidence(0, evidenceRequired);
+      this.#hud.showHint(MESSAGES.roundIntro(evidenceRequired), HintDuration.INTRO);
     });
-    events.on(GameEvent.CANDY_COLLECTED, ({ collected, required }) => {
-      this.#hud.setCandies(collected, required);
-      if (collected < required) this.#hud.showHint(MESSAGES.candiesRemaining(required - collected), HintDuration.NORMAL);
+    events.on(GameEvent.EVIDENCE_COLLECTED, ({ collected, required }) => {
+      this.#hud.setEvidence(collected, required);
+      if (collected < required) this.#hud.showHint(MESSAGES.evidenceRemaining(required - collected), HintDuration.NORMAL);
     });
     events.on(GameEvent.EXIT_UNLOCKED, () => {
       this.#effects.flash(FlashColor.EXIT_OPEN, 0.8);

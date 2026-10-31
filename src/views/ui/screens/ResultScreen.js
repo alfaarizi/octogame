@@ -10,7 +10,7 @@ export class ResultScreen extends UiPanel {
   #title = requireElement('end-title');
   #detail = requireElement('end-detail');
   #leaderboard;
-  #candiesRequired;
+  #evidenceRequired;
   #inputDelay;
   #acceptsInputAt = 0;
   #onPlayAgain = () => {};
@@ -18,15 +18,15 @@ export class ResultScreen extends UiPanel {
 
   /**
    * @param {object} options
-   * @param {number} options.candiesRequired
+   * @param {number} options.evidenceRequired
    * @param {number} options.leaderboardSize
    * @param {number} options.inputDelay - Seconds to ignore choices for after the screen appears.
    */
-  constructor({ candiesRequired, leaderboardSize, inputDelay }) {
+  constructor({ evidenceRequired, leaderboardSize, inputDelay }) {
     super('end');
-    this.#candiesRequired = candiesRequired;
+    this.#evidenceRequired = evidenceRequired;
     this.#inputDelay = inputDelay;
-    this.#leaderboard = new LeaderboardList(requireElement('board-end'), { candiesRequired, size: leaderboardSize });
+    this.#leaderboard = new LeaderboardList(requireElement('board-end'), { evidenceRequired, size: leaderboardSize });
     requireElement('again').addEventListener('click', () => this.#choose(this.#onPlayAgain));
     requireElement('next').addEventListener('click', () => this.#choose(this.#onNextPlayer));
     window.addEventListener('keydown', (event) => this.#handleKey(event));
@@ -46,11 +46,12 @@ export class ResultScreen extends UiPanel {
    * @param {number} rank - Its 1-based place on the board.
    * @param {RoundResult[]} rankedResults - The leaderboard, best first.
    */
-  open(result, rank, rankedResults) {
+  open(result, rank, rankedResults, isPractice = false) {
     this.#title.textContent = result.escaped ? MESSAGES.escapedTitle : MESSAGES.caughtTitle;
     this.#detail.textContent = result.escaped
       ? MESSAGES.escapedDetail(result, rank)
-      : MESSAGES.caughtDetail(result, this.#candiesRequired);
+      : MESSAGES.caughtDetail(result, this.#evidenceRequired);
+    if (isPractice) this.#detail.textContent = 'Development round — no leaderboard entry. Your photographs are below.';
     this.#leaderboard.render(rankedResults, result);
     this.#acceptsInputAt = performance.now() + this.#inputDelay * 1000;
     this.show();

@@ -7,6 +7,12 @@ export const Action = Object.freeze({
   TURN_RIGHT: 'turn-right',
   SPRINT: 'sprint',
   TOGGLE_FLASHLIGHT: 'toggle-flashlight',
+  USE_ITEM: 'use-item',
+  INTERACT: 'interact',
+  DROP_ITEM: 'drop-item',
+  SLOT_ONE: 'slot-one',
+  SLOT_TWO: 'slot-two',
+  JOURNAL: 'journal',
 });
 
 /** The primary mouse button, bindable like a key. */
@@ -21,5 +27,11 @@ export const DEFAULT_KEY_BINDINGS = Object.freeze({
   [Action.TURN_LEFT]: ['ArrowLeft'],
   [Action.TURN_RIGHT]: ['ArrowRight'],
   [Action.SPRINT]: ['ShiftLeft', 'ShiftRight'],
-  [Action.TOGGLE_FLASHLIGHT]: ['KeyF', MOUSE_PRIMARY],
+  [Action.TOGGLE_FLASHLIGHT]: ['KeyF'],
+  [Action.USE_ITEM]: [MOUSE_PRIMARY],
+  [Action.INTERACT]: ['KeyE'],
+  [Action.DROP_ITEM]: ['KeyQ'],
+  [Action.SLOT_ONE]: ['Digit1'],
+  [Action.SLOT_TWO]: ['Digit2'],
+  [Action.JOURNAL]: ['KeyJ'],
 });

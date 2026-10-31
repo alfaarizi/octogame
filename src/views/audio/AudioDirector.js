@@ -96,9 +96,13 @@ export class AudioDirector {
     on(GameEvent.PLAYER_ESCAPED, () => library.victory());
     on(GameEvent.JUMP_SCARE_STARTED, ({ gentle, listenerPosition }) => (gentle ? library.thump(listenerPosition) : library.scream()));
 
-    on(GameEvent.CANDY_COLLECTED, () => library.candyChime());
-    on(GameEvent.CANDY_NEARBY, ({ position }) => library.candySparkle(position));
+    on(GameEvent.EVIDENCE_COLLECTED, () => library.evidenceChime());
     on(GameEvent.BATTERY_COLLECTED, () => library.batteryCharge());
+    on(GameEvent.PHOTO_TAKEN, () => library.shutter());
+    on(GameEvent.ITEM_PICKED_UP, () => library.switchClick());
+    on(GameEvent.ITEM_DROPPED, () => library.switchClick());
+    on(GameEvent.HIDING_CHANGED, () => library.creak(null, .18));
+    on(GameEvent.OBJECT_INTERACTED, ({ position }) => library.creak(position, .12));
     on(GameEvent.EXIT_UNLOCKED, () => {
       library.boom();
       library.doorUnlock();

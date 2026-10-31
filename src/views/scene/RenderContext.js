@@ -47,6 +47,16 @@ export class RenderContext {
     this.#renderer.render(this.#scene, this.#camera);
   }
 
+  /** Read immediately after rendering, before WebGL clears its drawing buffer. */
+  capturePhoto() {
+    this.render();
+    const image = document.createElement('canvas');
+    image.width = 960;
+    image.height = Math.round(image.width * this.canvas.height / this.canvas.width);
+    image.getContext('2d').drawImage(this.canvas, 0, 0, image.width, image.height);
+    return image.toDataURL('image/jpeg', 0.85);
+  }
+
   #fitToWindow() {
     this.#camera.aspect = window.innerWidth / window.innerHeight;
     this.#camera.updateProjectionMatrix();

@@ -2,7 +2,7 @@
   "name": "flashlight-haunt",
   "version": "1.0.0",
   "private": true,
-  "description": "A first-person flashlight-versus-ghost Halloween game. Runs in the browser with no build step.",
+  "description": "A first-person office horror investigation with photography, hiding and a two-slot inventory. Runs in the browser with no build step.",
   "type": "module",
   "scripts": {
     "start": "python3 serve.py",

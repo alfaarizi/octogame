@@ -19,7 +19,7 @@ function sources({ building = {}, floor = {}, upstairs = {} } = {}) {
       lanterns: [],
       fixtures: [],
       portraits: [],
-      candySpots: [],
+      evidenceSpots: [],
       batterySpots: [],
       ghostSpots: [],
       stairs: [],
@@ -96,6 +96,12 @@ describe('parseLevel', () => {
 describe('level format errors', () => {
   const rejects = (level, messagePart) =>
     assert.throws(() => parseLevel(level), (error) => error instanceof LevelFormatError && error.message.includes(messagePart));
+
+  test('rejects unsupported equipment and duplicate interaction IDs across floors', () => {
+    rejects(sources({ floor: { equipment: [{ kind: 'unknown', position: { x: 2, y: 0, z: 1.5 } }] } }), 'equipment[0].kind');
+    const note = { id: 'memo', kind: 'note', name: 'Memo', text: 'Remember', position: { x: 2, y: 1, z: 1.5 } };
+    rejects(sources({ floor: { interactables: [note] }, upstairs: { interactables: [note] } }), 'duplicate id "memo"');
+  });
 
   test('name the file and the place of the problem', () => {
     rejects(withFurniture({ name: 'desk', parts: [{ desk: [1, 1, 2] }] }), 'ground.json furniture.the room[0].parts[0].desk: expected [x0, z0, x1, z1]');

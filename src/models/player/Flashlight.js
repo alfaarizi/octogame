@@ -18,6 +18,7 @@ export class Flashlight {
   #flickerUntil = 0;
   #nextFlickerAt = 0;
   #hasWarnedLow = false;
+  #isEquipped = true;
 
   constructor(config, events, random = Math.random) {
     this.#config = config;
@@ -36,7 +37,7 @@ export class Flashlight {
 
   /** On and with charge left, so it can light things up. */
   get isEmitting() {
-    return this.#isOn && this.#charge > 0;
+    return this.#isEquipped && this.#isOn && this.#charge > 0;
   }
 
   get isLow() {
@@ -44,8 +45,10 @@ export class Flashlight {
   }
 
   get brightness() {
-    return this.#brightness;
+    return this.#isEquipped ? this.#brightness : 0;
   }
+
+  setEquipped(equipped) { this.#isEquipped = equipped; }
 
   reset() {
     this.#charge = 1;
@@ -81,7 +84,7 @@ export class Flashlight {
   }
 
   #drain(seconds) {
-    if (!this.#isOn) return;
+    if (!this.isEmitting) return;
     this.#charge = Math.max(0, this.#charge - seconds / this.#config.batteryLife);
     if (this.#charge > 0) return;
     this.#isOn = false;

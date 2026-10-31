@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { easeToward, randomSpread } from '../../../utils.js';
-import { createTorchModel } from './torchModel.js';
+import { createEquipmentModel, createRightHand } from './equipmentModels.js';
 
 /** @typedef {import('../../../types.js').Cone} Cone */
 /** @typedef {import('../../../types.js').Movement} Movement */
@@ -23,6 +23,8 @@ export class FirstPersonView {
   #eyeHeight;
   #maxIntensity;
   #torch;
+  #held = new THREE.Group();
+  #tools = new Map();
   #spotlight;
   #bobPhase = 0;
   #bobOffset = 0;
@@ -43,8 +45,15 @@ export class FirstPersonView {
     this.#maxIntensity = flashlight.intensity;
     this.#sight = { origin: camera.position, direction: this.#viewDirection };
 
-    this.#torch = createTorchModel();
-    this.#torch.position.copy(TORCH_POSITION);
+    for (const kind of ['flashlight', 'camera', 'battery']) {
+      const tool = createEquipmentModel(kind);
+      this.#tools.set(kind, tool);
+      this.#held.add(tool);
+    }
+    this.#torch = this.#tools.get('flashlight');
+    this.#held.add(createRightHand());
+    this.#held.position.copy(TORCH_POSITION);
+    this.setHeldItem(null);
 
     const { range, halfAngle } = flashlight.beamCone;
     this.#spotlight = new THREE.SpotLight(BEAM_COLOR, flashlight.intensity, range, halfAngle, BEAM_PENUMBRA, BEAM_DECAY);
@@ -56,7 +65,7 @@ export class FirstPersonView {
     this.#spotlight.shadow.bias = -0.0004;
     this.#spotlight.shadow.normalBias = 0.02;
 
-    camera.add(this.#torch, this.#spotlight, this.#spotlight.target);
+    camera.add(this.#held, this.#spotlight, this.#spotlight.target);
   }
 
   get camera() {
@@ -83,7 +92,19 @@ export class FirstPersonView {
     }
     this.#camera.position.set(position.x, position.y + this.#eyeHeight + this.#bobOffset, position.z);
     this.#camera.rotation.set(pitch, yaw, 0, 'YXZ');
-    this.#torch.position.y = TORCH_POSITION.y + this.#bobOffset * TORCH_BOB_SHARE;
+    this.#held.position.y = TORCH_POSITION.y + this.#bobOffset * TORCH_BOB_SHARE;
+  }
+
+  setHeldItem(kind) {
+    this.#held.visible = Boolean(kind);
+    for (const [name, tool] of this.#tools) tool.visible = name === kind;
+  }
+
+  /** Photo capture excludes the equipment in the foreground. */
+  withoutHeldItem(capture) {
+    const visible = this.#held.visible;
+    this.#held.visible = false;
+    try { return capture(); } finally { this.#held.visible = visible; }
   }
 
   /** @param {number} fraction - Share of the flashlight's full intensity, from 0 to 1. */

@@ -30,7 +30,10 @@ export class RoundController {
     const { audio, input, pointerLock, simulation, ui, views } = this.#context;
     // Audio can start here because this runs inside the click or key press that started the round.
     audio.start();
-    simulation.startRound();
+    simulation.startRound(this.#session);
+    ui.pause.setNoHostiles(!simulation.hostilesEnabled);
+    views.photography.reset();
+    ui.album.updateChecklist(simulation.photography);
     views.ghost.hide();
     views.pickups.sync();
     views.firstPerson.update(0, simulation.player, simulation.player.movement);
@@ -38,7 +41,20 @@ export class RoundController {
     ui.pause.hide();
     input.clear();
     this.#subscriptions = [
-      input.onPressed(Action.TOGGLE_FLASHLIGHT, () => !this.#isPaused && simulation.flashlight.toggle()),
+      ...[
+        [Action.USE_ITEM, () => this.#useItem()],
+        [Action.TOGGLE_FLASHLIGHT, () => simulation.inventory.activeItem?.kind === 'flashlight' && simulation.actions.use()],
+        [Action.INTERACT, () => simulation.actions.interact()],
+        [Action.DROP_ITEM, () => simulation.actions.drop()],
+        [Action.SLOT_ONE, () => simulation.actions.select(0)],
+        [Action.SLOT_TWO, () => simulation.actions.select(1)],
+        [Action.JOURNAL, () => pointerLock.release()],
+      ].map(([action, handle]) => input.onPressed(action, () => {
+        if (this.#isPaused || !pointerLock.isLocked) return;
+        const look = input.consumeLookDelta();
+        simulation.player.look(look.x, look.y);
+        handle();
+      })),
       pointerLock.onChange((isLocked) => this.#setPaused(!isLocked)),
     ];
     pointerLock.request();
@@ -63,11 +79,12 @@ export class RoundController {
   #present(seconds) {
     const { audio, simulation, ui, views } = this.#context;
     const { flashlight, ghost, player, round, threat } = simulation;
-    views.firstPerson.update(seconds, player, player.movement);
+    views.firstPerson.update(seconds, player, simulation.movement);
+    views.firstPerson.setHeldItem(simulation.office.isHidden ? null : simulation.inventory.activeItem?.kind);
     views.firstPerson.setBeamBrightness(flashlight.brightness);
     const { sight } = views.firstPerson;
     views.ghost.update(seconds, player.position);
-    views.pickups.update(seconds, round.elapsed, flashlight.isEmitting ? sight : null);
+    views.pickups.update();
     audio.updateSoundscape(seconds, { listener: sight, ghost, threatCloseness: threat.closeness });
     ui.hud.update({
       batteryCharge: flashlight.charge,
@@ -75,7 +92,22 @@ export class RoundController {
       stamina: player.stamina,
       elapsed: round.elapsed,
       threatCloseness: threat.closeness,
+      inventory: simulation.inventory,
+      prompt: simulation.actions.prompt,
+      hidden: simulation.office.isHidden,
+      cameraTarget: simulation.photography.target(player.sight),
+      noHostiles: !simulation.hostilesEnabled,
     });
+  }
+
+  #useItem() {
+    const { simulation, views, ui } = this.#context;
+    const photo = simulation.actions.use();
+    if (!photo) return;
+    views.firstPerson.update(0, simulation.player, simulation.movement);
+    views.firstPerson.setBeamBrightness(simulation.flashlight.brightness);
+    views.photography.capture(photo, simulation.photography.photos);
+    ui.album.updateChecklist(simulation.photography);
   }
 
   #endRound(outcome) {

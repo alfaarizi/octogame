@@ -7,7 +7,7 @@
  * @property {{ minZ: number, halfWidth: number }} trigger
  */
 
-/** The front door: locked until all the candy is found, then reaching it ends the round. */
+/** The front door: locked until all the evidence is found, then reaching it ends the round. */
 export class ExitDoor {
   #isUnlocked = false;
   #centerX;

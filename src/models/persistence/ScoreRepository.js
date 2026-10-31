@@ -2,23 +2,23 @@ import { rankResults } from '../round/leaderboardRanking.js';
 
 /** @typedef {import('../round/Round.js').RoundResult} RoundResult */
 
-const STORAGE_KEY = 'flashlight-haunt-scores';
+const STORAGE_KEY = 'flashlight-haunt-investigation-scores-v2';
 const MAX_STORED_RESULTS = 100;
 
-// Stored with short keys, the format the first version of the game used, so existing scores still load.
-const toStored = ({ playerName, escaped, timeSeconds, candiesCollected, finishedAt }) => ({
+// Investigation scores are separate from the original candy-hunt leaderboard.
+const toStored = ({ playerName, escaped, timeSeconds, evidenceCollected, finishedAt }) => ({
   name: playerName,
   escaped,
   time: timeSeconds,
-  candies: candiesCollected,
+  evidence: evidenceCollected,
   at: finishedAt,
 });
 
-const fromStored = ({ name, escaped, time, candies, at }) => ({
+const fromStored = ({ name, escaped, time, evidence, at }) => ({
   playerName: String(name),
   escaped: Boolean(escaped),
   timeSeconds: Number(time),
-  candiesCollected: Number(candies),
+  evidenceCollected: Number(evidence),
   finishedAt: Number(at),
 });
 

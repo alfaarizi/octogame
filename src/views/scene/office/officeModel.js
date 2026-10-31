@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { createArchitecture } from './architecture.js';
+import { createAtmosphere } from './atmosphere.js';
 import { createFurnishings } from './furnishings.js';
 
 /** @typedef {import('../../../models/level/parseLevel.js').Level} Level */
@@ -13,6 +14,6 @@ import { createFurnishings } from './furnishings.js';
  */
 export function createOfficeModel(level, tileMaps) {
   const office = new THREE.Group();
-  office.add(...createArchitecture(level, tileMaps), ...createFurnishings(level.floors));
+  office.add(...createArchitecture(level, tileMaps), ...createFurnishings(level.floors), createAtmosphere(level, tileMaps));
   return office;
 }

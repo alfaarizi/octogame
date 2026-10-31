@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { createBoxMesh, createMergedBoxMesh } from '../meshes.js';
 import { createPortraitTexture } from './textures.js';
+import { createLandscapeProps } from './landscapeProps.js';
 
 /** @typedef {import('../../../models/level/furniture.js').FurniturePiece} FurniturePiece */
 /** @typedef {import('../../../models/level/parseLevel.js').PlacedFloor} PlacedFloor */
@@ -16,7 +17,10 @@ const PORTRAIT = Object.freeze({ frameWidth: 0.8, frameHeight: 1.0, frameDepth: 
  * @returns {THREE.Object3D[]}
  */
 export function createFurnishings(floors) {
-  return [...createFurniture(floors.flatMap((floor) => floor.furniture)), ...floors.flatMap((floor) => floor.portraits).flatMap(createPortrait)];
+  const furniture = floors.flatMap((floor) => floor.furniture);
+  return [...createFurniture(furniture.filter((piece) => piece.visual === null)),
+    ...createLandscapeProps(furniture.filter((piece) => piece.visual !== null)),
+    ...floors.flatMap((floor) => floor.portraits).flatMap(createPortrait)];
 }
 
 /**

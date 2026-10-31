@@ -38,12 +38,17 @@ export class SoundLibrary {
     this.#engine.playTone({ waveform: 'square', frequency: 1800, duration: 0.015, volume: 0.05 });
   }
 
+  shutter() {
+    this.#engine.playNoise({ duration: .09, volume: .3, filter: { type: 'highpass', frequency: 1700 } });
+    this.#engine.playTone({ frequency: 920, endFrequency: 260, duration: .13, volume: .05 });
+  }
+
   flickerBuzz() {
     this.#engine.playTone({ waveform: 'sawtooth', frequency: 110, duration: 0.07, volume: 0.05 });
     this.#engine.playNoise({ duration: 0.05, volume: 0.05, filter: { type: 'highpass', frequency: 4000 } });
   }
 
-  candyChime() {
+  evidenceChime() {
     this.#engine.playTone({ waveform: 'triangle', frequency: 988, duration: 0.14, volume: 0.25 });
     this.#engine.playTone({ waveform: 'triangle', frequency: 1319, duration: 0.3, volume: 0.25, delay: 0.09 });
   }
@@ -51,12 +56,6 @@ export class SoundLibrary {
   batteryCharge() {
     this.#engine.playTone({ waveform: 'square', frequency: 220, endFrequency: 880, duration: 0.22, volume: 0.08 });
     this.#engine.playTone({ frequency: 1760, duration: 0.15, volume: 0.12, delay: 0.2 });
-  }
-
-  candySparkle(position) {
-    const output = this.#engine.createTemporarySpatialOutput(position, 0.5);
-    this.#engine.playTone({ frequency: 2637, duration: 0.12, volume: 0.12, output });
-    this.#engine.playTone({ frequency: 3520, duration: 0.16, volume: 0.09, delay: 0.08, output });
   }
 
   /** A breathy "ha-ha-ha", falling in pitch: buzzy syllables through a vowel-like filter. */

@@ -20,11 +20,12 @@ export class PreferencesRepository {
     return {
       playerName: isObject && typeof stored.name === 'string' ? stored.name : '',
       chickenMode: isObject && stored.chicken === true,
+      noHostiles: isObject && stored.noHostiles === true,
     };
   }
 
   /** @param {Session} session */
-  save({ playerName, chickenMode }) {
-    this.#store.write(STORAGE_KEY, { name: playerName, chicken: chickenMode });
+  save({ playerName, chickenMode, noHostiles = false }) {
+    this.#store.write(STORAGE_KEY, { name: playerName, chicken: chickenMode, noHostiles });
   }
 }

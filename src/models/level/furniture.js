@@ -15,7 +15,7 @@ import { LevelFormatError, box, compass, floorPoint, list, number, object, rect,
 /**
  * A piece of furniture: its `footprint` is what the player bumps into (null for things you walk over or past,
  * like rugs and office chairs), and its `parts` are the boxes it's drawn with.
- * @typedef {{ name: string, footprint: Rect | null, parts: FurniturePart[] }} FurniturePiece
+ * @typedef {{ name: string, footprint: Rect | null, parts: FurniturePart[], visual: string | null }} FurniturePiece
  */
 
 /**
@@ -51,6 +51,18 @@ const PART_KINDS = Object.freeze({
       return [partBox(x0, z0, x1, z1, y0, y1, paint(part.color, `${path}.color`))];
     },
   },
+  screen: {
+    isSolid: true,
+    build: (part, path, paint) => screenParts(box(part.screen, `${path}.screen`), paint(part.color, `${path}.color`), paint('deskFrame', `${path}.frame`)),
+  },
+  cabinet: {
+    isSolid: true,
+    build: (part, path, paint) => storageParts(box(part.cabinet, `${path}.cabinet`), paint(part.color, `${path}.color`), paint('deskFrame', `${path}.frame`), true),
+  },
+  shelf: {
+    isSolid: true,
+    build: (part, path, paint) => storageParts(box(part.shelf, `${path}.shelf`), paint(part.color, `${path}.color`), paint('deskFrame', `${path}.frame`), false),
+  },
   table: {
     isSolid: true,
     build: (part, path, paint) => tableParts(rect(part.table, `${path}.table`), number(part.height, `${path}.height`), paint(part.color, `${path}.color`)),
@@ -74,6 +86,62 @@ const PART_KINDS = Object.freeze({
   },
 });
 
+/** A framed privacy screen with two posts, raised cloth and a top rail. */
+function screenParts({ x0, z0, x1, z1, y0, y1 }, panelColor, frameColor) {
+  const alongX = x1 - x0 > z1 - z0;
+  const end = Math.min(0.07, (alongX ? x1 - x0 : z1 - z0) / 4);
+  const panelBottom = Math.min(y0 + 0.32, y1 - 0.12);
+  const parts = [
+    partBox(x0, z0, x1, z1, panelBottom, y1 - 0.08, panelColor),
+    partBox(x0, z0, x1, z1, y1 - 0.08, y1, frameColor),
+  ];
+  if (alongX) {
+    parts.push(partBox(x0, z0, x0 + end, z1, y0, y1, frameColor));
+    parts.push(partBox(x1 - end, z0, x1, z1, y0, y1, frameColor));
+  } else {
+    parts.push(partBox(x0, z0, x1, z0 + end, y0, y1, frameColor));
+    parts.push(partBox(x0, z1 - end, x1, z1, y0, y1, frameColor));
+  }
+  return parts;
+}
+
+/** Framed storage with shelves; cabinets add hinged door leaves and small handles. */
+function storageParts({ x0, z0, x1, z1, y0, y1 }, bodyColor, frameColor, hasDoors) {
+  const thickness = Math.min(.045, (x1 - x0) / 6, (z1 - z0) / 6);
+  const alongX = x1 - x0 > z1 - z0;
+  const parts = [
+    partBox(x0, z0, x1, z1, y0, y0 + thickness, frameColor),
+    partBox(x0, z0, x1, z1, y1 - thickness, y1, bodyColor),
+  ];
+  if (alongX) {
+    parts.push(partBox(x0, z0, x1, z0 + thickness, y0, y1, frameColor));
+    parts.push(partBox(x0, z0, x0 + thickness, z1, y0, y1, bodyColor));
+    parts.push(partBox(x1 - thickness, z0, x1, z1, y0, y1, bodyColor));
+  } else {
+    parts.push(partBox(x1 - thickness, z0, x1, z1, y0, y1, frameColor));
+    parts.push(partBox(x0, z0, x1, z0 + thickness, y0, y1, bodyColor));
+    parts.push(partBox(x0, z1 - thickness, x1, z1, y0, y1, bodyColor));
+  }
+  for (const fraction of [.34, .67]) {
+    const shelfY = y0 + (y1 - y0) * fraction;
+    parts.push(partBox(x0 + thickness, z0 + thickness, x1 - thickness, z1 - thickness, shelfY, shelfY + thickness, bodyColor));
+  }
+  if (hasDoors) {
+    const center = alongX ? (x0 + x1) / 2 : (z0 + z1) / 2;
+    const gap = .008;
+    if (alongX) {
+      parts.push(partBox(x0 + thickness, z1 - thickness, center - gap, z1, y0 + thickness, y1 - thickness, bodyColor));
+      parts.push(partBox(center + gap, z1 - thickness, x1 - thickness, z1, y0 + thickness, y1 - thickness, bodyColor));
+      for (const x of [center - .045, center + .045]) parts.push(partBox(x - .012, z1, x + .012, z1 + .02, y0 + (y1 - y0) * .55, y0 + (y1 - y0) * .63, frameColor));
+    } else {
+      parts.push(partBox(x0, z0 + thickness, x0 + thickness, center - gap, y0 + thickness, y1 - thickness, bodyColor));
+      parts.push(partBox(x0, center + gap, x0 + thickness, z1 - thickness, y0 + thickness, y1 - thickness, bodyColor));
+      for (const z of [center - .045, center + .045]) parts.push(partBox(x0 - .02, z - .012, x0, z + .012, y0 + (y1 - y0) * .55, y0 + (y1 - y0) * .63, frameColor));
+    }
+  }
+  return parts;
+}
+
 /**
  * Reads one piece of furniture from its JSON. Unless it says otherwise, a piece's footprint is the bounding
  * rectangle of its solid parts; `"solid": false` gives it none, and `"footprint": [x0, z0, x1, z1]` sets it.
@@ -87,7 +155,9 @@ export function readFurniturePiece(json, path, paint) {
   const name = text(piece.name, `${path}.name`);
   const parts = list(piece.parts, `${path}.parts`, (part, partPath) => readPart(part, partPath, paint));
   if (parts.length === 0) throw new LevelFormatError(`${path}.parts`, 'expected at least one part');
-  return { name, footprint: footprintOf(piece, path, parts), parts: parts.flatMap((part) => part.boxes) };
+  const visual = piece.visual === undefined ? null : text(piece.visual, `${path}.visual`);
+  if (visual !== null && !['palm', 'shrub'].includes(visual)) throw new LevelFormatError(`${path}.visual`, `unknown furniture visual "${visual}"`);
+  return { name, footprint: footprintOf(piece, path, parts), parts: parts.flatMap((part) => part.boxes), visual };
 }
 
 /**

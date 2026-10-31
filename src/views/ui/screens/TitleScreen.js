@@ -10,18 +10,20 @@ import { LeaderboardList } from './LeaderboardList.js';
 export class TitleScreen extends UiPanel {
   #nameInput = /** @type {HTMLInputElement} */ (requireElement('name'));
   #chickenModeToggle = /** @type {HTMLInputElement} */ (requireElement('chicken'));
+  #noHostilesToggle = requireElement('no-hostiles');
   #leaderboard;
   /** @type {(session: Session) => void} */
   #onStart = () => {};
 
-  constructor({ candiesRequired, leaderboardSize }) {
+  constructor({ evidenceRequired, leaderboardSize }) {
     super('title');
-    this.#leaderboard = new LeaderboardList(requireElement('board-title'), { candiesRequired, size: leaderboardSize });
+    this.#leaderboard = new LeaderboardList(requireElement('board-title'), { evidenceRequired, size: leaderboardSize });
     requireElement('start-form').addEventListener('submit', (event) => {
       event.preventDefault();
       this.#onStart({
         playerName: this.#nameInput.value.trim() || MESSAGES.defaultPlayerName,
         chickenMode: this.#chickenModeToggle.checked,
+        noHostiles: this.#noHostilesToggle.checked,
       });
     });
   }
@@ -36,9 +38,10 @@ export class TitleScreen extends UiPanel {
    * @param {Partial<Session>} prefill - Values to put in the form.
    * @param {RoundResult[]} rankedResults - The leaderboard, best first.
    */
-  open({ playerName = '', chickenMode = false }, rankedResults) {
+  open({ playerName = '', chickenMode = false, noHostiles = false }, rankedResults) {
     this.#nameInput.value = playerName;
     this.#chickenModeToggle.checked = chickenMode;
+    this.#noHostilesToggle.checked = noHostiles;
     this.#leaderboard.render(rankedResults);
     this.show();
     this.#nameInput.focus();

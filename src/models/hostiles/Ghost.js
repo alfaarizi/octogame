@@ -11,7 +11,7 @@ import { GhostState, PRESENT_GHOST_STATES } from './GhostState.js';
  * @property {Point3} playerPosition
  * @property {boolean} playerLightOn - Whether the flashlight is lit; a lit one can be seen from much farther away.
  * @property {boolean} isLit - Whether the beam is on the ghost right now.
- * @property {number} candiesCollected - Candies found so far; each one makes the ghost hunt faster.
+ * @property {number} evidenceCollected - Evidence found so far; each one makes the ghost hunt faster.
  */
 
 /**
@@ -80,7 +80,7 @@ export class Ghost {
     this.#stateTimer.restart(Infinity);
   }
 
-  /** After the last candy: faster, never gives up, and comes back sooner if it's away. */
+  /** After the last evidence: faster, never gives up, and comes back sooner if it's away. */
   enrage() {
     this.#isEnraged = true;
     if (this.#state === GhostState.DORMANT || this.#state === GhostState.BANISHED) {
@@ -100,6 +100,12 @@ export class Ghost {
     else this.#updatePresent(seconds, situation);
   }
 
+  /** A shutter flash gives away a position, even when the flashlight is off. */
+  hearCamera(position, radius) {
+    if (!this.isPresent || distanceBetween(this.position, position) > radius) return;
+    this.#startHunting();
+  }
+
   #updateDormant(seconds) {
     if (!this.#stateTimer.tick(seconds)) return;
     this.#appearAt(this.position, GhostState.WANDERING);
@@ -114,6 +120,17 @@ export class Ghost {
   }
 
   #updatePresent(seconds, situation) {
+    if (situation.playerConcealed) {
+      this.#exposure = 0;
+      if (this.#state !== GhostState.WANDERING) {
+        this.#state = GhostState.WANDERING;
+        this.#wanderTarget = this.#spawnTable.ghostSpotFarFrom(situation.playerPosition);
+      }
+      if (this.#driftToward(this.#wanderTarget, this.#config.wanderSpeed, seconds) < this.#config.arrivalDistance) {
+        this.#wanderTarget = this.#spawnTable.randomGhostSpot();
+      }
+      return;
+    }
     if (this.#absorbLight(seconds, situation.isLit)) return;
     const distance = distanceBetween(this.position, situation.playerPosition);
     if (this.#state === GhostState.WANDERING) this.#wander(seconds, situation, distance);
@@ -158,7 +175,7 @@ export class Ghost {
   }
 
   #hunt(seconds, situation, distance) {
-    this.#driftToward(situation.playerPosition, this.#huntSpeed(situation.candiesCollected), seconds);
+    this.#driftToward(situation.playerPosition, this.#huntSpeed(situation.evidenceCollected), seconds);
     if (this.#isEnraged) return;
     // Far away and out of sight for long enough: it gives up and drifts off.
     const hasLostTrack = distance > this.#config.loseInterestDistance && !this.#canSee(situation.playerPosition);
@@ -169,9 +186,9 @@ export class Ghost {
     }
   }
 
-  #huntSpeed(candiesCollected) {
-    const { enragedSpeed, huntSpeed, huntSpeedPerCandy } = this.#config;
-    return this.#isEnraged ? enragedSpeed : huntSpeed + huntSpeedPerCandy * candiesCollected;
+  #huntSpeed(evidenceCollected) {
+    const { enragedSpeed, huntSpeed, huntSpeedPerEvidence } = this.#config;
+    return this.#isEnraged ? enragedSpeed : huntSpeed + huntSpeedPerEvidence * evidenceCollected;
   }
 
   /**

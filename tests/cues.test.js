@@ -3,7 +3,6 @@ import { describe, test } from 'node:test';
 import { GAME_CONFIG } from '../src/config/gameConfig.js';
 import { GameEvent } from '../src/core/GameEvent.js';
 import { AmbientNoiseCue, AmbientNoiseKind } from '../src/models/cues/AmbientNoiseCue.js';
-import { CandyNearbyCue } from '../src/models/cues/CandyNearbyCue.js';
 import { FootstepCue } from '../src/models/cues/FootstepCue.js';
 import { recordingEventBus } from './helpers.js';
 
@@ -27,20 +26,6 @@ describe('FootstepCue', () => {
       return recorder.count(GameEvent.PLAYER_STEPPED);
     };
     assert.ok(steps(true) > steps(false));
-  });
-});
-
-describe('CandyNearbyCue', () => {
-  test('sparkles only when a candy is within range', () => {
-    const recorder = recordingEventBus();
-    const cue = new CandyNearbyCue(recorder.bus, GAME_CONFIG.round);
-    const candy = { item: { position: { x: 1, y: 0.5, z: 1 } } };
-    cue.update(1, { ...candy, distance: GAME_CONFIG.round.candySparkleRange + 1 });
-    cue.update(1, null);
-    assert.equal(recorder.count(GameEvent.CANDY_NEARBY), 0);
-    cue.update(0.01, { ...candy, distance: 1 });
-    assert.equal(recorder.count(GameEvent.CANDY_NEARBY), 1);
-    assert.deepEqual(recorder.emitted[0].payload.position, candy.item.position);
   });
 });
 

@@ -20,12 +20,12 @@
 
 /**
  * Where someone appears, standing at height `y`, and which way they face, as a yaw (see Pose).
- * @typedef {Point3 & { yaw: number }} SpawnPoint
+ * @typedef {Point3 & { yaw: number, pitch?: number }} SpawnPoint
  */
 
 /**
- * A place a candy can hide, and the room it's in.
- * @typedef {Point3 & { room: string }} CandySpot
+ * An authored manifestation and its case-file clue.
+ * @typedef {Point3 & { id: string, name: string, room: string, kind: string, clue: string }} EvidenceSpot
  */
 
 /**
@@ -101,6 +101,7 @@
  * @typedef {object} Session
  * @property {string} playerName
  * @property {boolean} chickenMode - Whether to skip the jump scare.
+ * @property {boolean} [noHostiles] - Development exploration without a ghost; unranked.
  */
 
 /**

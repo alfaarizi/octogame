@@ -2,56 +2,65 @@
   "name": "basement",
   "description": "A workshop under the north-east of the building, with the CNC machines, a few desks and a storage room. Stairs lead up to the ground floor's workshop, and out to the front yard.",
   "tiles": "basement.tiles.txt",
-  "tilesOrigin": { "x": 13, "z": 1 },
+  "tilesOrigin": {"x": 13, "z": 1},
   "furniture": {
     "workshop": [
-      { "name": "CNC machine (old)", "parts": [{ "box": [13.55, 2.05, 14.75, 3.3, 0, 1], "color": "appliance" }, { "box": [13.65, 2.15, 14.65, 3.2, 1, 1.05], "color": "gym" }, { "box": [13.6, 2.5, 14.7, 2.65, 1.05, 1.5], "color": "gym" }] },
-      { "name": "CNC machine (new)", "parts": [{ "box": [15, 2.05, 16.2, 3.3, 0, 1], "color": "appliance" }, { "box": [15.1, 2.15, 16.1, 3.2, 1, 1.05], "color": "gym" }, { "box": [15.05, 2.5, 16.15, 2.65, 1.05, 1.5], "color": "gym" }] },
-      { "name": "desk (Ajeng)", "parts": [{ "desk": [16.4, 2, 17.6, 2.6] }, { "chair": { "x": 17, "z": 2.9 }, "facing": "north" }] },
-      { "name": "desk (Ferry)", "parts": [{ "desk": [17.6, 2, 18.8, 2.6] }, { "chair": { "x": 18.2, "z": 2.9 }, "facing": "north" }] },
-      { "name": "column", "parts": [{ "box": [18.8, 3.15, 19.25, 3.6, 0, 3], "color": "pillar" }] },
-      { "name": "desk (Rafidal)", "parts": [{ "desk": [17.9, 3.95, 18.6, 5] }, { "chair": { "x": 17.6, "z": 4.45 }, "facing": "east" }] },
-      { "name": "work table", "parts": [{ "table": [14.3, 3.9, 15.4, 6.2], "height": 0.76, "color": "wood" }, { "stool": { "x": 14, "z": 4.4 }, "height": 0.48, "color": "chair" }, { "stool": { "x": 14, "z": 5.6 }, "height": 0.48, "color": "chair" }, { "stool": { "x": 15.7, "z": 4.4 }, "height": 0.48, "color": "chair" }, { "stool": { "x": 15.7, "z": 5.6 }, "height": 0.48, "color": "chair" }] },
-      { "name": "workbench", "parts": [{ "table": [18, 5.95, 20.9, 6.5], "height": 0.76, "color": "wood" }] },
-      { "name": "table", "parts": [{ "table": [14.3, 7.4, 15.5, 8.2], "height": 0.76, "color": "wood" }] },
-      { "name": "bench", "parts": [{ "box": [13.5, 8.55, 15.4, 9, 0, 0.45], "color": "cabinet" }] },
-      { "name": "tall cabinet", "parts": [{ "box": [16.6, 6.6, 17, 8.4, 0, 1.8], "color": "cabinet" }] }
+      {"name": "CNC machine (old)", "parts": [{"box": [13.55, 2.05, 14.75, 3.3, 0, 1], "color": "appliance"}, {"box": [13.65, 2.15, 14.65, 3.2, 1, 1.05], "color": "gym"}, {"box": [13.6, 2.5, 14.7, 2.65, 1.05, 1.5], "color": "gym"}]},
+      {"name": "CNC machine (new)", "parts": [{"box": [15, 2.05, 16.2, 3.3, 0, 1], "color": "appliance"}, {"box": [15.1, 2.15, 16.1, 3.2, 1, 1.05], "color": "gym"}, {"box": [15.05, 2.5, 16.15, 2.65, 1.05, 1.5], "color": "gym"}]},
+      {"name": "desk (Ajeng)", "parts": [{"desk": [16.4, 2, 17.6, 2.6]}, {"chair": {"x": 17, "z": 2.9}, "facing": "north"}]},
+      {"name": "desk (Ferry)", "parts": [{"desk": [17.6, 2, 18.8, 2.6]}, {"chair": {"x": 18.2, "z": 2.9}, "facing": "north"}]},
+      {"name": "column", "parts": [{"box": [18.8, 3.15, 19.25, 3.6, 0, 3], "color": "pillar"}]},
+      {"name": "desk (Rafidal)", "parts": [{"desk": [17.9, 3.95, 18.6, 5]}, {"chair": {"x": 17.6, "z": 4.45}, "facing": "east"}]},
+      {"name": "work table", "parts": [{"table": [14.3, 3.9, 15.4, 6.2], "height": 0.76, "color": "wood"}, {"stool": {"x": 14, "z": 4.4}, "height": 0.48, "color": "chair"}, {"stool": {"x": 14, "z": 5.6}, "height": 0.48, "color": "chair"}, {"stool": {"x": 15.7, "z": 4.4}, "height": 0.48, "color": "chair"}, {"stool": {"x": 15.7, "z": 5.6}, "height": 0.48, "color": "chair"}]},
+      {"name": "workbench", "parts": [{"table": [18, 5.95, 20.9, 6.5], "height": 0.76, "color": "wood"}]},
+      {"name": "table", "parts": [{"table": [14.3, 7.4, 15.5, 8.2], "height": 0.76, "color": "wood"}]},
+      {"name": "bench", "parts": [{"table": [13.5, 8.55, 15.4, 9], "height": 0.45, "color": "cabinet"}]},
+      {"name": "tall cabinet", "parts": [{"cabinet": [16.6, 6.6, 17, 8.4, 0, 1.8], "color": "cabinet"}]}
     ],
     "storage room": [
-      { "name": "storage shelves", "parts": [{ "box": [17.6, 7, 20.7, 7.4, 0, 1.9], "color": "shelf" }] },
-      { "name": "stack of crates", "parts": [{ "box": [20.2, 8.3, 20.8, 8.9, 0, 0.55], "color": "crate" }, { "box": [20.25, 8.35, 20.75, 8.85, 0.55, 1.05], "color": "crate" }] }
+      {"name": "storage shelves", "parts": [{"shelf": [17.6, 7, 20.7, 7.4, 0, 1.9], "color": "shelf"}]},
+      {"name": "stack of crates", "parts": [{"box": [20.2, 8.3, 20.8, 8.9, 0, 0.55], "color": "crate"}, {"box": [20.25, 8.35, 20.75, 8.85, 0.55, 1.05], "color": "crate"}]}
+    ],
+    "night shift barriers": [
+      {"name": "machine safety curtain", "parts": [{"color": "partition", "screen": [15.7, 5.05, 16.6, 5.2, 0, 2.35]}]},
+      {"name": "stored packing crates", "parts": [{"color": "crate", "box": [13.55, 6.4, 14.2, 7.2, 0, 1.85]}]}
+    ],
+    "desk details": [
+      {"name": "monitor, keyboard and abandoned paperwork", "solid": false, "parts": [{"box": [16.8, 2.2399999999999998, 17.2, 2.32, 0.84, 1.15], "color": "#131d20"}, {"box": [16.96, 2.26, 17.04, 2.34, 0.76, 0.84], "color": "#444d50"}, {"box": [16.8, 2.38, 17.2, 2.51, 0.76, 0.79], "color": "#283236"}, {"box": [17.24, 2.3499999999999996, 17.4, 2.54, 0.761, 0.767], "color": "#abac9c"}]},
+      {"name": "monitor, keyboard and abandoned paperwork", "solid": false, "parts": [{"box": [18.000000000000004, 2.2399999999999998, 18.400000000000002, 2.32, 0.84, 1.15], "color": "#131d20"}, {"box": [18.160000000000004, 2.26, 18.240000000000002, 2.34, 0.76, 0.84], "color": "#444d50"}, {"box": [18.000000000000004, 2.38, 18.400000000000002, 2.51, 0.76, 0.79], "color": "#283236"}, {"box": [18.44, 2.3499999999999996, 18.6, 2.54, 0.761, 0.767], "color": "#abac9c"}]},
+      {"name": "monitor, keyboard and abandoned paperwork", "solid": false, "parts": [{"box": [18.05, 4.415, 18.45, 4.494999999999999, 0.84, 1.15], "color": "#131d20"}, {"box": [18.21, 4.435, 18.29, 4.515, 0.76, 0.84], "color": "#444d50"}, {"box": [18.05, 4.555, 18.45, 4.685, 0.76, 0.79], "color": "#283236"}, {"box": [18.49, 4.5249999999999995, 18.65, 4.715, 0.761, 0.767], "color": "#abac9c"}]}
     ]
   },
   "lanterns": [
-    { "name": "on the work table, facing the stairs from the front yard", "x": 14.85, "y": 0.76, "z": 5.6, "lookAt": { "x": 16.2, "z": 9 } }
+    {"name": "on the work table, facing the stairs from the front yard", "x": 14.85, "y": 0.76, "z": 5.6, "lookAt": {"x": 16.2, "z": 9}}
   ],
   "fixtures": [
-    { "name": "CNC control panel", "box": [16.2, 2.35, 16.23, 2.85, 0.6, 0.95], "color": "#ffa040", "light": { "x": 16.6, "y": 0.9, "z": 2.6 } }
+    {"name": "CNC control panel", "box": [16.2, 2.35, 16.23, 2.85, 0.6, 0.95], "color": "#ffa040", "light": {"x": 16.6, "y": 0.9, "z": 2.6}}
   ],
-  "portraits": [],
-  "candySpots": [
-    { "room": "CNC corner", "x": 14.15, "y": 1.58, "z": 2.7 },
-    { "room": "CNC corner", "x": 16.6, "y": 0.08, "z": 3.5 },
-    { "room": "basement desks", "x": 17, "y": 0.84, "z": 2.3 },
-    { "room": "basement desks", "x": 18.25, "y": 0.84, "z": 4.5 },
-    { "room": "basement workshop", "x": 14.85, "y": 0.84, "z": 4.4 },
-    { "room": "basement workshop", "x": 14.9, "y": 0.84, "z": 7.8 },
-    { "room": "storage room", "x": 19.2, "y": 0.08, "z": 8.6 },
-    { "room": "storage room", "x": 20.5, "y": 1.13, "z": 8.6 }
+  "portraits": [
+  ],
+  "evidenceSpots": [
+    {"id": "drawing", "name": "The missing employee", "room": "basement workshop", "kind": "drawing", "x": 14.85, "y": 0.79, "z": 4.4, "clue": "Basement \u00b7 A work-table sketch names someone who never worked here."}
   ],
   "batterySpots": [
-    { "x": 13.8, "y": 0.25, "z": 6.8 },
-    { "x": 20.6, "y": 0.25, "z": 5.5 },
-    { "x": 18, "y": 0.25, "z": 8.6 }
+    {"x": 13.8, "y": 0.098, "z": 7.6},
+    {"x": 20.6, "y": 0.098, "z": 5.5},
+    {"x": 18, "y": 0.098, "z": 8.6}
   ],
   "ghostSpots": [
-    { "x": 15.9, "z": 3.8 },
-    { "x": 16, "z": 7.6 },
-    { "x": 19.6, "z": 8.2 },
-    { "x": 20.6, "z": 5.4 }
+    {"x": 15.9, "z": 3.8},
+    {"x": 16, "z": 7.6},
+    {"x": 19.6, "z": 8.2},
+    {"x": 20.6, "z": 5.4}
   ],
   "stairs": [
-    { "name": "workshop stairwell, up to the ground floor's workshop", "rect": [20, 1.5, 21, 5], "rises": "north", "low": 0, "high": 3, "rails": [] },
-    { "name": "yard stairs, up to the front yard", "rect": [15.5, 9.5, 18.5, 13.5], "rises": "south", "low": 0, "high": 3, "rails": ["east"] }
+    {"name": "workshop stairwell, up to the ground floor's workshop", "rect": [20, 1.5, 21, 5], "rises": "north", "low": 0, "high": 3, "rails": []},
+    {"name": "yard stairs, up to the front yard", "rect": [15.5, 9.5, 18.5, 13.5], "rises": "south", "low": 0, "high": 3, "rails": ["east"]}
+  ],
+  "equipment": [
+  ],
+  "interactables": [
+    {"id": "storage-closet", "name": "storage locker", "kind": "closet", "position": {"x": 18.6, "y": 1.25, "z": 8.84}, "box": [18.1, 8, 19.1, 8.8, 0, 2.3]},
+    {"id": "basement-supplies", "name": "supply drawer", "kind": "cache", "position": {"x": 20, "y": 2.25, "z": 7.44}, "box": [19.7, 7, 20.3, 7.4, 1.9, 2.45]}
   ]
 }

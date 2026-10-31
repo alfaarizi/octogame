@@ -2,7 +2,13 @@
  * Everything gameplay announces on the EventBus. Positions are floor-plan points: { x, z }.
  */
 export const GameEvent = Object.freeze({
-  /** Payload: { candiesRequired } */
+  FEEDBACK: 'feedback',
+  PHOTO_TAKEN: 'photo-taken',
+  ITEM_PICKED_UP: 'item-picked-up',
+  ITEM_DROPPED: 'item-dropped',
+  HIDING_CHANGED: 'hiding-changed',
+  OBJECT_INTERACTED: 'object-interacted',
+  /** Payload: { evidenceRequired } */
   ROUND_STARTED: 'round-started',
   ROUND_ENDED: 'round-ended',
   GAME_PAUSED: 'game-paused',
@@ -16,9 +22,7 @@ export const GameEvent = Object.freeze({
   JUMP_SCARE_STARTED: 'jump-scare-started',
 
   /** Payload: { collected, required } */
-  CANDY_COLLECTED: 'candy-collected',
-  /** Payload: { position: { x, y, z } } */
-  CANDY_NEARBY: 'candy-nearby',
+  EVIDENCE_COLLECTED: 'evidence-collected',
   BATTERY_COLLECTED: 'battery-collected',
   EXIT_UNLOCKED: 'exit-unlocked',
 

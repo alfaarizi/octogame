@@ -17,7 +17,8 @@
   <div id="flash"></div>
 
   <div id="hud" class="hidden">
-    <div id="candy">🍬 0 / 5</div>
+    <div id="evidence">EVIDENCE 0 / 5</div>
+    <div id="development-status" class="hidden">DEV · NO HOSTILES</div>
     <div id="timer">0:00.0</div>
     <div id="meters">
       <div class="meter"><span>🔦</span><div class="bar"><div id="battery-fill"></div></div></div>
@@ -25,32 +26,42 @@
     </div>
     <div id="crosshair"></div>
     <div id="hint"></div>
+    <div id="interaction"></div>
+    <div id="inventory"><span id="slot-one"></span><span id="slot-two"></span><small>1 / 2 select · E interact · Q drop · J case file</small></div>
+    <div id="viewfinder" class="hidden"><span>REC / NIGHT SHIFT</span><div id="camera-status"></div></div>
+    <div id="hiding" class="hidden"><span>HIDDEN · E TO LEAVE</span></div>
   </div>
 
   <div id="title" class="screen hidden">
     <div class="panel">
       <h1>Flashlight Haunt</h1>
-      <p class="tag">Find 5 candies. Get out. Don't let it touch you.</p>
+      <p class="tag">After hours. Five anomalies. Bring back proof.</p>
       <form id="start-form">
         <input id="name" type="text" maxlength="16" placeholder="Your name" autocomplete="off" spellcheck="false">
         <button type="submit">Enter the office</button>
       </form>
       <label class="chicken"><input type="checkbox" id="chicken"> Chicken mode (no jump scare)</label>
+      <label class="chicken development"><input type="checkbox" id="no-hostiles"> Development: no hostiles (unranked)</label>
       <div class="howto">
         <div><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> move &nbsp;·&nbsp; <kbd>Shift</kbd> sprint &nbsp;·&nbsp; <kbd>Mouse</kbd> look</div>
-        <div><kbd>Click</kbd> or <kbd>F</kbd> flashlight on/off &nbsp;·&nbsp; <kbd>Esc</kbd> pause</div>
+        <div><kbd>E</kbd> interact / hide &nbsp;·&nbsp; <kbd>Q</kbd> drop &nbsp;·&nbsp; <kbd>1</kbd><kbd>2</kbd> select item</div>
+        <div><kbd>Click</kbd> use held item &nbsp;·&nbsp; <kbd>J</kbd> case file / photos &nbsp;·&nbsp; <kbd>Esc</kbd> pause</div>
         <div><b>The ghost freezes in your light.</b> Hold the beam on it to banish it.</div>
-        <div>Your battery runs out, and the ghost can see a lit flashlight from far away.</div>
+        <div>Pick up your flashlight and camera from the trolley. Photograph the five anomalies, then reach the main gate. A flash attracts the ghost. Hide before it sees you enter.</div>
       </div>
       <ol id="board-title" class="board"></ol>
     </div>
   </div>
 
   <div id="pause" class="screen hidden">
-    <div class="panel small">
-      <h2>Paused</h2>
-      <p>Click anywhere to keep playing.</p>
-      <div class="buttons"><button id="quit" class="secondary">Quit to title</button></div>
+    <div class="panel case-file">
+      <h2>Case file</h2>
+      <p class="tag">Simulation paused · Photograph each anomaly, then escape.</p>
+      <label class="chicken development"><input type="checkbox" id="pause-no-hostiles"> Development: no hostiles (unranked)</label>
+      <ul id="evidence-checklist"></ul>
+      <div class="buttons"><button id="resume">Resume investigation</button><button id="quit" class="secondary">Quit to title</button></div>
+      <p class="album-help">Your photographs · Click a frame to download. Kept until the next round.</p>
+      <div id="pause-photos" class="photo-album"></div>
     </div>
   </div>
 
@@ -64,6 +75,8 @@
       </div>
       <div class="keys-hint"><kbd>Enter</kbd> play again &nbsp;·&nbsp; <kbd>N</kbd> next player</div>
       <ol id="board-end" class="board"></ol>
+      <p class="album-help">Photographs from this investigation · Click to download</p>
+      <div id="result-photos" class="photo-album"></div>
     </div>
   </div>
 

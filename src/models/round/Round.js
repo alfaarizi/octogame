@@ -8,51 +8,51 @@ export const RoundOutcome = Object.freeze({ ESCAPED: 'escaped', CAUGHT: 'caught'
  * @property {string} playerName
  * @property {boolean} escaped
  * @property {number} timeSeconds
- * @property {number} candiesCollected
+ * @property {number} evidenceCollected
  * @property {number} finishedAt - When the round ended, in epoch milliseconds.
  */
 
-/** Score-keeping for one attempt: the clock, the candy count, and opening the exit. */
+/** Score-keeping for one attempt: the clock, the evidence count, and opening the exit. */
 export class Round {
   #events;
   #exitDoor;
-  #candiesRequired;
+  #evidenceRequired;
   #elapsed = 0;
-  #candiesCollected = 0;
+  #evidenceCollected = 0;
 
-  constructor({ events, exitDoor, candiesRequired }) {
+  constructor({ events, exitDoor, evidenceRequired }) {
     this.#events = events;
     this.#exitDoor = exitDoor;
-    this.#candiesRequired = candiesRequired;
+    this.#evidenceRequired = evidenceRequired;
   }
 
   get elapsed() {
     return this.#elapsed;
   }
 
-  get candiesCollected() {
-    return this.#candiesCollected;
+  get evidenceCollected() {
+    return this.#evidenceCollected;
   }
 
-  get candiesRequired() {
-    return this.#candiesRequired;
+  get evidenceRequired() {
+    return this.#evidenceRequired;
   }
 
   start() {
     this.#elapsed = 0;
-    this.#candiesCollected = 0;
+    this.#evidenceCollected = 0;
     this.#exitDoor.lock();
-    this.#events.emit(GameEvent.ROUND_STARTED, { candiesRequired: this.#candiesRequired });
+    this.#events.emit(GameEvent.ROUND_STARTED, { evidenceRequired: this.#evidenceRequired });
   }
 
   tick(seconds) {
     this.#elapsed += seconds;
   }
 
-  recordCandy() {
-    this.#candiesCollected++;
-    this.#events.emit(GameEvent.CANDY_COLLECTED, { collected: this.#candiesCollected, required: this.#candiesRequired });
-    if (this.#candiesCollected >= this.#candiesRequired && !this.#exitDoor.isUnlocked) {
+  recordEvidence() {
+    this.#evidenceCollected++;
+    this.#events.emit(GameEvent.EVIDENCE_COLLECTED, { collected: this.#evidenceCollected, required: this.#evidenceRequired });
+    if (this.#evidenceCollected >= this.#evidenceRequired && !this.#exitDoor.isUnlocked) {
       this.#exitDoor.unlock();
       this.#events.emit(GameEvent.EXIT_UNLOCKED);
     }
@@ -68,7 +68,7 @@ export class Round {
       playerName,
       escaped: outcome === RoundOutcome.ESCAPED,
       timeSeconds: this.#elapsed,
-      candiesCollected: this.#candiesCollected,
+      evidenceCollected: this.#evidenceCollected,
       finishedAt: Date.now(),
     });
   }

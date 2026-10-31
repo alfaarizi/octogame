@@ -70,8 +70,14 @@ export class GameController {
     });
     ui.pause.onResume(() => pointerLock.request());
     ui.pause.onQuit(() => this.showTitle(persistence.preferences.load()));
+    ui.pause.onNoHostilesChange((noHostiles) => {
+      this.#session.noHostiles = noHostiles;
+      this.#context.simulation.setHostilesEnabled(!noHostiles);
+      if (noHostiles) this.#context.views.ghost.hide();
+      persistence.preferences.save(this.#session);
+    });
     ui.result.onPlayAgain(() => this.startRound(this.#session));
-    ui.result.onNextPlayer(() => this.showTitle({ playerName: '', chickenMode: this.#session.chickenMode }));
+    ui.result.onNextPlayer(() => this.showTitle({ ...this.#session, playerName: '' }));
   }
 
   /** Updates the current state and the always-on scenery, then draws. */
@@ -81,6 +87,8 @@ export class GameController {
     const { views, render } = this.#context;
     views.lighting.update(seconds, this.#worldTime);
     views.exitDoor.update(this.#worldTime);
+    views.investigation.update(this.#worldTime);
+    views.photography.update(seconds);
     render.render();
   }
 }

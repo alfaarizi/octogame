@@ -13,7 +13,7 @@ const spawnTable = { randomGhostSpot: () => at(25, 3), ghostSpotFarFrom: () => a
 
 describe('Ghost', () => {
   let ghost, recorded;
-  const world = (overrides = {}) => ({ playerPosition: at(2, 3), playerLightOn: false, isLit: false, candiesCollected: 0, ...overrides });
+  const world = (overrides = {}) => ({ playerPosition: at(2, 3), playerLightOn: false, isLit: false, evidenceCollected: 0, ...overrides });
 
   beforeEach(() => {
     recorded = [];
@@ -66,17 +66,17 @@ describe('Ghost', () => {
     assert.ok(recorded.includes(GameEvent.PLAYER_CAUGHT));
   });
 
-  test('hunts faster with each candy collected, fastest when enraged', () => {
+  test('hunts faster with each evidence collected, fastest when enraged', () => {
     const distanceAfterOneSecond = (setup) => {
       ghost.reset(at(20, 3), 0);
       ghost.update(0, world());
       setup();
-      ghost.update(1, world({ playerPosition: at(10, 3), playerLightOn: true, candiesCollected: 3 }));
+      ghost.update(1, world({ playerPosition: at(10, 3), playerLightOn: true, evidenceCollected: 3 }));
       return 20 - ghost.position.x;
     };
     const hunting = distanceAfterOneSecond(() => {});
     const enraged = distanceAfterOneSecond(() => ghost.enrage());
-    assert.ok(Math.abs(hunting - (config.huntSpeed + 3 * config.huntSpeedPerCandy)) < 1e-9);
+    assert.ok(Math.abs(hunting - (config.huntSpeed + 3 * config.huntSpeedPerEvidence)) < 1e-9);
     assert.ok(Math.abs(enraged - config.enragedSpeed) < 1e-9);
   });
 

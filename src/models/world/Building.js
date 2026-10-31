@@ -44,7 +44,9 @@ export class Building {
       const tileMap = new TileMap(floor.tiles, tileSize, floor.tilesOrigin);
       const stairs = [...flightsUp[index], ...(flightsUp[index - 1] ?? [])];
       const obstacles = [...floor.obstacles, ...stairs.flatMap((flight) => flight.rails)];
-      return { elevation: floor.elevation, tileMap, stairs, collisions: new CollisionWorld(tileMap, obstacles) };
+      const occluders = [...(floor.furniture ?? []).flatMap((piece) => piece.parts),
+        ...(floor.interactables ?? []).filter((item) => item.box).map((item) => item.box)];
+      return { elevation: floor.elevation, tileMap, stairs, occluders, collisions: new CollisionWorld(tileMap, obstacles) };
     });
   }
 
@@ -83,7 +85,26 @@ export class Building {
    */
   hasLineOfSight(from, to) {
     const floor = this.#floorAt(from.y);
-    return floor === this.#floorAt(to.y) && floor.tileMap.hasLineOfSight(from, to);
+    return floor === this.#floorAt(to.y) && this.hasClearRay(
+      { ...from, y: from.y + 1.2 }, { ...to, y: to.y + 1.2 });
+  }
+
+  /** Physical, eye-height sight check used by interactions, photography and the ghost. */
+  hasClearRay(from, to) {
+    const floorFor = (y) => this.#floors.findLast((floor) => floor.elevation <= y + 0.001);
+    const floor = floorFor(from.y);
+    if (!floor || floor !== floorFor(to.y) || !floor.tileMap.hasLineOfSight(from, to)) return false;
+    return !floor.occluders.some((box) => segmentIntersectsBox(from, to, box));
+  }
+
+  /** Finds a grounded drop point along a short, collision-resolved walk. */
+  dropPosition(position, yaw, distance, radius) {
+    const result = { ...position };
+    const steps = Math.ceil(distance / 0.08);
+    for (let step = 0; step < steps; step++) {
+      this.move(result, -Math.sin(yaw) * distance / steps, -Math.cos(yaw) * distance / steps, radius);
+    }
+    return { ...result, y: result.y + 0.12 };
   }
 
   /** The floor nearest `height`; halfway up the stairs, that's the upper one. */
@@ -95,3 +116,21 @@ export class Building {
 }
 
 const isWithinStep = (height, standingHeight) => Math.abs(height - standingHeight) <= MAX_STEP;
+
+/** Slab intersection, excluding endpoint contact so an object can be targeted on its surface. */
+function segmentIntersectsBox(from, to, box) {
+  let near = 0.002, far = 0.998;
+  for (const axis of ['x', 'y', 'z']) {
+    const delta = to[axis] - from[axis];
+    const low = box[`${axis}0`], high = box[`${axis}1`];
+    if (Math.abs(delta) < 1e-9) {
+      if (from[axis] <= low || from[axis] >= high) return false;
+      continue;
+    }
+    const a = (low - from[axis]) / delta, b = (high - from[axis]) / delta;
+    near = Math.max(near, Math.min(a, b));
+    far = Math.min(far, Math.max(a, b));
+    if (near >= far) return false;
+  }
+  return true;
+}

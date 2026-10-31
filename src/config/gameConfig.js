@@ -6,13 +6,11 @@ import { deepFreeze, degreesToRadians } from '../utils.js';
  */
 export const GAME_CONFIG = deepFreeze({
   round: {
-    candiesRequired: 5,
+    evidenceRequired: 5,
     batteriesPlaced: 3,
-    ghostGracePeriod: 15,
+    ghostGracePeriod: 30,
     ambientNoiseInterval: { min: 20, max: 40 },
     ambientNoiseLanternFlickerChance: 0.3,
-    candySparkleRange: 3,
-    candySparkleInterval: 1.4,
   },
 
   player: {
@@ -36,6 +34,9 @@ export const GAME_CONFIG = deepFreeze({
     sprintFootstepRate: 1.6,
   },
 
+  interaction: { range: 2.3, halfAngle: 0.5, dropDistance: 0.65 },
+  camera: { cooldown: 1.2, range: 7, halfAngle: 0.24, minDistance: 0.7, albumSize: 18, noiseRadius: 16 },
+
   flashlight: {
     /** Seconds of light from a full battery. */
     batteryLife: 60,
@@ -51,7 +52,7 @@ export const GAME_CONFIG = deepFreeze({
   ghost: {
     wanderSpeed: 1,
     huntSpeed: 2,
-    huntSpeedPerCandy: 0.2,
+    huntSpeedPerEvidence: 0.2,
     enragedSpeed: 3.5,
     insideWallSpeedFactor: 0.5,
     /** Seconds it has to stay in the beam. */
@@ -85,11 +86,11 @@ export const GAME_CONFIG = deepFreeze({
     fieldOfView: 70,
     maxPixelRatio: 1.5,
     exposure: 1.15,
-    fogDensity: 0.085,
+    fogDensity: 0.11,
     moonlightSkyColor: 0x7586b8,
     moonlightGroundColor: 0x0b0906,
     /** How much you can see with the flashlight off. */
-    moonlightIntensity: 1.6,
+    moonlightIntensity: 0.65,
     lanternIntensity: 1.6,
     /** Server lights, the CCTV monitor and the neon sign. */
     fixtureIntensity: 1.5,

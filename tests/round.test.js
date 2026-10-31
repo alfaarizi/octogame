@@ -11,35 +11,35 @@ import { recordingEventBus } from './helpers.js';
 import { OFFICE } from './office.js';
 
 describe('Round', () => {
-  test('opens the exit exactly once, when the last candy is collected', () => {
+  test('opens the exit exactly once, when the last evidence is collected', () => {
     const recorder = recordingEventBus();
     const exitDoor = new ExitDoor(OFFICE.exitDoor);
-    const round = new Round({ events: recorder.bus, exitDoor, candiesRequired: 3 });
+    const round = new Round({ events: recorder.bus, exitDoor, evidenceRequired: 3 });
     round.start();
-    round.recordCandy();
-    round.recordCandy();
+    round.recordEvidence();
+    round.recordEvidence();
     assert.equal(exitDoor.isUnlocked, false);
-    round.recordCandy();
+    round.recordEvidence();
     assert.equal(exitDoor.isUnlocked, true);
-    round.recordCandy();
+    round.recordEvidence();
     assert.equal(recorder.count(GameEvent.EXIT_UNLOCKED), 1);
   });
 
   test('starting a new round relocks the door and resets the count', () => {
     const exitDoor = new ExitDoor(OFFICE.exitDoor);
-    const round = new Round({ events: recordingEventBus().bus, exitDoor, candiesRequired: 1 });
+    const round = new Round({ events: recordingEventBus().bus, exitDoor, evidenceRequired: 1 });
     round.start();
-    round.recordCandy();
+    round.recordEvidence();
     round.tick(12);
     round.start();
     assert.equal(exitDoor.isUnlocked, false);
-    assert.equal(round.candiesCollected, 0);
+    assert.equal(round.evidenceCollected, 0);
     assert.equal(round.elapsed, 0);
   });
 
   test('summarizes the outcome', () => {
     const exitDoor = new ExitDoor(OFFICE.exitDoor);
-    const round = new Round({ events: recordingEventBus().bus, exitDoor, candiesRequired: 5 });
+    const round = new Round({ events: recordingEventBus().bus, exitDoor, evidenceRequired: 5 });
     round.start();
     round.tick(42);
     const result = round.summarize('Sam', RoundOutcome.CAUGHT);
@@ -50,31 +50,24 @@ describe('Round', () => {
 });
 
 describe('PickupField', () => {
-  test('collects only what is within reach, once', () => {
-    const field = new PickupField({ pickupRadius: 1.2, reachHeight: 2 });
-    field.populate({ candySpots: [{ x: 1, y: 0.8, z: 1 }, { x: 9, y: 0, z: 9 }], batterySpots: [{ x: 1.5, y: 0, z: 1 }] });
-    const standing = { x: 1, y: 0, z: 1 };
-    const reached = field.collectWithinReach(standing);
-    assert.deepEqual(reached.map((item) => item.kind).sort(), [PickupKind.BATTERY, PickupKind.CANDY]);
-    assert.equal(field.collectWithinReach(standing).length, 0);
-    assert.equal(field.items.length, 1);
-    assert.equal(field.nearest(PickupKind.CANDY, { x: 0, y: 0, z: 0 }).item.position.x, 9);
-  });
-
-  test("can't reach through a floor or a ceiling", () => {
-    const field = new PickupField({ pickupRadius: 1.2, reachHeight: 2 });
-    field.populate({ candySpots: [{ x: 1, y: 3.1, z: 1 }], batterySpots: [] });
-    assert.equal(field.collectWithinReach({ x: 1, y: 0, z: 1 }).length, 0);
-    assert.equal(field.nearest(PickupKind.CANDY, { x: 1, y: 0, z: 1 }), null);
-    assert.equal(field.collectWithinReach({ x: 1, y: 3, z: 1 }).length, 1);
+  test('explicit removal and re-addition preserve the dropped item identity', () => {
+    const field = new PickupField();
+    const item = field.add(PickupKind.FLASHLIGHT, { x: 1, y: .1, z: 1 });
+    const snapshot = field.items;
+    assert.equal(field.remove(item.id), item);
+    assert.equal(field.remove(item.id), null);
+    assert.equal(snapshot.length, 1);
+    field.add(item.kind, { x: 2, y: .1, z: 2 }, item.id);
+    assert.equal(field.items[0].id, item.id);
+    assert.equal(field.items[0].position.x, 2);
   });
 });
 
 describe('leaderboard', () => {
-  const escaped = (timeSeconds) => ({ escaped: true, timeSeconds, candiesCollected: 5 });
-  const caught = (candiesCollected, timeSeconds) => ({ escaped: false, timeSeconds, candiesCollected });
+  const escaped = (timeSeconds) => ({ escaped: true, timeSeconds, evidenceCollected: 5 });
+  const caught = (evidenceCollected, timeSeconds) => ({ escaped: false, timeSeconds, evidenceCollected });
 
-  test('escapes rank above catches, fastest first; catches by candy, then survival time', () => {
+  test('escapes rank above catches, fastest first; catches by evidence, then survival time', () => {
     const ranked = rankResults([caught(4, 50), escaped(90), caught(4, 80), escaped(60), caught(5, 10)]);
     assert.deepEqual(ranked, [escaped(60), escaped(90), caught(5, 10), caught(4, 80), caught(4, 50)]);
     assert.equal(compareResults(escaped(1), escaped(1)), 0);
@@ -84,11 +77,11 @@ describe('leaderboard', () => {
     const memory = new Map();
     const store = { read: (key, fallback) => memory.get(key) ?? fallback, write: (key, value) => memory.set(key, value) };
     const scores = new ScoreRepository(store);
-    scores.record({ playerName: 'A', escaped: false, timeSeconds: 30, candiesCollected: 2, finishedAt: 1 });
-    const best = { playerName: 'B', escaped: true, timeSeconds: 99, candiesCollected: 5, finishedAt: 2 };
+    scores.record({ playerName: 'A', escaped: false, timeSeconds: 30, evidenceCollected: 2, finishedAt: 1 });
+    const best = { playerName: 'B', escaped: true, timeSeconds: 99, evidenceCollected: 5, finishedAt: 2 };
     const { rank } = scores.record(best);
     assert.equal(rank, 1);
-    assert.deepEqual(memory.get('flashlight-haunt-scores')[0], { name: 'B', escaped: true, time: 99, candies: 5, at: 2 });
+    assert.deepEqual(memory.get('flashlight-haunt-investigation-scores-v2')[0], { name: 'B', escaped: true, time: 99, evidence: 5, at: 2 });
     assert.deepEqual(scores.loadRanked().map((result) => result.playerName), ['B', 'A']);
   });
 });

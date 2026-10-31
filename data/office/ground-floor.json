@@ -4,143 +4,190 @@
   "tiles": "ground-floor.tiles.txt",
   "furniture": {
     "office area": [
-      { "name": "desk (Andri)", "parts": [{ "desk": [0.55, 0.5, 1.8, 1.05] }, { "chair": { "x": 1.18, "z": 1.35 }, "facing": "north" }] },
-      { "name": "desk (Ihsan)", "parts": [{ "desk": [1.8, 0.5, 3.05, 1.05] }, { "chair": { "x": 2.43, "z": 1.35 }, "facing": "north" }] },
-      { "name": "desk (spare)", "parts": [{ "desk": [3.05, 0.5, 4.3, 1.05] }, { "chair": { "x": 3.68, "z": 1.35 }, "facing": "north" }] },
-      { "name": "desk (Ibrahim)", "parts": [{ "desk": [4.3, 0.5, 5.55, 1.05] }, { "chair": { "x": 4.93, "z": 1.35 }, "facing": "north" }] },
-      { "name": "desk (uPulse)", "parts": [{ "desk": [5.55, 0.5, 6.4, 1.5] }] },
-      { "name": "desk (Andrew)", "parts": [{ "desk": [1.2, 2.7, 2.42, 3.55] }, { "chair": { "x": 1.81, "z": 2.4 }, "facing": "south" }] },
-      { "name": "desk (Tempest)", "parts": [{ "desk": [2.42, 2.7, 3.65, 3.55] }, { "chair": { "x": 3.03, "z": 2.4 }, "facing": "south" }] },
-      { "name": "desk (spare, north)", "parts": [{ "desk": [4.7, 2.7, 5.95, 3.5] }, { "chair": { "x": 5.33, "z": 2.4 }, "facing": "south" }] },
-      { "name": "desk (spare, south)", "parts": [{ "desk": [4.7, 3.5, 5.95, 4.35] }, { "chair": { "x": 5.33, "z": 4.65 }, "facing": "north" }] },
-      { "name": "printer", "parts": [{ "box": [5.95, 3.1, 6.4, 3.55, 0, 0.9], "color": "printer" }] },
-      { "name": "desk (Farib)", "parts": [{ "desk": [1, 3.95, 1.85, 5.2] }, { "chair": { "x": 0.75, "z": 4.55 }, "facing": "east" }] },
-      { "name": "desk (Dila)", "parts": [{ "desk": [1, 5.2, 1.85, 6.45] }, { "chair": { "x": 0.75, "z": 5.85 }, "facing": "east" }] },
-      { "name": "desk (Oji)", "parts": [{ "desk": [1, 6.95, 1.85, 8.2] }, { "chair": { "x": 0.75, "z": 7.55 }, "facing": "east" }] },
-      { "name": "desk (intern 1)", "parts": [{ "desk": [2.8, 6.6, 4.05, 7.4] }, { "chair": { "x": 3.43, "z": 6.3 }, "facing": "south" }] },
-      { "name": "desk (intern 2)", "parts": [{ "desk": [4.05, 6.6, 5.3, 7.4] }, { "chair": { "x": 4.68, "z": 6.3 }, "facing": "south" }] },
-      { "name": "desk (intern 3)", "parts": [{ "desk": [5.3, 6.6, 6.55, 7.4] }, { "chair": { "x": 5.93, "z": 6.3 }, "facing": "south" }] },
-      { "name": "desk (shared printer)", "parts": [{ "desk": [2.8, 7.4, 4.05, 8.25] }, { "box": [3.1, 7.55, 3.75, 8.1, 0.76, 1.11], "color": "printer" }] },
-      { "name": "desk (Adika)", "parts": [{ "desk": [4.05, 7.4, 5.3, 8.25] }, { "chair": { "x": 4.68, "z": 8.5 }, "facing": "north" }] },
-      { "name": "desk (Elsa)", "parts": [{ "desk": [5.3, 7.4, 6.55, 8.25] }, { "chair": { "x": 5.93, "z": 8.5 }, "facing": "north" }] },
-      { "name": "desk (Fast)", "parts": [{ "desk": [11.95, 3.5, 12.75, 4.8] }, { "chair": { "x": 11.7, "z": 4.15 }, "facing": "east" }] },
-      { "name": "printer (Fast)", "parts": [{ "box": [12.3, 3.05, 12.75, 3.5, 0, 0.9], "color": "printer" }] },
-      { "name": "desk (3D printing)", "parts": [{ "desk": [12.7, 0.5, 13.95, 1.05] }, { "box": [13, 0.6, 13.6, 1, 0.76, 1.21], "color": "printer" }, { "chair": { "x": 13.33, "z": 1.35 }, "facing": "north" }] }
+      {"name": "desk (Andri)", "parts": [{"desk": [0.55, 0.5, 1.8, 1.05]}, {"chair": {"x": 1.18, "z": 1.35}, "facing": "north"}]},
+      {"name": "desk (Ihsan)", "parts": [{"desk": [1.8, 0.5, 3.05, 1.05]}, {"chair": {"x": 2.43, "z": 1.35}, "facing": "north"}]},
+      {"name": "desk (spare)", "parts": [{"desk": [3.05, 0.5, 4.3, 1.05]}, {"chair": {"x": 3.68, "z": 1.35}, "facing": "north"}]},
+      {"name": "desk (Ibrahim)", "parts": [{"desk": [4.3, 0.5, 5.55, 1.05]}, {"chair": {"x": 4.93, "z": 1.35}, "facing": "north"}]},
+      {"name": "desk (uPulse)", "parts": [{"desk": [5.55, 0.5, 6.4, 1.5]}]},
+      {"name": "desk (Andrew)", "parts": [{"desk": [1.2, 2.7, 2.42, 3.55]}, {"chair": {"x": 1.81, "z": 2.4}, "facing": "south"}]},
+      {"name": "desk (Tempest)", "parts": [{"desk": [2.42, 2.7, 3.65, 3.55]}, {"chair": {"x": 3.03, "z": 2.4}, "facing": "south"}]},
+      {"name": "desk (spare, north)", "parts": [{"desk": [4.7, 2.7, 5.95, 3.5]}, {"chair": {"x": 5.33, "z": 2.4}, "facing": "south"}]},
+      {"name": "desk (spare, south)", "parts": [{"desk": [4.7, 3.5, 5.95, 4.35]}, {"chair": {"x": 5.33, "z": 4.65}, "facing": "north"}]},
+      {"name": "printer", "parts": [{"box": [5.95, 3.1, 6.4, 3.55, 0, 0.9], "color": "printer"}]},
+      {"name": "desk (Farib)", "parts": [{"desk": [1, 3.95, 1.85, 5.2]}, {"chair": {"x": 0.75, "z": 4.55}, "facing": "east"}]},
+      {"name": "desk (Dila)", "parts": [{"desk": [1, 5.2, 1.85, 6.45]}, {"chair": {"x": 0.75, "z": 5.85}, "facing": "east"}]},
+      {"name": "desk (Oji)", "parts": [{"desk": [1, 6.95, 1.85, 8.2]}, {"chair": {"x": 0.75, "z": 7.55}, "facing": "east"}]},
+      {"name": "desk (intern 1)", "parts": [{"desk": [2.8, 6.6, 4.05, 7.4]}, {"chair": {"x": 3.43, "z": 6.3}, "facing": "south"}]},
+      {"name": "desk (intern 2)", "parts": [{"desk": [4.05, 6.6, 5.3, 7.4]}, {"chair": {"x": 4.68, "z": 6.3}, "facing": "south"}]},
+      {"name": "desk (intern 3)", "parts": [{"desk": [5.3, 6.6, 6.55, 7.4]}, {"chair": {"x": 5.93, "z": 6.3}, "facing": "south"}]},
+      {"name": "desk (shared printer)", "parts": [{"desk": [2.8, 7.4, 4.05, 8.25]}, {"box": [3.1, 7.55, 3.75, 8.1, 0.76, 1.11], "color": "printer"}]},
+      {"name": "desk (Adika)", "parts": [{"desk": [4.05, 7.4, 5.3, 8.25]}, {"chair": {"x": 4.68, "z": 8.5}, "facing": "north"}]},
+      {"name": "desk (Elsa)", "parts": [{"desk": [5.3, 7.4, 6.55, 8.25]}, {"chair": {"x": 5.93, "z": 8.5}, "facing": "north"}]},
+      {"name": "desk (Fast)", "parts": [{"desk": [11.95, 3.5, 12.75, 4.8]}, {"chair": {"x": 11.7, "z": 4.15}, "facing": "east"}]},
+      {"name": "printer (Fast)", "parts": [{"box": [12.3, 3.05, 12.75, 3.5, 0, 0.9], "color": "printer"}]},
+      {"name": "desk (3D printing)", "parts": [{"desk": [12.7, 0.5, 13.95, 1.05]}, {"box": [13, 0.6, 13.6, 1, 0.76, 1.21], "color": "printer"}, {"chair": {"x": 13.33, "z": 1.35}, "facing": "north"}]}
     ],
     "lobby": [
-      { "name": "lobby partition", "parts": [{ "box": [6.9, 7.4, 7.2, 8.95, 0, 1.8], "color": "whiteFurniture" }] },
-      { "name": "first aid kit", "solid": false, "parts": [{ "box": [6.3, 8.85, 6.7, 9, 1.2, 1.55], "color": "firstAid" }] },
-      { "name": "armchair", "parts": [{ "seat": [9.25, 6.65, 10.1, 7.5], "back": "north", "color": "whiteFurniture" }] },
-      { "name": "armchair", "parts": [{ "seat": [9.55, 8.2, 10.35, 9], "back": "east", "color": "whiteFurniture" }] },
-      { "name": "bookshelf", "parts": [{ "box": [10.45, 6.55, 10.8, 8.95, 0, 1.8], "color": "shelf" }] }
+      {"name": "lobby partition", "parts": [{"box": [6.9, 7.4, 7.2, 8.95, 0, 1.8], "color": "whiteFurniture"}]},
+      {"name": "first aid kit", "solid": false, "parts": [{"box": [6.3, 8.85, 6.7, 9, 1.2, 1.55], "color": "firstAid"}]},
+      {"name": "armchair", "parts": [{"seat": [9.25, 6.65, 10.1, 7.5], "back": "north", "color": "whiteFurniture"}]},
+      {"name": "armchair", "parts": [{"seat": [9.55, 8.2, 10.35, 9], "back": "east", "color": "whiteFurniture"}]},
+      {"name": "bookshelf", "parts": [{"shelf": [10.45, 6.55, 10.8, 8.95, 0, 1.8], "color": "shelf"}]}
     ],
     "workshop": [
-      { "name": "desk (Marvin)", "parts": [{ "desk": [14.25, 0.5, 15.45, 1.05] }, { "chair": { "x": 14.85, "z": 1.35 }, "facing": "north" }] },
-      { "name": "desk (workshop intern)", "parts": [{ "desk": [16, 0.5, 17.25, 1.05] }, { "chair": { "x": 16.63, "z": 1.35 }, "facing": "north" }] },
-      { "name": "desk (Tuwuh)", "parts": [{ "desk": [12.75, 2.3, 14, 3.1] }, { "chair": { "x": 13.38, "z": 2 }, "facing": "south" }] },
-      { "name": "desk (Nikko)", "parts": [{ "desk": [12.75, 3.1, 14, 3.95] }, { "chair": { "x": 13.38, "z": 4.25 }, "facing": "north" }] },
-      { "name": "desk (Kafin)", "parts": [{ "desk": [15.5, 3.05, 16.35, 4.3] }, { "chair": { "x": 16.6, "z": 3.68 }, "facing": "west" }] },
-      { "name": "desk (Flo)", "parts": [{ "desk": [16.4, 4.3, 17.65, 5.15] }] },
-      { "name": "desk (Bagas)", "parts": [{ "desk": [17.65, 4.3, 18.9, 5.15] }, { "chair": { "x": 18.28, "z": 4 }, "facing": "south" }] },
-      { "name": "column", "parts": [{ "box": [18.6, 3.15, 19.05, 3.6, 0, 3], "color": "pillar" }] },
-      { "name": "meeting table", "parts": [{ "table": [14.95, 6.2, 17.5, 7.4], "height": 0.76, "color": "meetingTable" }, { "stool": { "x": 15.6, "z": 5.95 }, "height": 0.48, "color": "chair" }, { "stool": { "x": 15.6, "z": 7.65 }, "height": 0.48, "color": "chair" }, { "stool": { "x": 16.85, "z": 5.95 }, "height": 0.48, "color": "chair" }, { "stool": { "x": 16.85, "z": 7.65 }, "height": 0.48, "color": "chair" }] },
-      { "name": "rover track tables", "parts": [{ "table": [18.1, 6.2, 19.35, 7.45], "height": 0.76, "color": "whiteTable" }, { "table": [19.35, 6.2, 20.6, 7.45], "height": 0.76, "color": "whiteTable" }] },
-      { "name": "workbench (east)", "parts": [{ "table": [21.3, 6.3, 21.95, 8.7], "height": 0.76, "color": "whiteTable" }, { "chair": { "x": 21, "z": 6.8 }, "facing": "east" }, { "chair": { "x": 21, "z": 8.1 }, "facing": "east" }] },
-      { "name": "workbench (south)", "parts": [{ "table": [18.7, 8.35, 19.9, 8.95], "height": 0.76, "color": "whiteTable" }] },
-      { "name": "workbench (south)", "parts": [{ "table": [20, 8.4, 21, 8.95], "height": 0.76, "color": "whiteTable" }] },
-      { "name": "tool cabinet", "parts": [{ "box": [18.95, 4.25, 19.45, 5.25, 0, 0.95], "color": "cabinet" }] },
-      { "name": "stack of crates", "parts": [{ "box": [12.95, 6.45, 13.55, 7.05, 0, 0.55], "color": "crate" }, { "box": [13, 6.5, 13.5, 7, 0.55, 1.05], "color": "crate" }] },
-      { "name": "desk (Fahmi)", "parts": [{ "desk": [13.1, 9.2, 14.25, 9.95] }, { "chair": { "x": 13.68, "z": 8.85 }, "facing": "south" }] },
-      { "name": "desk (Dion)", "parts": [{ "desk": [14.35, 9.2, 15.5, 9.95] }, { "chair": { "x": 14.93, "z": 8.85 }, "facing": "south" }] },
-      { "name": "desk (Lintang)", "parts": [{ "desk": [15.6, 9.2, 16.75, 9.95] }, { "chair": { "x": 16.18, "z": 8.85 }, "facing": "south" }] },
-      { "name": "desk (Faisal)", "parts": [{ "desk": [16.85, 9.2, 18, 9.95] }, { "chair": { "x": 17.43, "z": 8.85 }, "facing": "south" }] },
-      { "name": "wet lab sink", "parts": [{ "box": [22.55, 0.5, 23.45, 0.95, 0, 0.88], "color": "cabinet" }, { "box": [22.55, 0.5, 23.45, 0.95, 0.88, 0.92], "color": "sink" }] }
+      {"name": "desk (Marvin)", "parts": [{"desk": [14.25, 0.5, 15.45, 1.05]}, {"chair": {"x": 14.85, "z": 1.35}, "facing": "north"}]},
+      {"name": "desk (workshop intern)", "parts": [{"desk": [16, 0.5, 17.25, 1.05]}, {"chair": {"x": 16.63, "z": 1.35}, "facing": "north"}]},
+      {"name": "desk (Tuwuh)", "parts": [{"desk": [12.75, 2.3, 14, 3.1]}, {"chair": {"x": 13.38, "z": 2}, "facing": "south"}]},
+      {"name": "desk (Nikko)", "parts": [{"desk": [12.75, 3.1, 14, 3.95]}, {"chair": {"x": 13.38, "z": 4.25}, "facing": "north"}]},
+      {"name": "desk (Kafin)", "parts": [{"desk": [15.5, 3.05, 16.35, 4.3]}, {"chair": {"x": 16.6, "z": 3.68}, "facing": "west"}]},
+      {"name": "desk (Flo)", "parts": [{"desk": [16.4, 4.3, 17.65, 5.15]}]},
+      {"name": "desk (Bagas)", "parts": [{"desk": [17.65, 4.3, 18.9, 5.15]}, {"chair": {"x": 18.28, "z": 4}, "facing": "south"}]},
+      {"name": "column", "parts": [{"box": [18.6, 3.15, 19.05, 3.6, 0, 3], "color": "pillar"}]},
+      {"name": "meeting table", "parts": [{"table": [14.95, 6.2, 17.5, 7.4], "height": 0.76, "color": "meetingTable"}, {"stool": {"x": 15.6, "z": 5.95}, "height": 0.48, "color": "chair"}, {"stool": {"x": 15.6, "z": 7.65}, "height": 0.48, "color": "chair"}, {"stool": {"x": 16.85, "z": 5.95}, "height": 0.48, "color": "chair"}, {"stool": {"x": 16.85, "z": 7.65}, "height": 0.48, "color": "chair"}]},
+      {"name": "rover track tables", "parts": [{"table": [18.1, 6.2, 19.35, 7.45], "height": 0.76, "color": "whiteTable"}, {"table": [19.35, 6.2, 20.6, 7.45], "height": 0.76, "color": "whiteTable"}]},
+      {"name": "workbench (east)", "parts": [{"table": [21.3, 6.3, 21.95, 8.7], "height": 0.76, "color": "whiteTable"}, {"chair": {"x": 21, "z": 6.8}, "facing": "east"}, {"chair": {"x": 21, "z": 8.1}, "facing": "east"}]},
+      {"name": "workbench (south)", "parts": [{"table": [18.7, 8.35, 19.9, 8.95], "height": 0.76, "color": "whiteTable"}]},
+      {"name": "workbench (south)", "parts": [{"table": [20, 8.4, 21, 8.95], "height": 0.76, "color": "whiteTable"}]},
+      {"name": "tool cabinet", "parts": [{"cabinet": [18.95, 4.25, 19.45, 5.25, 0, 0.95], "color": "cabinet"}]},
+      {"name": "stack of crates", "parts": [{"box": [12.95, 6.45, 13.55, 7.05, 0, 0.55], "color": "crate"}, {"box": [13, 6.5, 13.5, 7, 0.55, 1.05], "color": "crate"}]},
+      {"name": "desk (Fahmi)", "parts": [{"desk": [13.1, 9.2, 14.25, 9.95]}, {"chair": {"x": 13.68, "z": 8.85}, "facing": "south"}]},
+      {"name": "desk (Dion)", "parts": [{"desk": [14.35, 9.2, 15.5, 9.95]}, {"chair": {"x": 14.93, "z": 8.85}, "facing": "south"}]},
+      {"name": "desk (Lintang)", "parts": [{"desk": [15.6, 9.2, 16.75, 9.95]}, {"chair": {"x": 16.18, "z": 8.85}, "facing": "south"}]},
+      {"name": "desk (Faisal)", "parts": [{"desk": [16.85, 9.2, 18, 9.95]}, {"chair": {"x": 17.43, "z": 8.85}, "facing": "south"}]},
+      {"name": "wet lab sink", "parts": [{"cabinet": [22.55, 0.5, 23.45, 0.95, 0, 0.88], "color": "cabinet"}, {"box": [22.55, 0.5, 23.45, 0.95, 0.88, 0.92], "color": "sink"}]}
     ],
     "server room and toilet #4": [
-      { "name": "server rack", "parts": [{ "box": [3.35, 10.45, 4, 11.7, 0, 1.95], "color": "server" }] },
-      { "name": "server room cabinet", "parts": [{ "box": [0.5, 9.5, 1.3, 9.9, 0, 1], "color": "cabinet" }] },
-      { "name": "toilet", "parts": [{ "seat": [5.2, 10.3, 5.6, 10.98], "back": "south", "color": "porcelain" }] }
+      {"name": "server rack", "parts": [{"box": [3.35, 10.45, 4, 11.7, 0, 1.95], "color": "server"}]},
+      {"name": "server room cabinet", "parts": [{"cabinet": [0.5, 9.5, 1.3, 9.9, 0, 1], "color": "cabinet"}]},
+      {"name": "toilet", "parts": [{"seat": [5.2, 10.3, 5.6, 10.98], "back": "south", "color": "porcelain"}]}
     ],
     "praying room and ablution area": [
-      { "name": "prayer rug", "solid": false, "parts": [{ "box": [1, 13.3, 2.2, 16.2, 0, 0.012], "color": "rug" }, { "box": [2.05, 13.3, 2.2, 16.2, 0.012, 0.016], "color": "rugTrim" }] },
-      { "name": "prayer rug", "solid": false, "parts": [{ "box": [2.6, 13.5, 3.8, 16.4, 0, 0.012], "color": "rug" }, { "box": [3.65, 13.5, 3.8, 16.4, 0.012, 0.016], "color": "rugTrim" }] },
-      { "name": "ablution bench", "parts": [{ "box": [4.5, 12, 4.8, 15, 0, 0.55], "color": "stone" }, { "box": [4.5, 12.46, 4.58, 12.54, 0.85, 0.93], "color": "sink" }, { "box": [4.5, 13.46, 4.58, 13.54, 0.85, 0.93], "color": "sink" }, { "box": [4.5, 14.46, 4.58, 14.54, 0.85, 0.93], "color": "sink" }] }
+      {"name": "prayer rug", "solid": false, "parts": [{"box": [1, 13.3, 2.2, 16.2, 0, 0.012], "color": "rug"}, {"box": [2.05, 13.3, 2.2, 16.2, 0.012, 0.016], "color": "rugTrim"}]},
+      {"name": "prayer rug", "solid": false, "parts": [{"box": [2.6, 13.5, 3.8, 16.4, 0, 0.012], "color": "rug"}, {"box": [3.65, 13.5, 3.8, 16.4, 0.012, 0.016], "color": "rugTrim"}]},
+      {"name": "ablution bench", "parts": [{"box": [4.5, 12, 4.8, 15, 0, 0.55], "color": "stone"}, {"box": [4.5, 12.46, 4.54, 12.54, 0.55, 0.85], "color": "sink"}, {"box": [4.5, 12.46, 4.58, 12.54, 0.85, 0.93], "color": "sink"}, {"box": [4.5, 13.46, 4.54, 13.54, 0.55, 0.85], "color": "sink"}, {"box": [4.5, 13.46, 4.58, 13.54, 0.85, 0.93], "color": "sink"}, {"box": [4.5, 14.46, 4.54, 14.54, 0.55, 0.85], "color": "sink"}, {"box": [4.5, 14.46, 4.58, 14.54, 0.85, 0.93], "color": "sink"}]}
     ],
     "terrace": [
-      { "name": "terrace steps", "solid": false, "parts": [{ "box": [6.5, 11.07, 12.6, 11.13, 0, 0.012], "color": "stepEdge" }, { "box": [6.5, 11.37, 12.6, 11.43, 0, 0.012], "color": "stepEdge" }, { "box": [6.5, 11.67, 12.6, 11.73, 0, 0.012], "color": "stepEdge" }, { "box": [6.5, 11.97, 12.6, 12.03, 0, 0.012], "color": "stepEdge" }, { "box": [6.5, 12.32, 12.6, 12.38, 0, 0.012], "color": "stepEdge" }, { "box": [6.5, 12.67, 12.6, 12.73, 0, 0.012], "color": "stepEdge" }] },
-      { "name": "company sign", "parts": [{ "box": [10, 9.6, 11.6, 9.72, 0.25, 0.8], "color": "sign" }, { "box": [10.1, 9.63, 10.16, 9.69, 0, 0.25], "color": "pole" }, { "box": [11.44, 9.63, 11.5, 9.69, 0, 0.25], "color": "pole" }] }
+      {"name": "terrace steps", "solid": false, "parts": [{"box": [6.5, 11.07, 12.6, 11.13, 0, 0.012], "color": "stepEdge"}, {"box": [6.5, 11.37, 12.6, 11.43, 0, 0.012], "color": "stepEdge"}, {"box": [6.5, 11.67, 12.6, 11.73, 0, 0.012], "color": "stepEdge"}, {"box": [6.5, 11.97, 12.6, 12.03, 0, 0.012], "color": "stepEdge"}, {"box": [6.5, 12.32, 12.6, 12.38, 0, 0.012], "color": "stepEdge"}, {"box": [6.5, 12.67, 12.6, 12.73, 0, 0.012], "color": "stepEdge"}]},
+      {"name": "company sign", "parts": [{"box": [10, 9.6, 11.6, 9.72, 0.25, 0.8], "color": "sign"}, {"box": [10.1, 9.63, 10.16, 9.69, 0, 0.25], "color": "pole"}, {"box": [11.44, 9.63, 11.5, 9.69, 0, 0.25], "color": "pole"}]}
     ],
     "east yard: toilet and security post": [
-      { "name": "squat toilet", "solid": false, "parts": [{ "box": [20.55, 11, 21, 11.5, 0, 0.04], "color": "porcelain" }] },
-      { "name": "CCTV desk", "parts": [{ "desk": [20.05, 12.55, 20.95, 13.1] }, { "chair": { "x": 20.5, "z": 13.45 }, "facing": "north" }] }
+      {"name": "squat toilet", "solid": false, "parts": [{"box": [20.55, 11, 21, 11.5, 0, 0.04], "color": "porcelain"}]},
+      {"name": "CCTV desk", "parts": [{"desk": [20.05, 12.55, 20.95, 13.1]}, {"chair": {"x": 20.5, "z": 13.45}, "facing": "north"}]}
     ],
     "front yard": [
-      { "name": "flag pole", "footprint": [9.4, 23.25, 9.8, 23.65], "parts": [{ "box": [9.4, 23.25, 9.8, 23.65, 0, 0.12], "color": "stone" }, { "box": [9.56, 23.41, 9.64, 23.49, 0.12, 4], "color": "pole" }, { "box": [9.64, 23.43, 10.4, 23.47, 3.4, 3.9], "color": "flag" }] },
-      { "name": "palm tree", "footprint": [4.2, 24.05, 4.6, 24.45], "parts": [{ "box": [4.28, 24.13, 4.52, 24.37, 0, 3.2], "color": "palmTrunk" }, { "box": [3.1, 24.03, 5.7, 24.47, 3, 3.07], "color": "palmLeaf" }, { "box": [4.18, 22.95, 4.62, 25.55, 3.05, 3.12], "color": "palmLeaf" }, { "box": [4.05, 23.9, 4.75, 24.6, 3.1, 3.35], "color": "palmLeaf" }] },
-      { "name": "palm tree", "footprint": [7.75, 23.5, 8.15, 23.9], "parts": [{ "box": [7.83, 23.58, 8.07, 23.82, 0, 3.2], "color": "palmTrunk" }, { "box": [6.65, 23.48, 9.25, 23.92, 3, 3.07], "color": "palmLeaf" }, { "box": [7.73, 22.4, 8.17, 25, 3.05, 3.12], "color": "palmLeaf" }, { "box": [7.6, 23.35, 8.3, 24.05, 3.1, 3.35], "color": "palmLeaf" }] },
-      { "name": "palm tree", "footprint": [12.4, 22.3, 12.8, 22.7], "parts": [{ "box": [12.48, 22.38, 12.72, 22.62, 0, 3.2], "color": "palmTrunk" }, { "box": [11.3, 22.28, 13.9, 22.72, 3, 3.07], "color": "palmLeaf" }, { "box": [12.38, 21.2, 12.82, 23.8, 3.05, 3.12], "color": "palmLeaf" }, { "box": [12.25, 22.15, 12.95, 22.85, 3.1, 3.35], "color": "palmLeaf" }] },
-      { "name": "shrub", "parts": [{ "box": [13.1, 11, 13.7, 11.6, 0, 0.7], "color": "shrub" }] },
-      { "name": "shrub", "parts": [{ "box": [14.1, 12.6, 14.7, 13.2, 0, 0.6], "color": "shrub" }] },
-      { "name": "bollard", "parts": [{ "box": [3.9, 20.6, 4.2, 20.9, 0, 0.9], "color": "bollard" }] }
+      {"name": "flag pole", "footprint": [9.4, 23.25, 9.8, 23.65], "parts": [{"box": [9.4, 23.25, 9.8, 23.65, 0, 0.12], "color": "stone"}, {"box": [9.56, 23.41, 9.64, 23.49, 0.12, 4], "color": "pole"}, {"box": [9.64, 23.43, 10.4, 23.47, 3.4, 3.9], "color": "flag"}]},
+      {"name": "palm tree", "footprint": [4.2, 24.05, 4.6, 24.45], "parts": [{"box": [4.28, 24.13, 4.52, 24.37, 0, 3.2], "color": "palmTrunk"}], "visual": "palm"},
+      {"name": "palm tree", "footprint": [7.75, 23.5, 8.15, 23.9], "parts": [{"box": [7.83, 23.58, 8.07, 23.82, 0, 3.2], "color": "palmTrunk"}], "visual": "palm"},
+      {"name": "palm tree", "footprint": [12.4, 22.3, 12.8, 22.7], "parts": [{"box": [12.48, 22.38, 12.72, 22.62, 0, 3.2], "color": "palmTrunk"}], "visual": "palm"},
+      {"name": "shrub", "parts": [{"box": [13.1, 11, 13.7, 11.6, 0, 0.7], "color": "shrub"}], "visual": "shrub"},
+      {"name": "shrub", "parts": [{"box": [14.1, 12.6, 14.7, 13.2, 0, 0.6], "color": "shrub"}], "visual": "shrub"},
+      {"name": "bollard", "parts": [{"box": [3.9, 20.6, 4.2, 20.9, 0, 0.9], "color": "bollard"}]}
+    ],
+    "night shift barriers": [
+      {"name": "desk privacy screen", "parts": [{"color": "partition", "screen": [1.2, 3.46, 3.65, 3.57, 0.76, 1.95]}], "solid": false},
+      {"name": "archive divider", "parts": [{"color": "partition", "screen": [4.47, 2.75, 4.61, 4.65, 0, 2.25]}]},
+      {"name": "intern desk screen", "parts": [{"color": "partition", "screen": [2.8, 6.6, 6.4, 6.72, 0.76, 2.05]}], "solid": false},
+      {"name": "lobby folding screen", "parts": [{"color": "partition", "screen": [10.95, 5.85, 11.1, 7.35, 0, 2.2]}]},
+      {"name": "workshop welding curtain", "parts": [{"color": "partition", "screen": [14.15, 2.3, 14.3, 4.35, 0, 2.35]}]},
+      {"name": "covered equipment barrier", "parts": [{"color": "partition", "screen": [18.96, 6.3, 19.14, 7.35, 0.76, 2.15]}], "solid": false}
+    ],
+    "arrival equipment": [
+      {"name": "equipment trolley", "parts": [{"table": [7.3, 7.8, 8.6, 8.22], "height": 0.78, "color": "cabinet"}]}
+    ],
+    "yard obstructions": [
+      {"name": "abandoned delivery van", "parts": [{"box": [6.8, 15.2, 8.8, 18.8, 0.25, 1.02], "color": "#303a3c"}, {"box": [6.9, 16.15, 8.7, 18.7, 1.02, 2.25], "color": "#374246"}, {"box": [6.9, 15.45, 8.7, 16.15, 1.02, 1.95], "color": "#303a3c"}, {"box": [6.95, 15.44, 8.65, 15.47, 1.31, 1.82], "color": "#101a20"}, {"box": [6.86, 15.5, 6.9, 16.12, 1.25, 1.82], "color": "#101a20"}, {"box": [8.7, 15.5, 8.74, 16.12, 1.25, 1.82], "color": "#101a20"}, {"box": [6.86, 15.2, 8.74, 15.25, 0.4, 0.67], "color": "#1a2021"}, {"box": [6.92, 15.18, 7.17, 15.24, 0.73, 0.88], "color": "#d8d9bb"}, {"box": [8.43, 15.18, 8.68, 15.24, 0.73, 0.88], "color": "#d8d9bb"}, {"box": [8.74, 16.55, 8.79, 18.25, 0.65, 1.95], "color": "#2b3538"}], "footprint": [6.8, 15.2, 8.8, 18.8]},
+      {"name": "stacked shipping crates", "parts": [{"box": [11, 18, 11.8, 18.63, 0, 0.7], "color": "crate"}, {"box": [11.88, 18, 12.68, 18.63, 0, 0.7], "color": "crate"}, {"box": [12.76, 18, 13.56, 18.63, 0, 0.7], "color": "crate"}, {"box": [11, 18.71, 11.8, 19.34, 0, 0.7], "color": "crate"}, {"box": [11.88, 18.71, 12.68, 19.34, 0, 0.7], "color": "crate"}, {"box": [12.76, 18.71, 13.56, 19.34, 0, 0.7], "color": "crate"}, {"box": [11.05, 18.04, 11.85, 18.67, 0.7, 1.38], "color": "crate"}, {"box": [11.93, 18.04, 12.73, 18.67, 0.7, 1.38], "color": "crate"}, {"box": [12.81, 18.04, 13.56, 18.67, 0.7, 1.38], "color": "crate"}, {"box": [11.5, 18.3, 12.3, 18.93, 1.38, 1.85], "color": "crate"}], "footprint": [11, 18, 13.6, 19.35]},
+      {"name": "construction screen", "parts": [{"color": "#50574b", "screen": [11.5, 14.8, 11.65, 17.15, 0, 2.4]}]},
+      {"name": "parked car", "parts": [{"box": [17, 17.2, 18.25, 20.1, 0.24, 0.76], "color": "#252a30"}, {"box": [17.07, 17.85, 18.18, 19.26, 0.76, 1.32], "color": "#303943"}, {"box": [17.09, 17.83, 18.16, 17.87, 0.88, 1.21], "color": "#111d25"}, {"box": [17.09, 19.24, 18.16, 19.28, 0.88, 1.21], "color": "#111d25"}, {"box": [17.02, 17.2, 17.22, 17.25, 0.49, 0.64], "color": "#dfd5b7"}, {"box": [18.03, 17.2, 18.23, 17.25, 0.49, 0.64], "color": "#dfd5b7"}, {"box": [17.08, 20.04, 17.3, 20.1, 0.46, 0.59], "color": "#66322b"}, {"box": [17.95, 20.04, 18.17, 20.1, 0.46, 0.59], "color": "#66322b"}], "footprint": [17, 17.2, 18.25, 20.1]},
+      {"name": "overgrown planter", "parts": [{"box": [14.3, 20, 15.1, 21.4, 0, 0.35], "color": "planter"}], "visual": "shrub"}
+    ],
+    "desk details": [
+      {"name": "monitor, keyboard and abandoned paperwork", "solid": false, "parts": [{"box": [0.9750000000000001, 0.7150000000000001, 1.375, 0.795, 0.84, 1.15], "color": "#131d20"}, {"box": [1.135, 0.735, 1.215, 0.8150000000000001, 0.76, 0.84], "color": "#444d50"}, {"box": [0.9750000000000001, 0.855, 1.375, 0.985, 0.76, 0.79], "color": "#283236"}, {"box": [1.415, 0.8250000000000001, 1.5750000000000002, 1.0150000000000001, 0.761, 0.767], "color": "#abac9c"}]},
+      {"name": "monitor, keyboard and abandoned paperwork", "solid": false, "parts": [{"box": [2.2249999999999996, 0.7150000000000001, 2.625, 0.795, 0.84, 1.15], "color": "#131d20"}, {"box": [2.385, 0.735, 2.465, 0.8150000000000001, 0.76, 0.84], "color": "#444d50"}, {"box": [2.2249999999999996, 0.855, 2.625, 0.985, 0.76, 0.79], "color": "#283236"}, {"box": [2.665, 0.8250000000000001, 2.8249999999999997, 1.0150000000000001, 0.761, 0.767], "color": "#abac9c"}]},
+      {"name": "monitor, keyboard and abandoned paperwork", "solid": false, "parts": [{"box": [3.4749999999999996, 0.7150000000000001, 3.875, 0.795, 0.84, 1.15], "color": "#131d20"}, {"box": [3.635, 0.735, 3.715, 0.8150000000000001, 0.76, 0.84], "color": "#444d50"}, {"box": [3.4749999999999996, 0.855, 3.875, 0.985, 0.76, 0.79], "color": "#283236"}, {"box": [3.915, 0.8250000000000001, 4.075, 1.0150000000000001, 0.761, 0.767], "color": "#abac9c"}]},
+      {"name": "monitor, keyboard and abandoned paperwork", "solid": false, "parts": [{"box": [4.725, 0.7150000000000001, 5.125, 0.795, 0.84, 1.15], "color": "#131d20"}, {"box": [4.885, 0.735, 4.965, 0.8150000000000001, 0.76, 0.84], "color": "#444d50"}, {"box": [4.725, 0.855, 5.125, 0.985, 0.76, 0.79], "color": "#283236"}, {"box": [5.165, 0.8250000000000001, 5.325, 1.0150000000000001, 0.761, 0.767], "color": "#abac9c"}]},
+      {"name": "monitor, keyboard and abandoned paperwork", "solid": false, "parts": [{"box": [5.7749999999999995, 0.94, 6.175, 1.02, 0.84, 1.15], "color": "#131d20"}, {"box": [5.935, 0.96, 6.015, 1.04, 0.76, 0.84], "color": "#444d50"}, {"box": [5.7749999999999995, 1.08, 6.175, 1.21, 0.76, 0.79], "color": "#283236"}, {"box": [6.215, 1.05, 6.375, 1.24, 0.761, 0.767], "color": "#abac9c"}]},
+      {"name": "monitor, keyboard and abandoned paperwork", "solid": false, "parts": [{"box": [1.61, 3.065, 2.0100000000000002, 3.145, 0.84, 1.15], "color": "#131d20"}, {"box": [1.77, 3.085, 1.85, 3.165, 0.76, 0.84], "color": "#444d50"}, {"box": [1.61, 3.205, 2.0100000000000002, 3.335, 0.76, 0.79], "color": "#283236"}, {"box": [2.05, 3.175, 2.21, 3.365, 0.761, 0.767], "color": "#abac9c"}]},
+      {"name": "monitor, keyboard and abandoned paperwork", "solid": false, "parts": [{"box": [2.835, 3.065, 3.2350000000000003, 3.145, 0.84, 1.15], "color": "#131d20"}, {"box": [2.995, 3.085, 3.075, 3.165, 0.76, 0.84], "color": "#444d50"}, {"box": [2.835, 3.205, 3.2350000000000003, 3.335, 0.76, 0.79], "color": "#283236"}, {"box": [3.2750000000000004, 3.175, 3.435, 3.365, 0.761, 0.767], "color": "#abac9c"}]},
+      {"name": "monitor, keyboard and abandoned paperwork", "solid": false, "parts": [{"box": [5.125, 3.04, 5.525, 3.12, 0.84, 1.15], "color": "#131d20"}, {"box": [5.285, 3.06, 5.365, 3.14, 0.76, 0.84], "color": "#444d50"}, {"box": [5.125, 3.18, 5.525, 3.31, 0.76, 0.79], "color": "#283236"}, {"box": [5.565, 3.15, 5.7250000000000005, 3.34, 0.761, 0.767], "color": "#abac9c"}]},
+      {"name": "monitor, keyboard and abandoned paperwork", "solid": false, "parts": [{"box": [5.125, 3.8649999999999998, 5.525, 3.945, 0.84, 1.15], "color": "#131d20"}, {"box": [5.285, 3.885, 5.365, 3.965, 0.76, 0.84], "color": "#444d50"}, {"box": [5.125, 4.005, 5.525, 4.135, 0.76, 0.79], "color": "#283236"}, {"box": [5.565, 3.9749999999999996, 5.7250000000000005, 4.165, 0.761, 0.767], "color": "#abac9c"}]},
+      {"name": "monitor, keyboard and abandoned paperwork", "solid": false, "parts": [{"box": [1.225, 4.515000000000001, 1.625, 4.595, 0.84, 1.15], "color": "#131d20"}, {"box": [1.385, 4.535, 1.465, 4.615, 0.76, 0.84], "color": "#444d50"}, {"box": [1.225, 4.655, 1.625, 4.785, 0.76, 0.79], "color": "#283236"}, {"box": [1.665, 4.625, 1.8250000000000002, 4.815, 0.761, 0.767], "color": "#abac9c"}]},
+      {"name": "monitor, keyboard and abandoned paperwork", "solid": false, "parts": [{"box": [1.225, 5.765000000000001, 1.625, 5.845, 0.84, 1.15], "color": "#131d20"}, {"box": [1.385, 5.785, 1.465, 5.865, 0.76, 0.84], "color": "#444d50"}, {"box": [1.225, 5.905, 1.625, 6.035, 0.76, 0.79], "color": "#283236"}, {"box": [1.665, 5.875, 1.8250000000000002, 6.065, 0.761, 0.767], "color": "#abac9c"}]},
+      {"name": "monitor, keyboard and abandoned paperwork", "solid": false, "parts": [{"box": [1.225, 7.515, 1.625, 7.594999999999999, 0.84, 1.15], "color": "#131d20"}, {"box": [1.385, 7.534999999999999, 1.465, 7.614999999999999, 0.76, 0.84], "color": "#444d50"}, {"box": [1.225, 7.654999999999999, 1.625, 7.784999999999999, 0.76, 0.79], "color": "#283236"}, {"box": [1.665, 7.624999999999999, 1.8250000000000002, 7.8149999999999995, 0.761, 0.767], "color": "#abac9c"}]},
+      {"name": "monitor, keyboard and abandoned paperwork", "solid": false, "parts": [{"box": [3.2249999999999996, 6.94, 3.625, 7.02, 0.84, 1.15], "color": "#131d20"}, {"box": [3.385, 6.96, 3.465, 7.04, 0.76, 0.84], "color": "#444d50"}, {"box": [3.2249999999999996, 7.08, 3.625, 7.21, 0.76, 0.79], "color": "#283236"}, {"box": [3.665, 7.05, 3.8249999999999997, 7.24, 0.761, 0.767], "color": "#abac9c"}]},
+      {"name": "monitor, keyboard and abandoned paperwork", "solid": false, "parts": [{"box": [4.475, 6.94, 4.875, 7.02, 0.84, 1.15], "color": "#131d20"}, {"box": [4.635, 6.96, 4.715, 7.04, 0.76, 0.84], "color": "#444d50"}, {"box": [4.475, 7.08, 4.875, 7.21, 0.76, 0.79], "color": "#283236"}, {"box": [4.915, 7.05, 5.075, 7.24, 0.761, 0.767], "color": "#abac9c"}]},
+      {"name": "monitor, keyboard and abandoned paperwork", "solid": false, "parts": [{"box": [5.725, 6.94, 6.125, 7.02, 0.84, 1.15], "color": "#131d20"}, {"box": [5.885, 6.96, 5.965, 7.04, 0.76, 0.84], "color": "#444d50"}, {"box": [5.725, 7.08, 6.125, 7.21, 0.76, 0.79], "color": "#283236"}, {"box": [6.165, 7.05, 6.325, 7.24, 0.761, 0.767], "color": "#abac9c"}]},
+      {"name": "monitor, keyboard and abandoned paperwork", "solid": false, "parts": [{"box": [3.2249999999999996, 7.765000000000001, 3.625, 7.845, 0.84, 1.15], "color": "#131d20"}, {"box": [3.385, 7.785, 3.465, 7.865, 0.76, 0.84], "color": "#444d50"}, {"box": [3.2249999999999996, 7.905, 3.625, 8.035, 0.76, 0.79], "color": "#283236"}, {"box": [3.665, 7.875, 3.8249999999999997, 8.065, 0.761, 0.767], "color": "#abac9c"}]},
+      {"name": "monitor, keyboard and abandoned paperwork", "solid": false, "parts": [{"box": [4.475, 7.765000000000001, 4.875, 7.845, 0.84, 1.15], "color": "#131d20"}, {"box": [4.635, 7.785, 4.715, 7.865, 0.76, 0.84], "color": "#444d50"}, {"box": [4.475, 7.905, 4.875, 8.035, 0.76, 0.79], "color": "#283236"}, {"box": [4.915, 7.875, 5.075, 8.065, 0.761, 0.767], "color": "#abac9c"}]},
+      {"name": "monitor, keyboard and abandoned paperwork", "solid": false, "parts": [{"box": [5.725, 7.765000000000001, 6.125, 7.845, 0.84, 1.15], "color": "#131d20"}, {"box": [5.885, 7.785, 5.965, 7.865, 0.76, 0.84], "color": "#444d50"}, {"box": [5.725, 7.905, 6.125, 8.035, 0.76, 0.79], "color": "#283236"}, {"box": [6.165, 7.875, 6.325, 8.065, 0.761, 0.767], "color": "#abac9c"}]},
+      {"name": "monitor, keyboard and abandoned paperwork", "solid": false, "parts": [{"box": [12.15, 4.090000000000001, 12.549999999999999, 4.17, 0.84, 1.15], "color": "#131d20"}, {"box": [12.31, 4.11, 12.389999999999999, 4.19, 0.76, 0.84], "color": "#444d50"}, {"box": [12.15, 4.23, 12.549999999999999, 4.36, 0.76, 0.79], "color": "#283236"}, {"box": [12.59, 4.2, 12.75, 4.390000000000001, 0.761, 0.767], "color": "#abac9c"}]},
+      {"name": "monitor, keyboard and abandoned paperwork", "solid": false, "parts": [{"box": [13.125, 0.7150000000000001, 13.524999999999999, 0.795, 0.84, 1.15], "color": "#131d20"}, {"box": [13.285, 0.735, 13.364999999999998, 0.8150000000000001, 0.76, 0.84], "color": "#444d50"}, {"box": [13.125, 0.855, 13.524999999999999, 0.985, 0.76, 0.79], "color": "#283236"}, {"box": [13.565, 0.8250000000000001, 13.725, 1.0150000000000001, 0.761, 0.767], "color": "#abac9c"}]},
+      {"name": "monitor, keyboard and abandoned paperwork", "solid": false, "parts": [{"box": [14.65, 0.7150000000000001, 15.049999999999999, 0.795, 0.84, 1.15], "color": "#131d20"}, {"box": [14.81, 0.735, 14.889999999999999, 0.8150000000000001, 0.76, 0.84], "color": "#444d50"}, {"box": [14.65, 0.855, 15.049999999999999, 0.985, 0.76, 0.79], "color": "#283236"}, {"box": [15.09, 0.8250000000000001, 15.25, 1.0150000000000001, 0.761, 0.767], "color": "#abac9c"}]},
+      {"name": "monitor, keyboard and abandoned paperwork", "solid": false, "parts": [{"box": [16.425, 0.7150000000000001, 16.825, 0.795, 0.84, 1.15], "color": "#131d20"}, {"box": [16.585, 0.735, 16.665, 0.8150000000000001, 0.76, 0.84], "color": "#444d50"}, {"box": [16.425, 0.855, 16.825, 0.985, 0.76, 0.79], "color": "#283236"}, {"box": [16.865, 0.8250000000000001, 17.025, 1.0150000000000001, 0.761, 0.767], "color": "#abac9c"}]},
+      {"name": "monitor, keyboard and abandoned paperwork", "solid": false, "parts": [{"box": [13.175, 2.64, 13.575, 2.72, 0.84, 1.15], "color": "#131d20"}, {"box": [13.335, 2.66, 13.415, 2.74, 0.76, 0.84], "color": "#444d50"}, {"box": [13.175, 2.7800000000000002, 13.575, 2.91, 0.76, 0.79], "color": "#283236"}, {"box": [13.615, 2.75, 13.775, 2.9400000000000004, 0.761, 0.767], "color": "#abac9c"}]},
+      {"name": "monitor, keyboard and abandoned paperwork", "solid": false, "parts": [{"box": [13.175, 3.4650000000000003, 13.575, 3.5450000000000004, 0.84, 1.15], "color": "#131d20"}, {"box": [13.335, 3.4850000000000003, 13.415, 3.5650000000000004, 0.76, 0.84], "color": "#444d50"}, {"box": [13.175, 3.6050000000000004, 13.575, 3.7350000000000003, 0.76, 0.79], "color": "#283236"}, {"box": [13.615, 3.575, 13.775, 3.7650000000000006, 0.761, 0.767], "color": "#abac9c"}]},
+      {"name": "monitor, keyboard and abandoned paperwork", "solid": false, "parts": [{"box": [15.725000000000001, 3.6149999999999998, 16.125, 3.695, 0.84, 1.15], "color": "#131d20"}, {"box": [15.885000000000002, 3.635, 15.965, 3.715, 0.76, 0.84], "color": "#444d50"}, {"box": [15.725000000000001, 3.755, 16.125, 3.885, 0.76, 0.79], "color": "#283236"}, {"box": [16.165, 3.7249999999999996, 16.325, 3.915, 0.761, 0.767], "color": "#abac9c"}]},
+      {"name": "monitor, keyboard and abandoned paperwork", "solid": false, "parts": [{"box": [16.825, 4.665, 17.224999999999998, 4.744999999999999, 0.84, 1.15], "color": "#131d20"}, {"box": [16.985, 4.685, 17.064999999999998, 4.765, 0.76, 0.84], "color": "#444d50"}, {"box": [16.825, 4.805, 17.224999999999998, 4.935, 0.76, 0.79], "color": "#283236"}, {"box": [17.264999999999997, 4.7749999999999995, 17.424999999999997, 4.965, 0.761, 0.767], "color": "#abac9c"}]},
+      {"name": "monitor, keyboard and abandoned paperwork", "solid": false, "parts": [{"box": [18.075, 4.665, 18.474999999999998, 4.744999999999999, 0.84, 1.15], "color": "#131d20"}, {"box": [18.235, 4.685, 18.314999999999998, 4.765, 0.76, 0.84], "color": "#444d50"}, {"box": [18.075, 4.805, 18.474999999999998, 4.935, 0.76, 0.79], "color": "#283236"}, {"box": [18.514999999999997, 4.7749999999999995, 18.674999999999997, 4.965, 0.761, 0.767], "color": "#abac9c"}]},
+      {"name": "monitor, keyboard and abandoned paperwork", "solid": false, "parts": [{"box": [13.475000000000001, 9.514999999999999, 13.875, 9.594999999999999, 0.84, 1.15], "color": "#131d20"}, {"box": [13.635000000000002, 9.535, 13.715, 9.614999999999998, 0.76, 0.84], "color": "#444d50"}, {"box": [13.475000000000001, 9.655, 13.875, 9.785, 0.76, 0.79], "color": "#283236"}, {"box": [13.915000000000001, 9.625, 14.075000000000001, 9.815, 0.761, 0.767], "color": "#abac9c"}]},
+      {"name": "monitor, keyboard and abandoned paperwork", "solid": false, "parts": [{"box": [14.725000000000001, 9.514999999999999, 15.125, 9.594999999999999, 0.84, 1.15], "color": "#131d20"}, {"box": [14.885000000000002, 9.535, 14.965, 9.614999999999998, 0.76, 0.84], "color": "#444d50"}, {"box": [14.725000000000001, 9.655, 15.125, 9.785, 0.76, 0.79], "color": "#283236"}, {"box": [15.165000000000001, 9.625, 15.325000000000001, 9.815, 0.761, 0.767], "color": "#abac9c"}]},
+      {"name": "monitor, keyboard and abandoned paperwork", "solid": false, "parts": [{"box": [15.975000000000001, 9.514999999999999, 16.375, 9.594999999999999, 0.84, 1.15], "color": "#131d20"}, {"box": [16.135, 9.535, 16.215, 9.614999999999998, 0.76, 0.84], "color": "#444d50"}, {"box": [15.975000000000001, 9.655, 16.375, 9.785, 0.76, 0.79], "color": "#283236"}, {"box": [16.415, 9.625, 16.575, 9.815, 0.761, 0.767], "color": "#abac9c"}]},
+      {"name": "monitor, keyboard and abandoned paperwork", "solid": false, "parts": [{"box": [17.225, 9.514999999999999, 17.625, 9.594999999999999, 0.84, 1.15], "color": "#131d20"}, {"box": [17.385, 9.535, 17.465, 9.614999999999998, 0.76, 0.84], "color": "#444d50"}, {"box": [17.225, 9.655, 17.625, 9.785, 0.76, 0.79], "color": "#283236"}, {"box": [17.665, 9.625, 17.825, 9.815, 0.761, 0.767], "color": "#abac9c"}]},
+      {"name": "monitor, keyboard and abandoned paperwork", "solid": false, "parts": [{"box": [20.3, 12.764999999999999, 20.7, 12.844999999999999, 0.84, 1.15], "color": "#131d20"}, {"box": [20.46, 12.785, 20.54, 12.864999999999998, 0.76, 0.84], "color": "#444d50"}, {"box": [20.3, 12.905, 20.7, 13.035, 0.76, 0.79], "color": "#283236"}, {"box": [20.74, 12.875, 20.9, 13.065, 0.761, 0.767], "color": "#abac9c"}]}
     ]
   },
   "lanterns": [
-    { "name": "on the uPulse desk", "x": 5.98, "y": 0.76, "z": 1, "lookAt": { "x": 6, "z": 5 } },
-    { "name": "on the meeting table", "x": 16.9, "y": 0.76, "z": 6.5, "lookAt": { "x": 16.5, "z": 9 } },
-    { "name": "at the top of the terrace steps", "x": 12.2, "y": 0, "z": 10.3, "lookAt": { "x": 9, "z": 16 } }
+    {"name": "on the uPulse desk", "x": 5.98, "y": 0.76, "z": 1, "lookAt": {"x": 6, "z": 5}},
+    {"name": "on the meeting table", "x": 16.9, "y": 0.76, "z": 6.5, "lookAt": {"x": 16.5, "z": 9}},
+    {"name": "at the top of the terrace steps", "x": 12.2, "y": 0, "z": 10.3, "lookAt": {"x": 9, "z": 16}}
   ],
   "fixtures": [
-    { "name": "server lights", "box": [3.3, 10.6, 3.35, 11.55, 0.3, 1.75], "color": "#3dffb0", "light": { "x": 2.9, "y": 1.2, "z": 11.1 } },
-    { "name": "CCTV monitor", "box": [20.25, 12.58, 20.75, 12.68, 0.78, 1.12], "color": "#9fc3ff", "light": { "x": 20.5, "y": 1, "z": 13 } },
-    { "name": "neon sign", "box": [8.3, 23.85, 9.7, 24, 1, 1.5], "color": "#2fd6ff", "light": { "x": 9, "y": 1.3, "z": 23.4 } }
+    {"name": "server lights", "box": [3.3, 10.6, 3.35, 11.55, 0.3, 1.75], "color": "#3dffb0", "light": {"x": 2.9, "y": 1.2, "z": 11.1}},
+    {"name": "CCTV monitor", "box": [20.25, 12.58, 20.75, 12.68, 0.78, 1.12], "color": "#9fc3ff", "light": {"x": 20.5, "y": 1, "z": 13}},
+    {"name": "neon sign", "box": [8.3, 23.85, 9.7, 24, 1, 1.5], "color": "#2fd6ff", "light": {"x": 9, "y": 1.3, "z": 23.4}}
   ],
   "portraits": [
-    { "x": 2.4, "z": 0.5 },
-    { "x": 15.6, "z": 0.5 }
+    {"x": 2.4, "z": 0.5},
+    {"x": 15.6, "z": 0.5}
   ],
-  "candySpots": [
-    { "room": "office", "x": 1.18, "y": 0.84, "z": 0.8 },
-    { "room": "office", "x": 1.42, "y": 0.84, "z": 7.6 },
-    { "room": "office", "x": 6.2, "y": 0.08, "z": 4.6 },
-    { "room": "workshop", "x": 15.9, "y": 0.84, "z": 3.65 },
-    { "room": "workshop", "x": 16.2, "y": 0.84, "z": 6.8 },
-    { "room": "workshop", "x": 17.4, "y": 0.84, "z": 9.55 },
-    { "room": "wet lab", "x": 22.95, "y": 0.98, "z": 0.72 },
-    { "room": "stairwell", "x": 20.8, "y": 0.08, "z": 1 },
-    { "room": "server room", "x": 2.5, "y": 0.08, "z": 11.2 },
-    { "room": "toilet #4", "x": 4.75, "y": 0.08, "z": 9.75 },
-    { "room": "praying room", "x": 1.6, "y": 0.08, "z": 14.8 },
-    { "room": "ablution area", "x": 4.65, "y": 0.62, "z": 13.5 },
-    { "room": "terrace", "x": 8.2, "y": 0.08, "z": 10.2 },
-    { "room": "open area", "x": 9.85, "y": 0.3, "z": 23.2 },
-    { "room": "security post", "x": 20.85, "y": 0.84, "z": 12.85 },
-    { "room": "east toilet", "x": 21.2, "y": 0.08, "z": 11.75 },
-    { "room": "west parking", "x": 1.5, "y": 0.08, "z": 22 },
-    { "room": "guest parking", "x": 19, "y": 0.08, "z": 18.5 }
+  "evidenceSpots": [
+    {"id": "handprint", "name": "The sixth fingerprint", "room": "office", "kind": "handprint", "x": 2.68, "y": 0.78, "z": 3.22, "clue": "Ground floor \u00b7 A handprint on the central office desks has too many fingers."},
+    {"id": "phone", "name": "The disconnected caller", "room": "workshop", "kind": "phone", "x": 16.2, "y": 0.89, "z": 6.8, "clue": "Ground floor \u00b7 The workshop meeting table. A phone rings without a cable."},
+    {"id": "visitor", "name": "The visitor without a face", "room": "guest parking", "kind": "silhouette", "x": 18.7, "y": 1.05, "z": 19.2, "clue": "Outside \u00b7 A visitor waits beside the parked car, near the main gate."}
   ],
   "batterySpots": [
-    { "x": 6.5, "y": 0.25, "z": 5.6 },
-    { "x": 14.2, "y": 0.25, "z": 5.2 },
-    { "x": 1.2, "y": 0.25, "z": 11.8 },
-    { "x": 12.2, "y": 0.25, "z": 11.3 },
-    { "x": 17.5, "y": 0.25, "z": 15.6 },
-    { "x": 2.5, "y": 0.25, "z": 19.5 }
+    {"x": 6.5, "y": 0.098, "z": 5.6},
+    {"x": 14.2, "y": 0.098, "z": 5.2},
+    {"x": 1.2, "y": 0.098, "z": 11.8},
+    {"x": 12.2, "y": 0.098, "z": 11.3},
+    {"x": 17.5, "y": 0.098, "z": 15.6},
+    {"x": 2.5, "y": 0.098, "z": 19.5}
   ],
   "ghostSpots": [
-    { "x": 3.2, "z": 4.8 },
-    { "x": 14.4, "z": 4.9 },
-    { "x": 20.2, "z": 7.9 },
-    { "x": 22.5, "z": 3.2 },
-    { "x": 9, "z": 14.5 },
-    { "x": 2.2, "z": 15.3 },
-    { "x": 17.3, "z": 16 },
-    { "x": 3, "z": 22 },
-    { "x": 12.5, "z": 20.5 }
+    {"x": 3.2, "z": 4.8},
+    {"x": 14.4, "z": 4.9},
+    {"x": 20.2, "z": 7.9},
+    {"x": 22.5, "z": 3.2},
+    {"x": 9, "z": 14.5},
+    {"x": 2.2, "z": 15.3},
+    {"x": 17.3, "z": 16},
+    {"x": 3, "z": 22},
+    {"x": 12.5, "z": 20.5}
   ],
   "stairs": [
-    { "name": "main staircase, up to the landing", "rect": [8.5, 1.5, 10.5, 4.5], "rises": "north", "low": 0, "high": 1.5, "rails": ["west", "east"] },
-    { "name": "main staircase landing", "rect": [8.5, 0.5, 10.5, 1.5], "rises": null, "low": 1.5, "high": 1.5, "rails": [] },
-    { "name": "main staircase, west flight up to the top floor", "rect": [6.5, 0.5, 8.5, 1.5], "rises": "west", "low": 1.5, "high": 3, "rails": ["south"] },
-    { "name": "main staircase, east flight up to the top floor", "rect": [10.5, 0.5, 12.5, 1.5], "rises": "east", "low": 1.5, "high": 3, "rails": ["south"] }
+    {"name": "main staircase, up to the landing", "rect": [8.5, 1.5, 10.5, 4.5], "rises": "north", "low": 0, "high": 1.5, "rails": ["west", "east"]},
+    {"name": "main staircase landing", "rect": [8.5, 0.5, 10.5, 1.5], "rises": null, "low": 1.5, "high": 1.5, "rails": []},
+    {"name": "main staircase, west flight up to the top floor", "rect": [6.5, 0.5, 8.5, 1.5], "rises": "west", "low": 1.5, "high": 3, "rails": ["south"]},
+    {"name": "main staircase, east flight up to the top floor", "rect": [10.5, 0.5, 12.5, 1.5], "rises": "east", "low": 1.5, "high": 3, "rails": ["south"]}
+  ],
+  "equipment": [
+    {"kind": "flashlight", "position": {"x": 7.65, "y": 0.83, "z": 8.05}},
+    {"kind": "camera", "position": {"x": 8.25, "y": 0.885, "z": 8.05}}
+  ],
+  "interactables": [
+    {"id": "lobby-closet", "name": "coat closet", "kind": "closet", "position": {"x": 7.7, "y": 1.25, "z": 7.14}, "box": [7.2, 6.3, 8.2, 7.1, 0, 2.3]},
+    {"id": "office-supplies", "name": "supply drawer", "kind": "cache", "position": {"x": 6.1, "y": 0.7, "z": 6.32}, "box": [5.8, 5.8, 6.3999999999999995, 6.3, 0, 0.8]},
+    {"id": "arrival-note", "name": "night shift briefing", "kind": "note", "position": {"x": 8, "y": 0.79, "z": 8.05}, "text": "NIGHT SHIFT: Photograph all five anomalies listed in J. The gate releases after the final exposure. Switch between camera and light with 1 / 2. A flash attracts it.", "orientation": "flat"},
+    {"id": "hiding-note", "name": "locker warning", "kind": "note", "position": {"x": 7.43, "y": 1.22, "z": 7.105}, "text": "Break its line of sight BEFORE entering a closet. If it sees you enter, it will follow. E to leave.", "orientation": "wall"}
   ]
 }

@@ -23,6 +23,9 @@ import { ScreenEffects } from '../views/ui/hud/ScreenEffects.js';
 import { PauseScreen } from '../views/ui/screens/PauseScreen.js';
 import { ResultScreen } from '../views/ui/screens/ResultScreen.js';
 import { TitleScreen } from '../views/ui/screens/TitleScreen.js';
+import { PhotoAlbum } from '../views/ui/PhotoAlbum.js';
+import { InvestigationView } from '../views/scene/investigation/InvestigationView.js';
+import { PhotographyView } from '../views/scene/investigation/PhotographyView.js';
 
 /** @typedef {import('../models/level/parseLevel.js').Level} Level */
 
@@ -44,6 +47,7 @@ export function createGameContext({ config, level, isTestMode }) {
   const render = new RenderContext(document.body, config.rendering);
   const pointerLock = isTestMode ? new SimulatedPointerLock() : new BrowserPointerLock(render.canvas);
   const store = new LocalJsonStore();
+  const ui = createUi({ config, events });
 
   return Object.freeze({
     config,
@@ -51,23 +55,26 @@ export function createGameContext({ config, level, isTestMode }) {
     events,
     simulation,
     render,
-    views: createViews({ config, events, level, building, simulation, render }),
+    views: createViews({ config, events, level, building, simulation, render, album: ui.album }),
     pointerLock,
     input: new InputController({ surface: render.canvas, pointerLock }),
     audio: new AudioDirector({ engine: new AudioEngine(config.audio), events, screamSamplePaths: config.audio.screamSamplePaths }),
-    ui: createUi({ config, events }),
+    ui,
     persistence: Object.freeze({ scores: new ScoreRepository(store), preferences: new PreferencesRepository(store) }),
   });
 }
 
-function createViews({ config, events, level, building, simulation, render }) {
+function createViews({ config, events, level, building, simulation, render, album }) {
   render.scene.add(createOfficeModel(level, building.tileMaps));
+  const firstPerson = new FirstPersonView(render.camera, {
+    eyeHeight: config.player.eyeHeight,
+    flashlight: config.flashlight,
+    shadowMapSize: config.rendering.shadowMapSize,
+  });
   return Object.freeze({
-    firstPerson: new FirstPersonView(render.camera, {
-      eyeHeight: config.player.eyeHeight,
-      flashlight: config.flashlight,
-      shadowMapSize: config.rendering.shadowMapSize,
-    }),
+    firstPerson,
+    investigation: new InvestigationView(render.scene, simulation.office, simulation.photography),
+    photography: new PhotographyView(render, firstPerson, album),
     lighting: new OfficeLightingView(render.scene, events, {
       lanterns: level.lanterns,
       fixtures: level.fixtures,
@@ -76,14 +83,15 @@ function createViews({ config, events, level, building, simulation, render }) {
     }),
     exitDoor: new ExitDoorView(render.scene, simulation.exitDoor, level.exitDoor, config.rendering.exitIntensity),
     ghost: new GhostView(render.scene, simulation.ghost, config.ghost),
-    pickups: new PickupView(render.scene, simulation.pickups, config.flashlight.beamCone),
+    pickups: new PickupView(render.scene, simulation.pickups),
   });
 }
 
 function createUi({ config, events }) {
-  const screenOptions = { candiesRequired: config.round.candiesRequired, leaderboardSize: config.ui.leaderboardSize };
+  const screenOptions = { evidenceRequired: config.round.evidenceRequired, leaderboardSize: config.ui.leaderboardSize };
   const effects = new ScreenEffects();
   return Object.freeze({
+    album: new PhotoAlbum(),
     title: new TitleScreen(screenOptions),
     pause: new PauseScreen(),
     result: new ResultScreen({ ...screenOptions, inputDelay: config.ui.resultInputDelay }),

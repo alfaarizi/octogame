@@ -22,25 +22,59 @@ describe('Simulation', () => {
       config: GAME_CONFIG,
       events: recorder.bus,
       building: new Building(OFFICE.floors, OFFICE.tileSize),
-      spawnTable: new SpawnTable({ candySpots: OFFICE.candySpots, batterySpots: OFFICE.batterySpots, ghostSpots: OFFICE.ghostSpots }),
-      layout: { playerStart: OFFICE.playerStart, ghostStart: OFFICE.ghostStart, exitDoor: OFFICE.exitDoor },
+      spawnTable: new SpawnTable({ evidenceSpots: OFFICE.evidenceSpots, batterySpots: OFFICE.batterySpots, ghostSpots: OFFICE.ghostSpots }),
+      layout: OFFICE,
     });
     simulation.startRound();
   });
 
   const standAt = ({ x, y, z }) => Object.assign(simulation.player.position, { x, y, z });
 
-  test('the last candy opens the exit and enrages the ghost, and reaching the exit escapes', () => {
-    for (const candy of simulation.pickups.items.filter((item) => item.kind === PickupKind.CANDY)) {
-      standAt(candy.position);
-      assert.equal(simulation.step(0.01, STAND_STILL), null);
+  const aimAt = (target) => {
+    const origin = simulation.player.sight.origin;
+    const dx = target.x - origin.x, dy = target.y - origin.y, dz = target.z - origin.z;
+    simulation.player.yaw = Math.atan2(-dx, -dz);
+    simulation.player.pitch = Math.atan2(dy, Math.hypot(dx, dz));
+  };
+
+  test('starts empty-handed, requires E, and stowing the flashlight stops drain and light', () => {
+    assert.equal(simulation.inventory.activeItem, null);
+    assert.equal(simulation.flashlight.isEmitting, false);
+    const torch = simulation.pickups.items.find(item => item.kind === 'flashlight');
+    aimAt(torch.position);
+    simulation.step(.01, STAND_STILL);
+    assert.equal(simulation.inventory.activeItem, null);
+    simulation.actions.interact();
+    assert.equal(simulation.inventory.activeItem?.kind, 'flashlight');
+    assert.equal(simulation.flashlight.isEmitting, true);
+    simulation.actions.select(1);
+    const charge = simulation.flashlight.charge;
+    simulation.step(1, STAND_STILL);
+    assert.equal(simulation.flashlight.charge, charge);
+    assert.equal(simulation.flashlight.isEmitting, false);
+  });
+
+  test('five distinct photos unlock and enrage; duplicates do not score; the exit completes the round', () => {
+    simulation.inventory.pickUp({ id: 99, kind: 'camera' });
+    const approaches = {
+      drawing: { x: 16.2, y: -3, z: 4.4 }, handprint: { x: 3.03, y: 0, z: 2.1 },
+      phone: { x: 16.2, y: 0, z: 8.1 }, clock: { x: 11.8, y: 3, z: 6.5 },
+      visitor: { x: 19.2, y: 0, z: 20.5 },
+    };
+    for (const subject of OFFICE.evidenceSpots) {
+      standAt(approaches[subject.id]);
+      aimAt(subject);
+      const before = simulation.round.evidenceCollected;
+      assert.equal(simulation.actions.use()?.isNewEvidence, true, subject.name);
+      simulation.round.tick(2);
+      assert.equal(simulation.actions.use()?.isNewEvidence, false);
+      assert.equal(simulation.round.evidenceCollected, before + 1);
+      simulation.round.tick(2);
     }
-    assert.equal(simulation.round.candiesCollected, GAME_CONFIG.round.candiesRequired);
     assert.equal(simulation.exitDoor.isUnlocked, true);
     assert.equal(simulation.ghost.isEnraged, true);
-
-    standAt({ x: OFFICE.exitDoor.centerX, y: 0, z: OFFICE.exitDoor.trigger.minZ + 0.5 });
-    assert.equal(simulation.step(0.01, STAND_STILL), RoundOutcome.ESCAPED);
+    standAt({ x: OFFICE.exitDoor.centerX, y: 0, z: OFFICE.exitDoor.trigger.minZ + .5 });
+    assert.equal(simulation.step(.01, STAND_STILL), RoundOutcome.ESCAPED);
     assert.equal(recorder.count(GameEvent.PLAYER_ESCAPED), 1);
   });
 
@@ -53,6 +87,7 @@ describe('Simulation', () => {
   });
 
   test('the beam freezes the ghost only while the player looks at it', () => {
+    simulation.inventory.pickUp({ id: 99, kind: 'flashlight' });
     standAt({ x: 16, y: 0, z: 8.5 });
     simulation.ghost.reset({ x: 16, y: 0, z: 5.5 }, 0);
     simulation.step(0.01, STAND_STILL);
@@ -70,5 +105,50 @@ describe('Simulation', () => {
     assert.equal(simulation.pickups.items.length, 0);
     assert.equal(simulation.exitDoor.isUnlocked, false);
     assert.equal(simulation.ghost.isPresent, false);
+  });
+
+  test('no-hostiles mode prevents waking, camera aggression, enrage and catches', () => {
+    simulation.startRound({ noHostiles: true });
+    assert.equal(simulation.hostilesEnabled, false);
+    assert.equal(simulation.isPracticeRound, true);
+    assert.equal(simulation.step(120, STAND_STILL), null);
+    simulation.ghost.hearCamera(simulation.player.position, 100);
+    for (let i = 0; i < GAME_CONFIG.round.evidenceRequired; i++) simulation.round.recordEvidence();
+    recorder.bus.emit(GameEvent.PLAYER_CAUGHT);
+    assert.equal(simulation.step(120, STAND_STILL), null);
+    assert.equal(simulation.ghost.isPresent, false);
+    assert.equal(simulation.ghost.isEnraged, false);
+    assert.equal(simulation.threat.closeness, 0);
+  });
+
+  test('toggling off removes an active ghost immediately; re-enabling keeps the round unranked', () => {
+    simulation.ghost.reset(simulation.player.position, 0);
+    simulation.step(.01, STAND_STILL);
+    assert.equal(simulation.ghost.isPresent, true);
+    simulation.setHostilesEnabled(false);
+    assert.equal(simulation.ghost.isPresent, false);
+    assert.equal(simulation.step(3, STAND_STILL), null);
+    simulation.setHostilesEnabled(true);
+    assert.equal(simulation.hostilesEnabled, true);
+    assert.equal(simulation.ghost.isPresent, false);
+    assert.equal(simulation.isPracticeRound, true);
+    simulation.startRound();
+    assert.equal(simulation.isPracticeRound, false);
+  });
+
+  test('full inventory leaves an item on the ground; using a battery consumes only that pack', () => {
+    simulation.inventory.pickUp({ id: 90, kind: 'flashlight' });
+    simulation.inventory.pickUp({ id: 91, kind: 'battery' });
+    aimAt(simulation.pickups.items.find(item => item.kind === 'camera').position);
+    const count = simulation.pickups.items.length;
+    simulation.actions.interact();
+    assert.equal(simulation.pickups.items.length, count);
+    simulation.actions.syncEquipment();
+    simulation.flashlight.update(30, 30, 0);
+    simulation.actions.select(1);
+    simulation.actions.use();
+    assert.equal(simulation.inventory.activeItem, null);
+    assert.equal(simulation.inventory.has('flashlight'), true);
+    assert.equal(simulation.flashlight.charge, .9);
   });
 });

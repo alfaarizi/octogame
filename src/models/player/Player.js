@@ -54,10 +54,10 @@ export class Player {
   }
 
   /** @param {SpawnPoint} spawn */
-  respawn({ x, y, z, yaw }) {
+  respawn({ x, y, z, yaw, pitch = 0 }) {
     Object.assign(this.position, { x, y, z });
     this.yaw = yaw;
-    this.pitch = 0;
+    this.pitch = pitch;
     this.#stamina = 1;
     this.#isWinded = false;
     this.#movement = STANDING_STILL;

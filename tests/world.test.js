@@ -129,17 +129,9 @@ describe('Building', () => {
 });
 
 describe('SpawnTable', () => {
-  const candySpots = ['a', 'a', 'a', 'b', 'b', 'c'].map((room, i) => ({ room, x: i, y: 0, z: 0 }));
+  const batterySpots = ['a', 'a', 'a', 'b', 'b', 'c'].map((room, i) => ({ room, x: i, y: 0, z: 0 }));
   const ghostSpots = [{ x: 0, y: 0, z: 0 }, { x: 10, y: 0, z: 0 }, { x: 0, y: 30, z: 0 }];
-  const table = new SpawnTable({ candySpots, batterySpots: candySpots, ghostSpots, maxCandiesPerRoom: 2 });
-
-  test('never puts more than the allowed number of candies in one room', () => {
-    for (let run = 0; run < 50; run++) {
-      const rooms = table.pickCandySpots(5).map((spot) => spot.room);
-      assert.equal(rooms.length, 5);
-      assert.ok(rooms.filter((room) => room === 'a').length <= 2);
-    }
-  });
+  const table = new SpawnTable({ batterySpots, ghostSpots });
 
   test('respawns the ghost at one of the two spots farthest away, counting height', () => {
     for (let run = 0; run < 20; run++) {
