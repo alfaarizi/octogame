@@ -3,7 +3,7 @@ import { RAIL_THICKNESS } from '../../../models/world/StairFlight.js';
 import { Tile } from '../../../models/world/TileMap.js';
 import { Compass, edgeStrip } from '../../../utils.js';
 import { createFlatSurfaceGeometry, createMergedBoxMesh } from '../meshes.js';
-import { createConcreteTexture, createGardenPavingTexture, createOfficeFloorTexture, createOfficeWallTexture, createStoneTileTexture } from './textures.js';
+import { createConcreteTexture, createGardenPavingTexture, createOfficeFloorTexture, createOfficeWallTexture, createStoneTileTexture, furnitureFinishTexture } from './textures.js';
 
 /** @typedef {import('../../../models/level/parseLevel.js').Level} Level */
 /** @typedef {import('../../../models/level/parseLevel.js').PlacedFloor} PlacedFloor */
@@ -34,6 +34,7 @@ const FLOOR_TILES = Object.freeze([Tile.FLOOR, Tile.CARPORT, Tile.WET_FLOOR, Til
 const ROOFED_TILES = new Set([Tile.FLOOR, Tile.WET_FLOOR, Tile.CARPORT, Tile.STAIRS, Tile.VOID]);
 /** @type {readonly string[]} Openings in the floor, railed off wherever they meet a flat floor. */
 const OPENING_TILES = Object.freeze([Tile.VOID, Tile.PIT]);
+const TRIM_FACING_TILES = Object.freeze([Tile.FLOOR, Tile.WET_FLOOR, Tile.CARPORT]);
 
 /**
  * The building itself on every floor: walls, floors, ceilings, the railings around openings, and the stairs.
@@ -51,16 +52,35 @@ export function createArchitecture({ floors, storeyHeight, lowWallHeight }, tile
   }));
   const wallsOf = (tile, height) =>
     storeys.flatMap(({ elevation, rectsByTile }) => raise(rectsByTile.get(tile) ?? [], elevation, elevation + height));
-  const wallMaterial = new THREE.MeshStandardMaterial({ map: createOfficeWallTexture(), roughness: 0.95 });
+  const plaster = createOfficeWallTexture();
+  const concrete = createConcreteTexture();
+  const wallMaterial = new THREE.MeshStandardMaterial({ map: plaster, bumpMap: plaster, bumpScale: .012, roughness: .94 });
   return [
     createWalls(wallsOf(Tile.WALL, storeyHeight), wallMaterial),
-    createWalls(wallsOf(Tile.LOW_WALL, lowWallHeight), new THREE.MeshStandardMaterial({ map: createConcreteTexture(), roughness: 1 })),
+    createWalls(wallsOf(Tile.LOW_WALL, lowWallHeight), new THREE.MeshStandardMaterial({ map: concrete, bumpMap: concrete, bumpScale: .015, roughness: 1 })),
+    createWallTrim(storeys),
     ...createFloors(storeys),
     createPitLining(storeys),
     ...createCeilings(storeys, storeyHeight),
     createRailings(storeys),
     createStairs(floors),
   ];
+}
+
+/** Shallow skirting boards tie the painted walls to the interior floor. */
+function createWallTrim(storeys) {
+  const boxes = [];
+  for (const { elevation, tileMap, rectsByTile } of storeys) {
+    for (const rect of rectsByTile.get(Tile.WALL) ?? []) {
+      for (const side of sidesFacing(rect, tileMap, TRIM_FACING_TILES)) {
+        boxes.push({ ...edgeStrip(rect, side, .045), y0: elevation, y1: elevation + .105 });
+      }
+    }
+  }
+  const grain = furnitureFinishTexture('wood');
+  const trim = createMergedBoxMesh(boxes, new THREE.MeshStandardMaterial({ color: 0x34302c, map: grain, bumpMap: grain, bumpScale: .008, roughness: .85 }));
+  trim.castShadow = trim.receiveShadow = true;
+  return trim;
 }
 
 /** Close the exposed sides of shallow yard pits so their bottoms belong to the surrounding paving. */
@@ -102,10 +122,10 @@ function createFloors(storeys) {
   // Drawn in front of the tops of the walls below, which end at the same height.
   const floor = (look) => new THREE.MeshStandardMaterial({ ...look, polygonOffset: true, polygonOffsetFactor: -1 });
   const surfaces = [
-    { tile: Tile.FLOOR, material: floor({ map: officeFloor, roughness: 0.6 }) },
-    { tile: Tile.CARPORT, material: floor({ map: officeFloor, color: 0xc4bcae, roughness: 0.8 }) },
-    { tile: Tile.WET_FLOOR, material: floor({ map: stone, roughness: 0.5 }) },
-    { tile: Tile.PAVING, material: floor({ map: stone, roughness: 0.9 }) },
+    { tile: Tile.FLOOR, material: floor({ map: officeFloor, bumpMap: officeFloor, bumpScale: .004, roughness: 0.6 }) },
+    { tile: Tile.CARPORT, material: floor({ map: officeFloor, bumpMap: officeFloor, bumpScale: .006, color: 0xc4bcae, roughness: 0.8 }) },
+    { tile: Tile.WET_FLOOR, material: floor({ map: stone, bumpMap: stone, bumpScale: .006, roughness: 0.5 }) },
+    { tile: Tile.PAVING, material: floor({ map: stone, bumpMap: stone, bumpScale: .01, roughness: 0.9 }) },
     { tile: Tile.GARDEN, material: floor({ map: createGardenPavingTexture(), roughness: 1 }) },
     { tile: Tile.PIT, depth: PIT_DEPTH, material: new THREE.MeshStandardMaterial({ color: 0x0b0a09, roughness: 1 }) },
   ];

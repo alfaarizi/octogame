@@ -85,9 +85,9 @@ export class GameController {
     this.#worldTime += seconds;
     this.#states.update(seconds);
     const { views, render } = this.#context;
-    views.lighting.update(seconds, this.#worldTime);
+    views.lighting.update(seconds);
     views.exitDoor.update(this.#worldTime);
-    views.investigation.update(this.#worldTime);
+    views.investigation.update();
     views.photography.update(seconds);
     render.render();
   }

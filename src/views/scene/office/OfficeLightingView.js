@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { GameEvent } from '../../../core/GameEvent.js';
-import { atHeight, chance, Countdown, headingTo, pointAlongHeading } from '../../../utils.js';
+import { atHeight, Countdown, headingTo, pointAlongHeading } from '../../../utils.js';
 import { createBoxMeshFromBounds } from '../meshes.js';
 import { GlowingLight } from './GlowingLight.js';
 import { createLanternModel, LANTERN_FACE_GLOW } from './lanternModel.js';
@@ -13,19 +13,18 @@ const LANTERN_SEAT_OFFSET = 0.13;
 const LANTERN_LIGHT = Object.freeze({ color: 0xff8a2a, range: 4.5, forwardOffset: 0.25, heightOffset: 0.25 });
 const FIXTURE_LIGHT_RANGE = 4.5;
 const FIXTURE_GLOW = 1.4;
-/** Each light's strength is `base + swing * sin(rate1 * t) * sin(rate2 * t)`, offset per light so they don't sync up. */
-const FLICKER = Object.freeze({ base: 0.85, swing: 0.15, rates: [8.3, 13.1], phaseSteps: [2.1, 5.3] });
-const STUTTER = Object.freeze({ dropChance: 0.45, dropped: 0.05, flare: 1.5 });
+const STUTTER_DEPTH = 0.6;
 const StutterDuration = Object.freeze({ EXIT_UNLOCKED: 1.6, AMBIENT_NOISE: 0.4 });
 
 /**
  * The jack-o'-lanterns and the things that glow on their own (server lights, a monitor, a neon sign): warm or
- * cold lights that flicker, and all stutter at once when the exit opens or a spooky noise asks for it.
+ * cold lights that stay steady until the exit opens or a spooky noise briefly dims them.
  */
 export class OfficeLightingView {
   #scene;
   #lights = [];
   #stutter = new Countdown();
+  #stutterDuration = 0;
 
   /**
    * @param {THREE.Scene} scene
@@ -46,17 +45,15 @@ export class OfficeLightingView {
 
   /** Makes every light stutter for at least `seconds`. */
   stutterAll(seconds) {
-    this.#stutter.restart(Math.max(this.#stutter.remaining, seconds));
+    this.#stutterDuration = Math.max(this.#stutter.remaining, seconds);
+    this.#stutter.restart(this.#stutterDuration);
   }
 
-  update(seconds, time) {
-    const isStuttering = !this.#stutter.tick(seconds);
-    const [rate1, rate2] = FLICKER.rates, [phaseStep1, phaseStep2] = FLICKER.phaseSteps;
-    this.#lights.forEach((light, index) => {
-      let strength = FLICKER.base + FLICKER.swing * Math.sin(time * rate1 + index * phaseStep1) * Math.sin(time * rate2 + index * phaseStep2);
-      if (isStuttering) strength *= chance(STUTTER.dropChance) ? STUTTER.dropped : STUTTER.flare;
-      light.setStrength(strength);
-    });
+  update(seconds) {
+    const finished = this.#stutter.tick(seconds);
+    const progress = finished ? 0 : this.#stutter.remaining / this.#stutterDuration;
+    const strength = 1 - STUTTER_DEPTH * Math.sin(Math.PI * progress) ** 2;
+    for (const light of this.#lights) light.setStrength(strength);
   }
 
   /** @param {Lantern} lantern */

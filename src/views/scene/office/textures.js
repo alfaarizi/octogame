@@ -31,6 +31,15 @@ function addGrime(context, spots) {
   }
 }
 
+/** Stable noise keeps the same surface from changing between loads or render passes. */
+function seededRandom(seed) {
+  let state = seed >>> 0;
+  return () => {
+    state = (Math.imul(state, 1664525) + 1013904223) >>> 0;
+    return state / 4294967296;
+  };
+}
+
 /** Fills the polygon through `points`, given as flat [x0, y0, x1, y1, ...] pairs. */
 function fillPolygon(context, points) {
   context.beginPath();
@@ -46,23 +55,81 @@ function fillEllipse(context, centerX, centerY, radiusX, radiusY) {
   context.fill();
 }
 
-/** One wall tile's face, floor to ceiling: off-white paint above a dark skirting board, with old grime. */
+/** Painted plaster with fine grain, old roller marks, hairline cracks and a dark skirting board. */
 export const createOfficeWallTexture = () =>
-  paintTexture(128, 716, (context) => {
+  paintTexture(256, 768, (context) => {
     const { width, height } = context.canvas;
-    context.fillStyle = '#cdc6b9';
+    const random = seededRandom(8193);
+    context.fillStyle = '#c2bdb2';
     context.fillRect(0, 0, width, height);
-    for (let streak = 0; streak < 14; streak++) {
-      context.fillStyle = `rgba(70, 60, 50, ${0.03 + Math.random() * 0.05})`;
-      const x = Math.random() * width, top = Math.random() * height * 0.6;
-      context.fillRect(x, top, 2 + Math.random() * 6, height * (0.2 + Math.random() * 0.4));
+    for (let speck = 0; speck < 24000; speck++) {
+      context.fillStyle = random() < .5 ? 'rgba(255,255,250,.055)' : 'rgba(48,43,38,.045)';
+      const size = .5 + random() * 1.5;
+      context.fillRect(random() * width, random() * height, size, size);
     }
-    context.fillStyle = 'rgba(60, 50, 40, 0.12)';
-    context.fillRect(0, height * 0.66, width, 6);
-    context.fillStyle = '#3a3632';
-    context.fillRect(0, height - 26, width, 26);
-    addGrime(context, 160);
+    for (let mark = 0; mark < 55; mark++) {
+      const x = random() * width, y = random() * height * .84;
+      context.fillStyle = `rgba(62,54,47,${.012 + random() * .027})`;
+      context.fillRect(x, y, .7 + random() * 2, 18 + random() * 155);
+    }
+    for (let crack = 0; crack < 9; crack++) {
+      const x = random() * width, y = 50 + random() * (height - 135);
+      context.strokeStyle = 'rgba(62,58,53,.12)';
+      context.lineWidth = .7;
+      context.beginPath(); context.moveTo(x, y);
+      context.lineTo(x + (random() - .5) * 22, y + 20);
+      context.lineTo(x + (random() - .5) * 30, y + 37);
+      context.stroke();
+    }
+    const trimY = height - 46;
+    context.fillStyle = '#8c877b'; context.fillRect(0, trimY - 3, width, 3);
+    context.fillStyle = '#353735'; context.fillRect(0, trimY, width, height - trimY);
+    context.fillStyle = 'rgba(255,255,255,.1)'; context.fillRect(0, trimY + 3, width, 2);
   });
+
+/** Shared neutral maps multiply the authored furniture colors without replacing them. */
+const FURNITURE_FINISHES = new Map();
+export function furnitureFinishTexture(finish) {
+  if (FURNITURE_FINISHES.has(finish)) return FURNITURE_FINISHES.get(finish);
+  const seeds = { wood: 139, metal: 227, fabric: 313, stone: 419, painted: 521 };
+  const texture = paintTexture(256, 256, (context) => {
+    const random = seededRandom(seeds[finish]);
+    const size = context.canvas.width;
+    context.fillStyle = '#f5f4f0';
+    context.fillRect(0, 0, size, size);
+    if (finish === 'wood') {
+      for (let line = 0; line < 380; line++) {
+        const y = random() * size;
+        context.strokeStyle = `rgba(64,38,21,${.025 + random() * .095})`;
+        context.lineWidth = .35 + random() * 1.5;
+        context.beginPath(); context.moveTo(-5, y);
+        context.bezierCurveTo(70, y + (random() - .5) * 8, 175, y + (random() - .5) * 9, size + 5, y + (random() - .5) * 5);
+        context.stroke();
+      }
+      for (let knot = 0; knot < 4; knot++) {
+        const x = random() * size, y = random() * size;
+        context.strokeStyle = 'rgba(64,38,21,.13)';
+        context.beginPath(); context.ellipse(x, y, 14 + random() * 12, 3 + random() * 3, 0, 0, Math.PI * 2); context.stroke();
+      }
+    } else if (finish === 'fabric') {
+      context.strokeStyle = 'rgba(45,45,45,.085)'; context.lineWidth = .7;
+      for (let line = 0; line < size; line += 5) {
+        context.beginPath(); context.moveTo(line, 0); context.lineTo(line, size); context.stroke();
+        context.beginPath(); context.moveTo(0, line); context.lineTo(size, line); context.stroke();
+      }
+    } else {
+      const marks = finish === 'stone' ? 6200 : finish === 'metal' ? 2300 : 1800;
+      for (let spot = 0; spot < marks; spot++) {
+        const shade = random() < .5 ? 'rgba(35,35,35,.075)' : 'rgba(255,255,255,.08)';
+        context.fillStyle = shade;
+        const width = finish === 'metal' ? 3 + random() * 18 : 1 + random() * 3;
+        context.fillRect(random() * size, random() * size, width, finish === 'metal' ? .5 : 1 + random() * 2);
+      }
+    }
+  });
+  FURNITURE_FINISHES.set(finish, texture);
+  return texture;
+}
 
 /** Two by two large, pale stone tiles with soft veins: 2 m of office floor. */
 export const createOfficeFloorTexture = () =>

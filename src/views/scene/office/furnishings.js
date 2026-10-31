@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { createBoxMesh, createMergedBoxMesh } from '../meshes.js';
 import { createPortraitTexture } from './textures.js';
 import { createLandscapeProps } from './landscapeProps.js';
+import { createFurnitureMaterial } from './furnitureMaterials.js';
 
 /** @typedef {import('../../../models/level/furniture.js').FurniturePiece} FurniturePiece */
 /** @typedef {import('../../../models/level/parseLevel.js').PlacedFloor} PlacedFloor */
@@ -36,7 +37,7 @@ function createFurniture(furniture) {
     partsByLook.get(key).parts.push(part);
   }
   return [...partsByLook.values()].map(({ color, castsShadow, parts }) => {
-    const mesh = createMergedBoxMesh(parts, new THREE.MeshStandardMaterial({ color, roughness: 0.85 }));
+    const mesh = createMergedBoxMesh(parts, createFurnitureMaterial(color));
     mesh.castShadow = castsShadow;
     mesh.receiveShadow = true;
     return mesh;

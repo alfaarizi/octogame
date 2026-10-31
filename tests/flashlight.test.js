@@ -49,4 +49,15 @@ describe('Flashlight', () => {
     assert.equal(recorder.count(GameEvent.FLASHLIGHT_FLICKERED), 1);
     assert.ok(light.brightness < 1);
   });
+
+  test('holds one brightness during a flicker instead of changing every frame', () => {
+    const recorder = recordingEventBus();
+    const samples = [0.5, 0.5, 0.2, 0.9];
+    const light = new Flashlight(config, recorder.bus, () => samples.shift());
+    light.update(0, 0, 1);
+    const firstBrightness = light.brightness;
+    light.update(0, 0.02, 1);
+    assert.equal(light.brightness, firstBrightness);
+    assert.equal(samples.length, 1);
+  });
 });

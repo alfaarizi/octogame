@@ -5,6 +5,8 @@ import * as THREE from 'three';
 /** @typedef {import('../../types.js').Rect} Rect */
 /** @typedef {import('../../types.js').Size3} Size3 */
 
+const FURNITURE_TEXTURE_METERS = 0.7;
+
 /**
  * @param {Size3} size
  * @param {Point3} center
@@ -82,5 +84,18 @@ export function createFlatSurfaceGeometry(rects, y, { facesUp, textureMeters }) 
 
 /** @param {Box} box */
 function createBoxGeometry({ x0, x1, y0, y1, z0, z1 }) {
-  return new THREE.BoxGeometry(x1 - x0, y1 - y0, z1 - z0).translate((x0 + x1) / 2, (y0 + y1) / 2, (z0 + z1) / 2);
+  const width = x1 - x0, height = y1 - y0, depth = z1 - z0;
+  const geometry = new THREE.BoxGeometry(width, height, depth);
+  const faceSizes = [[depth, height], [depth, height], [width, depth], [width, depth], [width, height], [width, height]];
+  const uv = geometry.attributes.uv;
+  for (let face = 0; face < faceSizes.length; face++) {
+    const [faceWidth, faceHeight] = faceSizes[face];
+    for (let corner = 0; corner < 4; corner++) {
+      const vertex = face * 4 + corner;
+      uv.setXY(vertex, uv.getX(vertex) * faceWidth / FURNITURE_TEXTURE_METERS,
+        uv.getY(vertex) * faceHeight / FURNITURE_TEXTURE_METERS);
+    }
+  }
+  uv.needsUpdate = true;
+  return geometry.translate((x0 + x1) / 2, (y0 + y1) / 2, (z0 + z1) / 2);
 }

@@ -17,6 +17,7 @@ export class Flashlight {
   #brightness = 1;
   #flickerUntil = 0;
   #nextFlickerAt = 0;
+  #flickerBrightness = 1;
   #hasWarnedLow = false;
   #isEquipped = true;
 
@@ -56,6 +57,7 @@ export class Flashlight {
     this.#brightness = 1;
     this.#flickerUntil = 0;
     this.#nextFlickerAt = 0;
+    this.#flickerBrightness = 1;
     this.#hasWarnedLow = false;
   }
 
@@ -112,8 +114,9 @@ export class Flashlight {
     if (time >= this.#nextFlickerAt) {
       this.#flickerUntil = time + randomInRange(FLICKER_LENGTH, this.#random);
       this.#nextFlickerAt = time + randomInRange(FLICKER_GAP, this.#random) * (1.25 - strength);
+      this.#flickerBrightness = this.#random() * FLICKER_MAX_BRIGHTNESS;
       this.#events.emit(GameEvent.FLASHLIGHT_FLICKERED);
     }
-    return time < this.#flickerUntil ? this.#random() * FLICKER_MAX_BRIGHTNESS : 1;
+    return time < this.#flickerUntil ? this.#flickerBrightness : 1;
   }
 }

@@ -34,12 +34,12 @@ export class InvestigationView {
     }
   }
 
-  update(time) {
+  update() {
     for (const [id, { mesh, closedZ }] of this.#drawers) mesh.position.z = closedZ + (this.#office.isOpened(id) ? .2 : 0);
     for (const [id, object] of this.#subjects) {
       const recorded = this.#photography.isDocumented(id);
       for (const material of object.userData.evidenceMaterials) {
-        material.emissiveIntensity = recorded ? .07 : .28 + Math.sin(time * 2) * .08;
+        material.emissiveIntensity = recorded ? .07 : .28;
       }
     }
   }
