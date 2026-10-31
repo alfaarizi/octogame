@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { MAX_STAIR_RISER, RAIL_THICKNESS } from '../../../models/world/StairFlight.js';
+import { MAX_STAIR_RISER, RAIL_THICKNESS, StairFlight } from '../../../models/world/StairFlight.js';
 import { Tile } from '../../../models/world/TileMap.js';
 import { Compass, edgeStrip } from '../../../utils.js';
 import { createFlatSurfaceGeometry, createMergedBoxMesh } from '../meshes.js';
@@ -27,6 +27,7 @@ const TEXTURE_METERS = 2;
 /** How far below the floor a pit appears to go. */
 const PIT_DEPTH = 0.6;
 const RAILING = Object.freeze({ height: 1.0, middleHeight: 0.5, thickness: 0.05 });
+const RAIL_POST_EMBED = 0.02;
 /** The most one step rises, and how far a stair's parapet stands above its treads. */
 const STAIRS = Object.freeze({ parapetHeight: 0.9 });
 /** @type {readonly string[]} Tiles with a flat floor. */
@@ -183,7 +184,7 @@ function createRailings(storeys) {
     const segments = [];
     for (const rect of OPENING_TILES.flatMap((tile) => rectsByTile.get(tile) ?? [])) {
       for (const side of sidesFacing(rect, tileMap, FLOOR_TILES)) {
-        segments.push(edgeStrip(rect, side, thickness));
+        segments.push(railStripOnFloor(rect, side, thickness));
       }
     }
     for (const rail of mergeRailingSegments(segments)) {
@@ -196,14 +197,21 @@ function createRailings(storeys) {
       for (let index = 0; index <= Math.ceil(length / 0.75); index++) {
         const offset = Math.min(length - thickness, index * length / Math.ceil(length / 0.75));
         boxes.push(alongX
-          ? { x0: rail.x0 + offset, x1: rail.x0 + offset + thickness, z0: rail.z0, z1: rail.z1, y0: elevation, y1: elevation + height }
-          : { x0: rail.x0, x1: rail.x1, z0: rail.z0 + offset, z1: rail.z0 + offset + thickness, y0: elevation, y1: elevation + height });
+          ? { x0: rail.x0 + offset, x1: rail.x0 + offset + thickness, z0: rail.z0, z1: rail.z1, y0: elevation - RAIL_POST_EMBED, y1: elevation + height }
+          : { x0: rail.x0, x1: rail.x1, z0: rail.z0 + offset, z1: rail.z0 + offset + thickness, y0: elevation - RAIL_POST_EMBED, y1: elevation + height });
       }
     }
   }
   const railings = createMergedBoxMesh(boxes, new THREE.MeshStandardMaterial({ color: 0x4a4f55, roughness: 0.5, metalness: 0.6 }));
   railings.castShadow = true;
   return railings;
+}
+
+/** Place the whole rail foot on the walkable tile beside an opening. */
+function railStripOnFloor(opening, floorSide, thickness) {
+  const strip = edgeStrip(opening, floorSide, thickness);
+  const dx = floorSide.x * thickness / 2, dz = floorSide.z * thickness / 2;
+  return { x0: strip.x0 + dx, x1: strip.x1 + dx, z0: strip.z0 + dz, z1: strip.z1 + dz };
 }
 
 /** Join adjacent half-meter edges so one opening reads as a single railing. */
@@ -248,6 +256,7 @@ function createStairs(floors) {
 /** Sloped handrails and sparse posts, each grounded on its own tread. */
 function createStairRail(flight, side, material) {
   const { rect } = flight;
+  const stair = new StairFlight(flight);
   const alongX = side.z !== 0;
   const endpoints = alongX
     ? [{ x: rect.x0, z: side.z < 0 ? rect.z0 : rect.z1 }, { x: rect.x1, z: side.z < 0 ? rect.z0 : rect.z1 }]
@@ -277,7 +286,12 @@ function createStairRail(flight, side, material) {
   const intervals = Math.max(1, Math.ceil(length / 0.75));
   for (let index = 0; index <= intervals; index++) {
     const fraction = index / intervals;
-    result.push(beam(raised(fraction, 0), raised(fraction, STAIRS.parapetHeight), RAIL_THICKNESS * 0.7));
+    const point = at(fraction);
+    result.push(beam(
+      { ...point, y: stair.treadHeightAt(point) - RAIL_POST_EMBED },
+      raised(fraction, STAIRS.parapetHeight),
+      RAIL_THICKNESS * 0.7,
+    ));
   }
   return result;
 }

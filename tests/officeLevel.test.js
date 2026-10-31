@@ -9,6 +9,9 @@ import { planarDistance } from '../src/utils.js';
 import { OFFICE } from './office.js';
 
 const STEP = 0.1;
+const overlapArea = (a, b) =>
+  Math.max(0, Math.min(a.x1, b.x1) - Math.max(a.x0, b.x0))
+  * Math.max(0, Math.min(a.z1, b.z1) - Math.max(a.z0, b.z0));
 
 /** Every point on a STEP grid, on any floor, that the player can walk to from `start` without bumping into anything. */
 function reachablePoints(building, radius, start) {
@@ -40,6 +43,41 @@ describe('office layout', () => {
   test('every spawn point is on a tile you can walk on', () => {
     for (const spot of [OFFICE.playerStart, OFFICE.ghostStart, ...OFFICE.floors.flatMap((floor) => [...floor.evidenceSpots, ...floor.batterySpots, ...floor.ghostSpots])]) {
       assert.equal(tileMapAt(spot.y).isBlocked(spot.x, spot.z), false, `${JSON.stringify(spot)} is inside a wall`);
+    }
+  });
+
+  test('furniture stands on walkable floor instead of walls or open pits', () => {
+    OFFICE.floors.forEach((floor, index) => {
+      const tileMap = building.tileMaps[index];
+      for (const piece of floor.furniture) for (const part of piece.parts) {
+        const firstX = Math.floor((part.x0 - floor.tilesOrigin.x) / OFFICE.tileSize);
+        const lastX = Math.ceil((part.x1 - floor.tilesOrigin.x) / OFFICE.tileSize);
+        const firstZ = Math.floor((part.z0 - floor.tilesOrigin.z) / OFFICE.tileSize);
+        const lastZ = Math.ceil((part.z1 - floor.tilesOrigin.z) / OFFICE.tileSize);
+        for (let x = firstX; x < lastX; x++) for (let z = firstZ; z < lastZ; z++) {
+          const tile = {
+            x0: floor.tilesOrigin.x + x * OFFICE.tileSize,
+            x1: floor.tilesOrigin.x + (x + 1) * OFFICE.tileSize,
+            z0: floor.tilesOrigin.z + z * OFFICE.tileSize,
+            z1: floor.tilesOrigin.z + (z + 1) * OFFICE.tileSize,
+          };
+          if (overlapArea(part, tile) <= .005) continue;
+          assert.ok(!tileMap.isBlocked((tile.x0 + tile.x1) / 2, (tile.z0 + tile.z1) / 2),
+            `${floor.name}: ${piece.name} extends onto a blocked tile`);
+        }
+      }
+    });
+  });
+
+  test('the entrance and pantry door have clear walking lanes', () => {
+    for (const [floorName, lane] of [
+      ['ground floor', { x0: 7.5, z0: 7, x1: 8.5, z1: 10 }],
+      ['top floor', { x0: 5.5, z0: 8.1, x1: 6.5, z1: 9.5 }],
+    ]) {
+      const floor = OFFICE.floors.find(({ name }) => name === floorName);
+      for (const obstacle of floor.obstacles) {
+        assert.equal(overlapArea(obstacle, lane), 0, `${floorName}: furniture obstructs a doorway`);
+      }
     }
   });
 

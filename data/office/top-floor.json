@@ -92,7 +92,7 @@
   ],
   "interactables": [
     {"id": "gym-closet", "name": "gym locker", "kind": "closet", "position": {"x": 14.6, "y": 1.25, "z": 6.84}, "box": [14.1, 6, 15.1, 6.8, 0, 2.3]},
-    {"id": "pantry-supplies", "name": "supply drawer", "kind": "cache", "position": {"x": 6.0, "y": 0.7, "z": 8.87}, "box": [5.7, 8.35, 6.3, 8.85, 0, 0.8]},
+    {"id": "pantry-supplies", "name": "supply drawer", "kind": "cache", "position": {"x": 7.2, "y": 0.7, "z": 8.87}, "box": [6.9, 8.35, 7.5, 8.85, 0, 0.8]},
     {"id": "lounge-note", "name": "unfinished shift report", "kind": "note", "position": {"x": 11.25, "y": 0.46, "z": 8.05}, "text": "02:13. The clock has not moved. The reflection in the parking lot has. The camera sees what the night shift refuses to remember.", "orientation": "flat"}
   ]
 }
