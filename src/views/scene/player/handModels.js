@@ -90,7 +90,7 @@ export function createFlashlightHand() {
   const hand = new THREE.Group();
   addRightHandBase(hand);
   // Keep the A+ lean and move the entire four-finger grip toward the screen.
-  const screenOffset = .02;
+  const screenOffset = .005;
   for (const [depth, radius] of [[-.02, .009], [.004, .009], [.028, .0085], [.052, .0075]]) {
     addFinger(hand, [-.032, -.021, depth + screenOffset], [-.009, .014, depth + screenOffset + .020], radius);
   }
