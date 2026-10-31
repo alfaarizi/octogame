@@ -92,7 +92,7 @@
       {"name": "covered equipment barrier", "parts": [{"color": "partition", "screen": [18.96, 6.3, 19.14, 7.35, 0.76, 2.15]}], "solid": false}
     ],
     "arrival equipment": [
-      {"name": "equipment trolley", "parts": [{"table": [7.3, 7.8, 8.6, 8.22], "height": 0.78, "color": "cabinet"}]}
+      {"name": "equipment trolley", "parts": [{"table": [7.3, 7.8, 8.6, 8.22], "height": 0.78, "color": "cabinet"}, {"box": [7.4, 7.86, 8.55, 8.17, 0.78, 0.785], "color": "#1b2324"}, {"box": [7.4, 7.86, 7.42, 8.17, 0.785, 0.8], "color": "#1b2324"}, {"box": [8.53, 7.86, 8.55, 8.17, 0.785, 0.8], "color": "#1b2324"}, {"box": [7.42, 7.86, 8.53, 7.875, 0.785, 0.8], "color": "#1b2324"}, {"box": [7.42, 8.155, 8.53, 8.17, 0.785, 0.8], "color": "#1b2324"}]}
     ],
     "yard obstructions": [
       {"name": "abandoned delivery van", "parts": [{"box": [6.8, 15.2, 8.8, 18.8, 0.25, 1.02], "color": "#303a3c"}, {"box": [6.9, 16.15, 8.7, 18.7, 1.02, 2.25], "color": "#374246"}, {"box": [6.9, 15.45, 8.7, 16.15, 1.02, 1.95], "color": "#303a3c"}, {"box": [6.95, 15.44, 8.65, 15.47, 1.31, 1.82], "color": "#101a20"}, {"box": [6.86, 15.5, 6.9, 16.12, 1.25, 1.82], "color": "#101a20"}, {"box": [8.7, 15.5, 8.74, 16.12, 1.25, 1.82], "color": "#101a20"}, {"box": [6.86, 15.2, 8.74, 15.25, 0.4, 0.67], "color": "#1a2021"}, {"box": [6.92, 15.18, 7.17, 15.24, 0.73, 0.88], "color": "#d8d9bb"}, {"box": [8.43, 15.18, 8.68, 15.24, 0.73, 0.88], "color": "#d8d9bb"}, {"box": [8.74, 16.55, 8.79, 18.25, 0.65, 1.95], "color": "#2b3538"}], "footprint": [6.8, 15.2, 8.8, 18.8]},
@@ -151,7 +151,7 @@
     {"x": 15.6, "z": 0.5}
   ],
   "evidenceSpots": [
-    {"id": "handprint", "name": "The sixth fingerprint", "room": "office", "kind": "handprint", "x": 2.68, "y": 0.78, "z": 3.22, "clue": "Ground floor \u00b7 A handprint on the central office desks has too many fingers."},
+    {"id": "handprint", "name": "The sixth fingerprint", "room": "office", "kind": "handprint", "x": 2.68, "y": 0.764, "z": 3.22, "clue": "Ground floor \u00b7 A handprint on the central office desks has too many fingers."},
     {"id": "phone", "name": "The disconnected caller", "room": "workshop", "kind": "phone", "x": 16.2, "y": 0.89, "z": 6.8, "clue": "Ground floor \u00b7 The workshop meeting table. A phone rings without a cable."},
     {"id": "visitor", "name": "The visitor without a face", "room": "guest parking", "kind": "silhouette", "x": 18.7, "y": 1.05, "z": 19.2, "clue": "Outside \u00b7 A visitor waits beside the parked car, near the main gate."}
   ],
@@ -181,13 +181,13 @@
     {"name": "main staircase, east flight up to the top floor", "rect": [10.5, 0.5, 12.5, 1.5], "rises": "east", "low": 1.5, "high": 3, "rails": ["south"]}
   ],
   "equipment": [
-    {"kind": "flashlight", "position": {"x": 7.65, "y": 0.83, "z": 8.05}},
-    {"kind": "camera", "position": {"x": 8.25, "y": 0.885, "z": 8.05}}
+    {"kind": "flashlight", "position": {"x": 7.65, "y": 0.822, "z": 8.02}},
+    {"kind": "camera", "position": {"x": 8.3, "y": 0.89, "z": 8.02}}
   ],
   "interactables": [
     {"id": "lobby-closet", "name": "coat closet", "kind": "closet", "position": {"x": 7.7, "y": 1.25, "z": 7.14}, "box": [7.2, 6.3, 8.2, 7.1, 0, 2.3]},
     {"id": "office-supplies", "name": "supply drawer", "kind": "cache", "position": {"x": 6.1, "y": 0.7, "z": 6.32}, "box": [5.8, 5.8, 6.3999999999999995, 6.3, 0, 0.8]},
-    {"id": "arrival-note", "name": "night shift briefing", "kind": "note", "position": {"x": 8, "y": 0.79, "z": 8.05}, "text": "NIGHT SHIFT: Photograph all five anomalies listed in J. The gate releases after the final exposure. Switch between camera and light with 1 / 2. A flash attracts it.", "orientation": "flat"},
+    {"id": "arrival-note", "name": "night shift briefing", "kind": "note", "position": {"x": 7.98, "y": 0.788, "z": 8}, "text": "NIGHT SHIFT: Photograph all five anomalies listed in J. The gate releases after the final exposure. Switch between camera and light with 1 / 2. A flash attracts it.", "orientation": "flat"},
     {"id": "hiding-note", "name": "locker warning", "kind": "note", "position": {"x": 7.43, "y": 1.22, "z": 7.105}, "text": "Break its line of sight BEFORE entering a closet. If it sees you enter, it will follow. E to leave.", "orientation": "wall"}
   ]
 }

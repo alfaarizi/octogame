@@ -104,7 +104,9 @@ export class Building {
     for (let step = 0; step < steps; step++) {
       this.move(result, -Math.sin(yaw) * distance / steps, -Math.cos(yaw) * distance / steps, radius);
     }
-    return { ...result, y: result.y + 0.12 };
+    const floor = this.#floorAt(result.y);
+    const stair = floor.stairs.find((flight) => flight.contains(result));
+    return { ...result, y: stair?.treadHeightAt(result) ?? result.y };
   }
 
   /** The floor nearest `height`; halfway up the stairs, that's the upper one. */

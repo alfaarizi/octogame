@@ -1,7 +1,7 @@
 export const ItemKind = Object.freeze({ FLASHLIGHT: 'flashlight', CAMERA: 'camera', BATTERY: 'battery' });
 export const ITEM_NAMES = Object.freeze({ flashlight: 'Flashlight', camera: 'Camera', battery: 'Battery pack' });
 /** Center height of each ground mesh above its supporting surface. */
-export const ITEM_RESTING_HEIGHT = Object.freeze({ flashlight: .05, camera: .105, battery: .098 });
+export const ITEM_RESTING_HEIGHT = Object.freeze({ flashlight: .037, camera: .105, battery: .098 });
 
 /** Two stable slots, one active hand. Items retain their identity when dropped. */
 export class Inventory {

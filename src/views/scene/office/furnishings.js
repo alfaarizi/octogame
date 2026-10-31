@@ -30,14 +30,15 @@ export function createFurnishings(floors) {
  */
 function createFurniture(furniture) {
   const partsByLook = new Map();
-  for (const part of furniture.flatMap((piece) => piece.parts)) {
+  const allParts = furniture.flatMap((piece) => piece.parts);
+  for (const part of allParts) {
     const castsShadow = part.y1 - part.y0 > FLAT_PART_HEIGHT;
     const key = `${part.color}:${castsShadow}`;
     if (!partsByLook.has(key)) partsByLook.set(key, { color: part.color, castsShadow, parts: [] });
     partsByLook.get(key).parts.push(part);
   }
   return [...partsByLook.values()].map(({ color, castsShadow, parts }) => {
-    const mesh = createMergedBoxMesh(parts, createFurnitureMaterial(color));
+    const mesh = createMergedBoxMesh(parts, createFurnitureMaterial(color), allParts);
     mesh.castShadow = castsShadow;
     mesh.receiveShadow = true;
     return mesh;

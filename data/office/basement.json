@@ -40,7 +40,7 @@
   "portraits": [
   ],
   "evidenceSpots": [
-    {"id": "drawing", "name": "The missing employee", "room": "basement workshop", "kind": "drawing", "x": 14.85, "y": 0.79, "z": 4.4, "clue": "Basement \u00b7 A work-table sketch names someone who never worked here."}
+    {"id": "drawing", "name": "The missing employee", "room": "basement workshop", "kind": "drawing", "x": 14.85, "y": 0.764, "z": 4.4, "clue": "Basement \u00b7 A work-table sketch names someone who never worked here."}
   ],
   "batterySpots": [
     {"x": 13.8, "y": 0.098, "z": 7.6},

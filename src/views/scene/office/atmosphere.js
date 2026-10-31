@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { createMergedBoxMesh } from '../meshes.js';
 import { createLabel } from '../textLabels.js';
+import { CEILING_SLAB_THICKNESS } from './sceneDimensions.js';
 
 /** Deterministic dressing, batched by material. No per-frame lights or collision-only obstacles. */
 export function createAtmosphere(level, tileMaps) {
@@ -8,14 +9,15 @@ export function createAtmosphere(level, tileMaps) {
   const pipes = [], papers = [], ceilingFixtures = [], dust = [];
   for (const [floorIndex, floor] of level.floors.entries()) {
     const map = tileMaps[floorIndex];
+    const ceilingY = floor.elevation + level.storeyHeight - CEILING_SLAB_THICKNESS;
     map.forEachTile((tile, rect) => {
       if (tile !== '.') return;
       const x = (rect.x0 + rect.x1) / 2, z = (rect.z0 + rect.z1) / 2;
       const cellX = Math.round(x * 2), cellZ = Math.round(z * 2);
       const seed = (cellX * 73 + cellZ * 137 + floorIndex * 43) % 101;
       if (seed < 3) papers.push({ x0: x - .09, x1: x + .09, z0: z - .14, z1: z + .14, y0: floor.elevation + .001, y1: floor.elevation + .003 });
-      if (cellZ % 8 === 2) pipes.push({ x0: rect.x0, x1: rect.x1, z0: z - .025, z1: z + .025, y0: floor.elevation + 2.93, y1: floor.elevation + 3 });
-      if (cellX % 8 === 3 && cellZ % 8 === 3) ceilingFixtures.push({ x0: x - .2, x1: x + .2, z0: z - .12, z1: z + .12, y0: floor.elevation + 2.9, y1: floor.elevation + 3 });
+      if (cellZ % 8 === 2) pipes.push({ x0: rect.x0, x1: rect.x1, z0: z - .025, z1: z + .025, y0: ceilingY - .07, y1: ceilingY });
+      if (cellX % 8 === 3 && cellZ % 8 === 3) ceilingFixtures.push({ x0: x - .2, x1: x + .2, z0: z - .12, z1: z + .12, y0: ceilingY - .1, y1: ceilingY });
       if (seed < 14) dust.push(x, floor.elevation + .5 + seed / 8, z);
     });
   }

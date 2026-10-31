@@ -1,9 +1,10 @@
 import * as THREE from 'three';
-import { RAIL_THICKNESS } from '../../../models/world/StairFlight.js';
+import { MAX_STAIR_RISER, RAIL_THICKNESS } from '../../../models/world/StairFlight.js';
 import { Tile } from '../../../models/world/TileMap.js';
 import { Compass, edgeStrip } from '../../../utils.js';
 import { createFlatSurfaceGeometry, createMergedBoxMesh } from '../meshes.js';
-import { createConcreteTexture, createGardenPavingTexture, createOfficeFloorTexture, createOfficeWallTexture, createStoneTileTexture, furnitureFinishTexture } from './textures.js';
+import { createCeilingTexture, createConcreteTexture, createGardenPavingTexture, createOfficeFloorTexture, createOfficeWallTexture, createStoneTileTexture, furnitureFinishTexture } from './textures.js';
+import { CEILING_SLAB_THICKNESS } from './sceneDimensions.js';
 
 /** @typedef {import('../../../models/level/parseLevel.js').Level} Level */
 /** @typedef {import('../../../models/level/parseLevel.js').PlacedFloor} PlacedFloor */
@@ -27,7 +28,7 @@ const TEXTURE_METERS = 2;
 const PIT_DEPTH = 0.6;
 const RAILING = Object.freeze({ height: 1.0, middleHeight: 0.5, thickness: 0.05 });
 /** The most one step rises, and how far a stair's parapet stands above its treads. */
-const STAIRS = Object.freeze({ maxRiser: 0.19, parapetHeight: 0.9 });
+const STAIRS = Object.freeze({ parapetHeight: 0.9 });
 /** @type {readonly string[]} Tiles with a flat floor. */
 const FLOOR_TILES = Object.freeze([Tile.FLOOR, Tile.CARPORT, Tile.WET_FLOOR, Tile.PAVING, Tile.GARDEN]);
 /** @type {ReadonlySet<string>} Tiles with a roof over them when no floor stands above. */
@@ -119,6 +120,7 @@ function createWalls(boxes, material) {
  */
 function createFloors(storeys) {
   const officeFloor = createOfficeFloorTexture(), stone = createStoneTileTexture();
+  const grassBlocks = createGardenPavingTexture();
   // Drawn in front of the tops of the walls below, which end at the same height.
   const floor = (look) => new THREE.MeshStandardMaterial({ ...look, polygonOffset: true, polygonOffsetFactor: -1 });
   const surfaces = [
@@ -126,7 +128,7 @@ function createFloors(storeys) {
     { tile: Tile.CARPORT, material: floor({ map: officeFloor, bumpMap: officeFloor, bumpScale: .006, color: 0xc4bcae, roughness: 0.8 }) },
     { tile: Tile.WET_FLOOR, material: floor({ map: stone, bumpMap: stone, bumpScale: .006, roughness: 0.5 }) },
     { tile: Tile.PAVING, material: floor({ map: stone, bumpMap: stone, bumpScale: .01, roughness: 0.9 }) },
-    { tile: Tile.GARDEN, material: floor({ map: createGardenPavingTexture(), roughness: 1 }) },
+    { tile: Tile.GARDEN, material: floor({ map: grassBlocks, bumpMap: grassBlocks, bumpScale: .014, roughness: 1 }) },
     { tile: Tile.PIT, depth: PIT_DEPTH, material: new THREE.MeshStandardMaterial({ color: 0x0b0a09, roughness: 1 }) },
   ];
   return storeys.flatMap(({ elevation, rectsByTile }) =>
@@ -141,12 +143,16 @@ function createFloors(storeys) {
  * @param {Storey[]} storeys
  */
 function createCeilings(storeys, storeyHeight) {
-  const material = new THREE.MeshStandardMaterial({ color: 0x1d1a17, roughness: 1 });
+  const panels = createCeilingTexture();
+  const material = new THREE.MeshStandardMaterial({ color: 0x77736d, map: panels, bumpMap: panels, bumpScale: .012, roughness: 1 });
   return storeys.map(({ elevation, tileMapAbove, rectsByTile }) => {
     const rects = [...rectsByTile].flatMap(([tile, rects]) =>
       tile === Tile.WALL ? [] : rects.filter(({ x0, z0, x1, z1 }) => hasCeiling(tile, tileMapAbove?.tileAt((x0 + x1) / 2, (z0 + z1) / 2))),
     );
-    return createSurface(rects, elevation + storeyHeight, false, material);
+    const ceiling = createSurface(rects, elevation + storeyHeight - CEILING_SLAB_THICKNESS, false, material);
+    // The underside still blocks light between floors; receiving its own shadow map causes moving dark speckles.
+    ceiling.receiveShadow = false;
+    return ceiling;
   });
 }
 
@@ -293,7 +299,7 @@ function flightHeightAt({ rect, rises, low, high }, point) {
  */
 function stepsOf({ rect, rises, low, high }) {
   if (!rises) return [{ rect, top: low }];
-  const count = Math.ceil((high - low) / STAIRS.maxRiser);
+  const count = Math.ceil((high - low) / MAX_STAIR_RISER);
   const { x0, z0, x1, z1 } = rect;
   // Measured from the foot, a share of the way up the flight.
   const slice = (from, to) => {

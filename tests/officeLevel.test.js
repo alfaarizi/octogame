@@ -60,12 +60,21 @@ describe('office layout', () => {
     });
   });
 
+  test('dropped equipment rests on a visible stair tread', () => {
+    const plan = OFFICE.floors.find((floor) => floor.name === 'ground floor').stairs[0];
+    const flight = new StairFlight(plan);
+    const point = { x: (plan.rect.x0 + plan.rect.x1) / 2, z: (plan.rect.z0 + plan.rect.z1) / 2 };
+    const dropped = building.dropPosition({ ...point, y: flight.heightAt(point) }, 0, 0, collisionRadius);
+    assert.equal(dropped.y, flight.treadHeightAt(point));
+    assert.ok(dropped.y >= flight.heightAt(point));
+  });
+
   test('the authored evidence matches the objective count', () => {
     assert.equal(OFFICE.evidenceSpots.length, GAME_CONFIG.round.evidenceRequired);
   });
 
   test('each crime scene subject rests on its authored floor or furniture', () => {
-    const baseBelowTarget = { handprint: .02, phone: .13, drawing: .03, clock: .23, silhouette: 1.05 };
+    const baseBelowTarget = { handprint: .004, phone: .13, drawing: .004, clock: .23, silhouette: 1.05 };
     for (const floor of OFFICE.floors) for (const subject of floor.evidenceSpots) {
       const baseY = subject.y - baseBelowTarget[subject.kind];
       if (subject.kind === 'silhouette') {

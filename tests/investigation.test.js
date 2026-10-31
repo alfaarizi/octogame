@@ -79,7 +79,7 @@ describe('physical occlusion', () => {
   test('a drop stops before a wall and remains on the floor', () => {
     const drop = building.dropPosition({ x: 2.5, y: 0, z: 2.7 }, 0, .65, .3);
     assert.ok(drop.z >= 2.5 - 1e-9);
-    assert.equal(drop.y, .12);
+    assert.equal(drop.y, 0);
   });
   test('floor slabs prevent interacting with another storey', () => {
     const multistorey = new Building([0, 3].map(elevation => ({ elevation, tiles: SMALL_ROOM, stairs: [], obstacles: [] })), 1);

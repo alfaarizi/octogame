@@ -5,6 +5,7 @@ import { clamp01, edgeStrip } from '../../utils.js';
 
 /** How thick the parapet along a flight's open side is. */
 export const RAIL_THICKNESS = 0.1;
+export const MAX_STAIR_RISER = 0.19;
 
 /**
  * Where a flight of stairs lies and how it climbs. Heights are measured from the ground floor.
@@ -51,5 +52,13 @@ export class StairFlight {
     const run = Math.abs(eastward) * (x1 - x0) + Math.abs(southward) * (z1 - z0);
     const climbed = (x - (x0 + x1) / 2) * eastward + (z - (z0 + z1) / 2) * southward;
     return this.#low + (this.#high - this.#low) * clamp01(climbed / run + 0.5);
+  }
+
+  /** Static objects rest on the drawn tread, while moving bodies follow the smooth stair slope. */
+  treadHeightAt(point) {
+    if (!this.#rises) return this.#low;
+    const steps = Math.ceil((this.#high - this.#low) / MAX_STAIR_RISER);
+    const progress = (this.heightAt(point) - this.#low) / (this.#high - this.#low);
+    return this.#low + Math.min(steps, Math.floor(progress * steps) + 1) * (this.#high - this.#low) / steps;
   }
 }

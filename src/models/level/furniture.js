@@ -91,16 +91,16 @@ function screenParts({ x0, z0, x1, z1, y0, y1 }, panelColor, frameColor) {
   const alongX = x1 - x0 > z1 - z0;
   const end = Math.min(0.07, (alongX ? x1 - x0 : z1 - z0) / 4);
   const panelBottom = Math.min(y0 + 0.32, y1 - 0.12);
-  const parts = [
-    partBox(x0, z0, x1, z1, panelBottom, y1 - 0.08, panelColor),
-    partBox(x0, z0, x1, z1, y1 - 0.08, y1, frameColor),
-  ];
+  const railBottom = y1 - 0.08;
+  const parts = [partBox(x0, z0, x1, z1, railBottom, y1, frameColor)];
   if (alongX) {
-    parts.push(partBox(x0, z0, x0 + end, z1, y0, y1, frameColor));
-    parts.push(partBox(x1 - end, z0, x1, z1, y0, y1, frameColor));
+    parts.push(partBox(x0 + end, z0, x1 - end, z1, panelBottom, railBottom, panelColor));
+    parts.push(partBox(x0, z0, x0 + end, z1, y0, railBottom, frameColor));
+    parts.push(partBox(x1 - end, z0, x1, z1, y0, railBottom, frameColor));
   } else {
-    parts.push(partBox(x0, z0, x1, z0 + end, y0, y1, frameColor));
-    parts.push(partBox(x0, z1 - end, x1, z1, y0, y1, frameColor));
+    parts.push(partBox(x0, z0 + end, x1, z1 - end, panelBottom, railBottom, panelColor));
+    parts.push(partBox(x0, z0, x1, z0 + end, y0, railBottom, frameColor));
+    parts.push(partBox(x0, z1 - end, x1, z1, y0, railBottom, frameColor));
   }
   return parts;
 }
@@ -114,13 +114,13 @@ function storageParts({ x0, z0, x1, z1, y0, y1 }, bodyColor, frameColor, hasDoor
     partBox(x0, z0, x1, z1, y1 - thickness, y1, bodyColor),
   ];
   if (alongX) {
-    parts.push(partBox(x0, z0, x1, z0 + thickness, y0, y1, frameColor));
-    parts.push(partBox(x0, z0, x0 + thickness, z1, y0, y1, bodyColor));
-    parts.push(partBox(x1 - thickness, z0, x1, z1, y0, y1, bodyColor));
+    parts.push(partBox(x0 + thickness, z0, x1 - thickness, z0 + thickness, y0 + thickness, y1 - thickness, frameColor));
+    parts.push(partBox(x0, z0, x0 + thickness, z1, y0 + thickness, y1 - thickness, bodyColor));
+    parts.push(partBox(x1 - thickness, z0, x1, z1, y0 + thickness, y1 - thickness, bodyColor));
   } else {
-    parts.push(partBox(x1 - thickness, z0, x1, z1, y0, y1, frameColor));
-    parts.push(partBox(x0, z0, x1, z0 + thickness, y0, y1, bodyColor));
-    parts.push(partBox(x0, z1 - thickness, x1, z1, y0, y1, bodyColor));
+    parts.push(partBox(x1 - thickness, z0 + thickness, x1, z1 - thickness, y0 + thickness, y1 - thickness, frameColor));
+    parts.push(partBox(x0, z0, x1, z0 + thickness, y0 + thickness, y1 - thickness, bodyColor));
+    parts.push(partBox(x0, z1 - thickness, x1, z1, y0 + thickness, y1 - thickness, bodyColor));
   }
   for (const fraction of [.34, .67]) {
     const shelfY = y0 + (y1 - y0) * fraction;

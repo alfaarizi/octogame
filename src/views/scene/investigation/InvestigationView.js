@@ -176,11 +176,10 @@ function createVisitor(marked) {
 function drawAnomaly(kind) {
   const canvas = document.createElement('canvas'); canvas.width = 256; canvas.height = 320;
   const c = canvas.getContext('2d');
-  c.fillStyle = kind === 'handprint' ? '#783232' : '#c7d5c6';
+  c.fillStyle = '#c7d5c6';
   c.strokeStyle = '#abcec2'; c.lineWidth = 6;
   if (kind === 'handprint') {
-    c.beginPath(); c.ellipse(125, 194, 50, 62, -.1, 0, Math.PI * 2); c.fill();
-    for (let i = 0; i < 6; i++) { c.beginPath(); c.ellipse(57 + i * 27, 119 - Math.sin(i / 5 * Math.PI) * 33, 10, 49, (i - 2.5) * .13, 0, Math.PI * 2); c.fill(); }
+    drawSixFingerHandprint(c);
   } else if (kind === 'clock') {
     c.beginPath(); c.arc(128, 155, 101, 0, Math.PI * 2); c.stroke();
     c.font = 'bold 40px monospace'; c.fillText('13', 105, 101);
@@ -193,4 +192,48 @@ function drawAnomaly(kind) {
     c.fillRect(94, 94, 69, 28);
   }
   return canvas;
+}
+
+/** A smeared palm, thumb and five distinct fingers: the extra digit is the clue. */
+function drawSixFingerHandprint(context) {
+  context.fillStyle = 'rgba(106, 24, 24, .78)';
+  context.beginPath();
+  context.moveTo(67, 154);
+  context.bezierCurveTo(91, 141, 164, 145, 190, 161);
+  context.bezierCurveTo(211, 189, 192, 235, 164, 248);
+  context.lineTo(155, 295); context.lineTo(96, 289); context.lineTo(91, 251);
+  context.bezierCurveTo(59, 226, 52, 181, 67, 154);
+  context.fill();
+  const fingertipY = [89, 67, 50, 62, 85];
+  for (let index = 0; index < fingertipY.length; index++) {
+    const center = 77 + index * 28;
+    const width = index === 2 ? 21 : 19;
+    const tip = fingertipY[index];
+    context.beginPath();
+    context.moveTo(center - width / 2, 167);
+    context.lineTo(center - width / 2, tip + 10);
+    context.quadraticCurveTo(center - width / 2, tip, center, tip);
+    context.quadraticCurveTo(center + width / 2, tip, center + width / 2, tip + 10);
+    context.lineTo(center + width / 2, 167);
+    context.fill();
+  }
+  context.beginPath();
+  context.moveTo(72, 181);
+  context.bezierCurveTo(51, 177, 37, 164, 27, 146);
+  context.bezierCurveTo(16, 129, 28, 116, 40, 125);
+  context.bezierCurveTo(56, 138, 68, 145, 83, 155);
+  context.fill();
+  let seed = 79;
+  const random = () => { seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0; return seed / 4294967296; };
+  context.fillStyle = 'rgba(58, 12, 12, .24)';
+  for (let mark = 0; mark < 190; mark++) {
+    const x = 35 + random() * 178, y = 65 + random() * 227;
+    context.fillRect(x, y, 1 + random() * 5, 1 + random() * 3);
+  }
+  context.globalCompositeOperation = 'destination-out';
+  for (let gap = 0; gap < 18; gap++) {
+    const x = 62 + random() * 130, y = 95 + random() * 145;
+    context.fillRect(x, y, 1 + random() * 4, 2 + random() * 7);
+  }
+  context.globalCompositeOperation = 'source-over';
 }

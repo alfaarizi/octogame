@@ -74,7 +74,7 @@ export class PlayerActions {
     const restingHeight = ITEM_RESTING_HEIGHT[this.inventory.activeItem.kind];
     const position = this.building.dropPosition(this.player.position, this.player.yaw,
       this.config.interaction.dropDistance, this.config.player.collisionRadius);
-    position.y += restingHeight - .12;
+    position.y += restingHeight;
     const item = this.inventory.drop();
     this.pickups.add(item.kind, position, item.id);
     this.syncEquipment();

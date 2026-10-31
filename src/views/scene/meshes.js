@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { visibleBoxFaces } from './visibleBoxFaces.js';
 
 /** @typedef {import('../../types.js').Box} Box */
 /** @typedef {import('../../types.js').Point3} Point3 */
@@ -32,18 +33,24 @@ export function createBoxMeshFromBounds(box, material) {
  * Many boxes drawn as one mesh, which is far cheaper to render than one mesh per box.
  * @param {readonly Box[]} boxes
  * @param {THREE.Material} material
+ * @param {readonly Box[]} [occluders] - Boxes in other material batches that can cover these faces.
  * @returns {THREE.Mesh}
  */
-export function createMergedBoxMesh(boxes, material) {
+export function createMergedBoxMesh(boxes, material, occluders = boxes) {
   const positions = [], normals = [], uvs = [], indices = [];
-  for (const box of boxes) {
-    const geometry = createBoxGeometry(box);
-    const offset = positions.length / 3;
-    positions.push(...geometry.attributes.position.array);
-    normals.push(...geometry.attributes.normal.array);
-    uvs.push(...geometry.attributes.uv.array);
-    for (const index of geometry.index.array) indices.push(offset + index);
-    geometry.dispose();
+  for (const face of visibleBoxFaces(boxes, occluders)) {
+    const { axis, sign, plane, u0, u1, v0, v1 } = face;
+    const vertex = (u, v) => axis === 'x' ? [plane, v, u] : axis === 'y' ? [u, plane, v] : [u, v, plane];
+    const first = positions.length / 3;
+    positions.push(...vertex(u0, v0), ...vertex(u1, v0), ...vertex(u1, v1), ...vertex(u0, v1));
+    const normal = axis === 'x' ? [sign, 0, 0] : axis === 'y' ? [0, sign, 0] : [0, 0, sign];
+    for (let corner = 0; corner < 4; corner++) normals.push(...normal);
+    uvs.push(u0 / FURNITURE_TEXTURE_METERS, v0 / FURNITURE_TEXTURE_METERS,
+      u1 / FURNITURE_TEXTURE_METERS, v0 / FURNITURE_TEXTURE_METERS,
+      u1 / FURNITURE_TEXTURE_METERS, v1 / FURNITURE_TEXTURE_METERS,
+      u0 / FURNITURE_TEXTURE_METERS, v1 / FURNITURE_TEXTURE_METERS);
+    if (sign === (axis === 'z' ? 1 : -1)) indices.push(first, first + 1, first + 2, first, first + 2, first + 3);
+    else indices.push(first, first + 2, first + 1, first, first + 3, first + 2);
   }
   const merged = new THREE.BufferGeometry();
   merged.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
