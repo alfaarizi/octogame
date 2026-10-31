@@ -7,6 +7,13 @@ import { clamp01, edgeStrip } from '../../utils.js';
 export const RAIL_THICKNESS = 0.1;
 export const MAX_STAIR_RISER = 0.19;
 
+/** The full width of a stair rail sits on its tread, including its posts. */
+export function stairRailFootprint(rect, side) {
+  const strip = edgeStrip(rect, side, RAIL_THICKNESS);
+  const dx = -side.x * RAIL_THICKNESS / 2, dz = -side.z * RAIL_THICKNESS / 2;
+  return { x0: strip.x0 + dx, x1: strip.x1 + dx, z0: strip.z0 + dz, z1: strip.z1 + dz };
+}
+
 /**
  * Where a flight of stairs lies and how it climbs. Heights are measured from the ground floor.
  * @typedef {object} StairFlightPlan
@@ -30,7 +37,7 @@ export class StairFlight {
   /** @param {StairFlightPlan} plan */
   constructor({ rect, rises, low, high, rails }) {
     this.rect = rect;
-    this.rails = rails.map((side) => edgeStrip(rect, side, RAIL_THICKNESS));
+    this.rails = rails.map((side) => stairRailFootprint(rect, side));
     this.#rises = rises;
     this.#low = low;
     this.#high = high;

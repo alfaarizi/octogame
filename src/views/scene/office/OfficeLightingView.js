@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { GameEvent } from '../../../core/GameEvent.js';
 import { atHeight, Countdown, headingTo, pointAlongHeading } from '../../../utils.js';
 import { createBoxMeshFromBounds } from '../meshes.js';
+import { BrokenCeilingLight } from './BrokenCeilingLight.js';
 import { GlowingLight } from './GlowingLight.js';
 import { createLanternModel, LANTERN_FACE_GLOW } from './lanternModel.js';
 
@@ -17,12 +18,14 @@ const STUTTER_DEPTH = 0.6;
 const StutterDuration = Object.freeze({ EXIT_UNLOCKED: 1.6, AMBIENT_NOISE: 0.4 });
 
 /**
- * The jack-o'-lanterns and the things that glow on their own (server lights, a monitor, a neon sign): warm or
- * cold lights that stay steady until the exit opens or a spooky noise briefly dims them.
+ * Scene lighting: steady glowing props and switchable ceiling tubes with weak, repeatable flicker.
  */
 export class OfficeLightingView {
   #scene;
   #lights = [];
+  #brokenLights = [];
+  #office;
+  #elapsed = 0;
   #stutter = new Countdown();
   #stutterDuration = 0;
 
@@ -34,11 +37,19 @@ export class OfficeLightingView {
    * @param {readonly GlowingFixture[]} setup.fixtures
    * @param {number} setup.lanternIntensity
    * @param {number} setup.fixtureIntensity
+   * @param {readonly { id: string, switchId: string, position: import('../../../types.js').Point3 }[]} setup.ceilingLights
+   * @param {import('../../../models/interaction/OfficeInteractions.js').OfficeInteractions} setup.office
    */
-  constructor(scene, events, { lanterns, fixtures, lanternIntensity, fixtureIntensity }) {
+  constructor(scene, events, { lanterns, fixtures, ceilingLights, office, lanternIntensity, fixtureIntensity }) {
     this.#scene = scene;
+    this.#office = office;
     for (const lantern of lanterns) this.#addLantern(lantern, lanternIntensity);
     for (const fixture of fixtures) this.#addFixture(fixture, fixtureIntensity);
+    for (const definition of ceilingLights) {
+      const light = new BrokenCeilingLight(definition);
+      this.#scene.add(...light.objects);
+      this.#brokenLights.push({ switchId: definition.switchId, light });
+    }
     events.on(GameEvent.EXIT_UNLOCKED, () => this.stutterAll(StutterDuration.EXIT_UNLOCKED));
     events.on(GameEvent.AMBIENT_NOISE, ({ flickerLanterns }) => flickerLanterns && this.stutterAll(StutterDuration.AMBIENT_NOISE));
   }
@@ -50,10 +61,12 @@ export class OfficeLightingView {
   }
 
   update(seconds) {
+    this.#elapsed += seconds;
     const finished = this.#stutter.tick(seconds);
     const progress = finished ? 0 : this.#stutter.remaining / this.#stutterDuration;
     const strength = 1 - STUTTER_DEPTH * Math.sin(Math.PI * progress) ** 2;
     for (const light of this.#lights) light.setStrength(strength);
+    for (const { switchId, light } of this.#brokenLights) light.update(this.#office.isSwitchOn(switchId), this.#elapsed);
   }
 
   /** @param {Lantern} lantern */

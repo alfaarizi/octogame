@@ -146,6 +146,11 @@
     {"name": "CCTV monitor", "box": [20.25, 12.58, 20.75, 12.68, 0.78, 1.12], "color": "#9fc3ff", "light": {"x": 20.5, "y": 1, "z": 13}},
     {"name": "neon sign", "box": [8.3, 23.85, 9.7, 24, 1, 1.5], "color": "#2fd6ff", "light": {"x": 9, "y": 1.3, "z": 23.4}}
   ],
+  "ceilingLights": [
+    {"id": "office-tube", "switchId": "lobby-lights", "position": {"x": 5.25, "y": 2.788, "z": 5.25}},
+    {"id": "lobby-tube", "switchId": "lobby-lights", "position": {"x": 9.25, "y": 2.788, "z": 5.25}},
+    {"id": "workshop-tube", "switchId": "workshop-lights", "position": {"x": 17.25, "y": 2.788, "z": 5.25}}
+  ],
   "portraits": [
     {"x": 2.4, "z": 0.5},
     {"x": 15.6, "z": 0.5}
@@ -186,8 +191,10 @@
   ],
   "interactables": [
     {"id": "lobby-closet", "name": "coat closet", "kind": "closet", "position": {"x": 7.1, "y": 1.25, "z": 6.04}, "box": [6.7, 5.2, 7.5, 6, 0, 2.3]},
-    {"id": "office-supplies", "name": "supply drawer", "kind": "cache", "position": {"x": 6.1, "y": 0.7, "z": 6.32}, "box": [5.8, 5.8, 6.3999999999999995, 6.3, 0, 0.8]},
+    {"id": "office-supplies", "name": "supply drawer", "kind": "cache", "position": {"x": 6.1, "y": 0.7, "z": 6.32}, "box": [5.8, 5.8, 6.3999999999999995, 6.3, 0, 0.8], "facing": "south"},
     {"id": "arrival-note", "name": "night shift briefing", "kind": "note", "position": {"x": 7.1, "y": 0.788, "z": 7.53}, "text": "NIGHT SHIFT: Photograph all five anomalies listed in J. The gate releases after the final exposure. Switch between camera and light with 1 / 2. A flash attracts it.", "orientation": "flat"},
-    {"id": "hiding-note", "name": "locker warning", "kind": "note", "position": {"x": 7.1, "y": 1.22, "z": 6.005}, "text": "Break its line of sight BEFORE entering a closet. If it sees you enter, it will follow. E to leave.", "orientation": "wall"}
+    {"id": "hiding-note", "name": "locker warning", "kind": "note", "position": {"x": 7.1, "y": 1.22, "z": 6.005}, "text": "Break its line of sight BEFORE entering a closet. If it sees you enter, it will follow. E to leave.", "orientation": "wall"},
+    {"id": "lobby-lights", "name": "office lights", "kind": "switch", "position": {"x": 6.71, "y": 1.3, "z": 6.45}, "facing": "east"},
+    {"id": "workshop-lights", "name": "workshop lights", "kind": "switch", "position": {"x": 22.49, "y": 1.3, "z": 5.5}, "facing": "west"}
   ]
 }

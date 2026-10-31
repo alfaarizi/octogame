@@ -69,6 +69,45 @@ describe('office layout', () => {
     });
   });
 
+  test('raised desk accessories fit entirely on their supporting surface', () => {
+    for (const floor of OFFICE.floors) {
+      const parts = floor.furniture.flatMap((piece) => piece.parts);
+      for (const accessory of parts) {
+        if (accessory.y1 - accessory.y0 > .03 || accessory.y0 < floor.elevation + .1) continue;
+        const supported = parts.some((surface) => surface !== accessory
+          && Math.abs(surface.y1 - accessory.y0) < .015
+          && accessory.x0 >= surface.x0 - .001 && accessory.x1 <= surface.x1 + .001
+          && accessory.z0 >= surface.z0 - .001 && accessory.z1 <= surface.z1 + .001);
+        assert.ok(supported, `${floor.name}: raised accessory hangs off its support at (${accessory.x0}, ${accessory.z0})`);
+      }
+    }
+  });
+
+  test('closets and drawers stand on the floor or fully on a shelf', () => {
+    for (const floor of OFFICE.floors) for (const item of floor.interactables.filter((object) => object.box)) {
+      if (Math.abs(item.box.y0 - floor.elevation) < .001) continue;
+      const supported = floor.furniture.flatMap((piece) => piece.parts).some((surface) =>
+        Math.abs(surface.y1 - item.box.y0) < .001
+        && item.box.x0 >= surface.x0 && item.box.x1 <= surface.x1
+        && item.box.z0 >= surface.z0 && item.box.z1 <= surface.z1);
+      assert.ok(supported, `${floor.name}: ${item.name} floats above its support`);
+    }
+  });
+
+  test('supply drawers open toward walkable space', () => {
+    const direction = { north: { x: 0, z: -1 }, south: { x: 0, z: 1 }, east: { x: 1, z: 0 }, west: { x: -1, z: 0 } };
+    OFFICE.floors.forEach((floor, index) => {
+      for (const drawer of floor.interactables.filter((item) => item.kind === 'cache')) {
+        const { box } = drawer, facing = direction[drawer.facing];
+        const point = {
+          x: (box.x0 + box.x1) / 2 + facing.x * ((box.x1 - box.x0) / 2 + .25),
+          z: (box.z0 + box.z1) / 2 + facing.z * ((box.z1 - box.z0) / 2 + .25),
+        };
+        assert.ok(!building.tileMaps[index].isBlocked(point.x, point.z), `${drawer.id} opens into a wall`);
+      }
+    });
+  });
+
   test('the entrance and pantry door have clear walking lanes', () => {
     for (const [floorName, lane] of [
       ['ground floor', { x0: 7.5, z0: 7, x1: 8.5, z1: 10 }],
@@ -96,6 +135,15 @@ describe('office layout', () => {
         }
       }
     });
+  });
+
+  test('stair rail footprints stay entirely on the stair treads', () => {
+    for (const floor of OFFICE.floors) for (const plan of floor.stairs) {
+      for (const rail of new StairFlight(plan).rails) {
+        assert.ok(rail.x0 >= plan.rect.x0 - 1e-9 && rail.x1 <= plan.rect.x1 + 1e-9);
+        assert.ok(rail.z0 >= plan.rect.z0 - 1e-9 && rail.z1 <= plan.rect.z1 + 1e-9);
+      }
+    }
   });
 
   test('dropped equipment rests on a visible stair tread', () => {

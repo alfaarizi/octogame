@@ -2,6 +2,7 @@
 export class OfficeInteractions {
   #definitions;
   #opened = new Set();
+  #poweredSwitches = new Set();
   #hiding = null;
   #returnPosition = null;
   #witnessed = false;
@@ -12,8 +13,16 @@ export class OfficeInteractions {
   get isHidden() { return this.#hiding !== null; }
   get isConcealed() { return this.isHidden && !this.#witnessed; }
   isOpened(id) { return this.#opened.has(id); }
+  isSwitchOn(id) { return this.#poweredSwitches.has(id); }
 
-  reset() { this.#opened.clear(); this.#hiding = null; this.#returnPosition = null; this.#witnessed = false; }
+  reset() { this.#opened.clear(); this.#poweredSwitches.clear(); this.#hiding = null; this.#returnPosition = null; this.#witnessed = false; }
+
+  toggleSwitch(id) {
+    if (!this.#definitions.some((item) => item.id === id && item.kind === 'switch')) throw new Error(`Unknown light switch: ${id}`);
+    if (this.#poweredSwitches.has(id)) this.#poweredSwitches.delete(id);
+    else this.#poweredSwitches.add(id);
+    return this.isSwitchOn(id);
+  }
 
   open(id) {
     if (this.#opened.has(id)) return false;

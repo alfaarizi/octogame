@@ -111,4 +111,14 @@ describe('office interactions', () => {
     office.reset();
     assert.equal(office.open('drawer'), true);
   });
+  test('light switches toggle their circuits and reset between rounds', () => {
+    const office = new OfficeInteractions([{ id: 'lobby', kind: 'switch' }]);
+    assert.equal(office.isSwitchOn('lobby'), false);
+    assert.equal(office.toggleSwitch('lobby'), true);
+    assert.equal(office.toggleSwitch('lobby'), false);
+    office.toggleSwitch('lobby');
+    office.reset();
+    assert.equal(office.isSwitchOn('lobby'), false);
+    assert.throws(() => office.toggleSwitch('missing'), /Unknown light switch/);
+  });
 });

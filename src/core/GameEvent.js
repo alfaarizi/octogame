@@ -6,6 +6,7 @@ export const GameEvent = Object.freeze({
   PHOTO_TAKEN: 'photo-taken',
   ITEM_PICKED_UP: 'item-picked-up',
   ITEM_DROPPED: 'item-dropped',
+  LIGHT_SWITCH_TOGGLED: 'light-switch-toggled',
   HIDING_CHANGED: 'hiding-changed',
   OBJECT_INTERACTED: 'object-interacted',
   /** Payload: { evidenceRequired } */

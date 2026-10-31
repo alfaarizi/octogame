@@ -101,6 +101,7 @@ export class AudioDirector {
     on(GameEvent.PHOTO_TAKEN, () => library.shutter());
     on(GameEvent.ITEM_PICKED_UP, () => library.switchClick());
     on(GameEvent.ITEM_DROPPED, () => library.switchClick());
+    on(GameEvent.LIGHT_SWITCH_TOGGLED, () => library.switchClick());
     on(GameEvent.HIDING_CHANGED, () => library.creak(null, .18));
     on(GameEvent.OBJECT_INTERACTED, ({ position }) => library.creak(position, .12));
     on(GameEvent.EXIT_UNLOCKED, () => {

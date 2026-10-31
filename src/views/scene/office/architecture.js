@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { MAX_STAIR_RISER, RAIL_THICKNESS, StairFlight } from '../../../models/world/StairFlight.js';
+import { MAX_STAIR_RISER, RAIL_THICKNESS, StairFlight, stairRailFootprint } from '../../../models/world/StairFlight.js';
 import { Tile } from '../../../models/world/TileMap.js';
 import { Compass, edgeStrip } from '../../../utils.js';
 import { createFlatSurfaceGeometry, createMergedBoxMesh } from '../meshes.js';
@@ -257,10 +257,11 @@ function createStairs(floors) {
 function createStairRail(flight, side, material) {
   const { rect } = flight;
   const stair = new StairFlight(flight);
+  const footprint = stairRailFootprint(rect, side);
   const alongX = side.z !== 0;
   const endpoints = alongX
-    ? [{ x: rect.x0, z: side.z < 0 ? rect.z0 : rect.z1 }, { x: rect.x1, z: side.z < 0 ? rect.z0 : rect.z1 }]
-    : [{ x: side.x < 0 ? rect.x0 : rect.x1, z: rect.z0 }, { x: side.x < 0 ? rect.x0 : rect.x1, z: rect.z1 }];
+    ? [{ x: rect.x0, z: (footprint.z0 + footprint.z1) / 2 }, { x: rect.x1, z: (footprint.z0 + footprint.z1) / 2 }]
+    : [{ x: (footprint.x0 + footprint.x1) / 2, z: rect.z0 }, { x: (footprint.x0 + footprint.x1) / 2, z: rect.z1 }];
   const at = (fraction) => ({
     x: endpoints[0].x + (endpoints[1].x - endpoints[0].x) * fraction,
     z: endpoints[0].z + (endpoints[1].z - endpoints[0].z) * fraction,

@@ -22,6 +22,7 @@ export class PlayerActions {
     if (target.type === 'pickup') return this.inventory.isFull ? 'Hands full · Q to drop held item' : `E · Pick up ${ITEM_NAMES[item.kind]}`;
     if (item.kind === 'closet') return `E · Hide in ${item.name}`;
     if (item.kind === 'cache') return this.office.isOpened(item.id) ? 'Empty supply drawer' : `E · Search ${item.name}`;
+    if (item.kind === 'switch') return `E · Turn ${this.office.isSwitchOn(item.id) ? 'off' : 'on'} ${item.name}`;
     return `E · Read ${item.name}`;
   }
 
@@ -58,6 +59,10 @@ export class PlayerActions {
       this.syncEquipment();
       this.events.emit(GameEvent.HIDING_CHANGED, { hidden: true, witnessed });
       this.feedback(witnessed ? 'It saw you enter. This closet will not protect you!' : 'Hidden. Listen for it to pass. E to leave.');
+    } else if (item.kind === 'switch') {
+      const on = this.office.toggleSwitch(item.id);
+      this.events.emit(GameEvent.LIGHT_SWITCH_TOGGLED, { on, position: item.position });
+      this.feedback(on ? 'The ceiling tubes buzz and glow weakly.' : 'The ceiling tubes go dark.');
     } else if (item.kind === 'cache') {
       if (!this.office.open(item.id)) return this.feedback('The supply drawer is empty.');
       this.pickups.add(ItemKind.BATTERY, { ...item.position, y: item.box.y1 + ITEM_RESTING_HEIGHT.battery });

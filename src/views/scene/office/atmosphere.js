@@ -6,7 +6,7 @@ import { CEILING_SLAB_THICKNESS } from './sceneDimensions.js';
 /** Deterministic dressing, batched by material. No per-frame lights or collision-only obstacles. */
 export function createAtmosphere(level, tileMaps) {
   const group = new THREE.Group();
-  const pipes = [], papers = [], ceilingFixtures = [], dust = [];
+  const pipes = [], papers = [], ceilingFixtures = [], ceilingDiffusers = [], dust = [];
   for (const [floorIndex, floor] of level.floors.entries()) {
     const map = tileMaps[floorIndex];
     const ceilingY = floor.elevation + level.storeyHeight - CEILING_SLAB_THICKNESS;
@@ -17,13 +17,18 @@ export function createAtmosphere(level, tileMaps) {
       const seed = (cellX * 73 + cellZ * 137 + floorIndex * 43) % 101;
       if (seed < 3) papers.push({ x0: x - .09, x1: x + .09, z0: z - .14, z1: z + .14, y0: floor.elevation + .001, y1: floor.elevation + .003 });
       if (cellZ % 8 === 2) pipes.push({ x0: rect.x0, x1: rect.x1, z0: z - .025, z1: z + .025, y0: ceilingY - .07, y1: ceilingY });
-      if (cellX % 8 === 3 && cellZ % 8 === 3) ceilingFixtures.push({ x0: x - .2, x1: x + .2, z0: z - .12, z1: z + .12, y0: ceilingY - .1, y1: ceilingY });
+      if (cellX % 8 === 3 && cellZ % 8 === 3) {
+        ceilingFixtures.push({ x0: x - .2, x1: x + .2, z0: z - .12, z1: z + .12, y0: ceilingY - .1, y1: ceilingY });
+        ceilingDiffusers.push({ x0: x - .2, x1: x + .2, z0: z - .12, z1: z + .12, y0: ceilingY - .125, y1: ceilingY - .1 });
+      }
       if (seed < 14) dust.push(x, floor.elevation + .5 + seed / 8, z);
     });
   }
-  for (const [boxes, color] of [[pipes, 0x3f4847], [papers, 0x9d9e88], [ceilingFixtures, 0x676e69]]) {
+  for (const [boxes, color] of [[pipes, 0x3f4847], [papers, 0x9d9e88], [ceilingFixtures, 0x676e69], [ceilingDiffusers, 0x777b70]]) {
     const mesh = createMergedBoxMesh(boxes, new THREE.MeshStandardMaterial({ color, roughness: .95 }));
-    mesh.castShadow = true; mesh.receiveShadow = true; group.add(mesh);
+    mesh.castShadow = true;
+    mesh.receiveShadow = boxes !== ceilingFixtures && boxes !== ceilingDiffusers;
+    group.add(mesh);
   }
   const geometry = new THREE.BufferGeometry();
   geometry.setAttribute('position', new THREE.Float32BufferAttribute(dust, 3));

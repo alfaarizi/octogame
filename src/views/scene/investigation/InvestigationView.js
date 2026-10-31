@@ -3,12 +3,18 @@ import { createBoxMesh, createBoxMeshFromBounds } from '../meshes.js';
 import { createLabel } from '../textLabels.js';
 
 const surface = (color) => new THREE.MeshStandardMaterial({ color, roughness: .9, side: THREE.DoubleSide });
+const solidSurface = (color) => new THREE.MeshStandardMaterial({ color, roughness: .8, transparent: false, depthWrite: true });
+const Facing = Object.freeze({
+  south: { yaw: 0, x: 0, z: 1 }, north: { yaw: Math.PI, x: 0, z: -1 },
+  east: { yaw: Math.PI / 2, x: 1, z: 0 }, west: { yaw: -Math.PI / 2, x: -1, z: 0 },
+});
 
 /** Authored anomalies and office interaction props; model state drives drawer and evidence status. */
 export class InvestigationView {
   #office;
   #photography;
   #drawers = new Map();
+  #switches = new Map();
   #subjects = new Map();
 
   constructor(scene, office, photography) {
@@ -18,13 +24,14 @@ export class InvestigationView {
       if (item.kind === 'note') {
         scene.add(createNote(item));
       } else if (item.kind === 'closet') scene.add(createCloset(item));
-      else {
-        scene.add(createBoxMeshFromBounds(item.box, surface(0x4e5855)));
-        const { box } = item;
-        const drawer = createBoxMesh({ width: box.x1 - box.x0 - .06, height: .22, depth: .1 },
-          { x: item.position.x, y: box.y1 - .15, z: box.z1 + .025 }, surface(0x747a6d));
-        scene.add(drawer);
-        this.#drawers.set(item.id, { mesh: drawer, closedZ: drawer.position.z });
+      else if (item.kind === 'switch') {
+        const { group, rocker } = createLightSwitch(item);
+        scene.add(group);
+        this.#switches.set(item.id, rocker);
+      } else {
+        const { cabinet, drawer, direction } = createSupplyDrawer(item);
+        scene.add(cabinet, drawer);
+        this.#drawers.set(item.id, { mesh: drawer, closedX: drawer.position.x, closedZ: drawer.position.z, direction });
       }
     }
     for (const subject of photography.subjects) {
@@ -35,7 +42,12 @@ export class InvestigationView {
   }
 
   update() {
-    for (const [id, { mesh, closedZ }] of this.#drawers) mesh.position.z = closedZ + (this.#office.isOpened(id) ? .2 : 0);
+    for (const [id, { mesh, closedX, closedZ, direction }] of this.#drawers) {
+      const extension = this.#office.isOpened(id) ? .2 : 0;
+      mesh.position.x = closedX + direction.x * extension;
+      mesh.position.z = closedZ + direction.z * extension;
+    }
+    for (const [id, rocker] of this.#switches) rocker.rotation.x = this.#office.isSwitchOn(id) ? -.25 : .25;
     for (const [id, object] of this.#subjects) {
       const recorded = this.#photography.isDocumented(id);
       for (const material of object.userData.evidenceMaterials) {
@@ -43,6 +55,40 @@ export class InvestigationView {
       }
     }
   }
+}
+
+/** A closed cabinet body with an opaque, shallow tray that pulls forward. */
+function createSupplyDrawer({ box, facing }) {
+  const cabinet = createBoxMeshFromBounds(box, solidSurface(0x4e5855));
+  const drawer = new THREE.Group();
+  const shell = solidSurface(0x747a6d);
+  const inner = solidSurface(0x353d3a);
+  const { x0, x1, y1, z0, z1 } = box;
+  const acrossX = facing === 'north' || facing === 'south';
+  const width = acrossX ? x1 - x0 : z1 - z0;
+  const depth = acrossX ? z1 - z0 : x1 - x0;
+  const left = -width / 2 + .035, right = width / 2 - .035;
+  const bottom = y1 - .31, top = y1 - .08;
+  const front = depth / 2, back = front - Math.min(.2, depth - .07);
+  drawer.add(
+    createBoxMeshFromBounds({ x0: left, x1: right, y0: bottom, y1: top, z0: front + .015, z1: front + .055 }, shell),
+    createBoxMeshFromBounds({ x0: left, x1: right, y0: bottom, y1: bottom + .025, z0: back, z1: front + .055 }, inner),
+    createBoxMeshFromBounds({ x0: left, x1: left + .025, y0: bottom, y1: top, z0: back, z1: front + .015 }, inner),
+    createBoxMeshFromBounds({ x0: right - .025, x1: right, y0: bottom, y1: top, z0: back, z1: front + .015 }, inner),
+  );
+  drawer.position.set((x0 + x1) / 2, 0, (z0 + z1) / 2);
+  drawer.rotation.y = Facing[facing].yaw;
+  return { cabinet, drawer, direction: Facing[facing] };
+}
+
+function createLightSwitch({ position, facing }) {
+  const group = new THREE.Group();
+  const plate = createBoxMesh({ width: .14, height: .2, depth: .03 }, { x: 0, y: 0, z: 0 }, solidSurface(0xa6a99d));
+  const rocker = createBoxMesh({ width: .045, height: .09, depth: .045 }, { x: 0, y: 0, z: .035 }, solidSurface(0x303a37));
+  group.add(plate, rocker);
+  group.position.copy(position);
+  group.rotation.y = Facing[facing].yaw;
+  return { group, rocker };
 }
 
 function createNote({ name, position, orientation }) {
@@ -101,6 +147,7 @@ function createAnomaly(subject) {
   if (subject.kind === 'handprint' || subject.kind === 'drawing') {
     const decal = new THREE.Mesh(new THREE.PlaneGeometry(subject.kind === 'handprint' ? .32 : .48, subject.kind === 'handprint' ? .4 : .58), image());
     decal.rotation.x = -Math.PI / 2;
+    if (subject.kind === 'handprint') decal.rotation.z = Math.PI;
     group.add(decal);
   } else if (subject.kind === 'phone') {
     group.add(...createPhone(marked));

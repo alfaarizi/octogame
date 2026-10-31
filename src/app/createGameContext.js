@@ -78,6 +78,8 @@ function createViews({ config, events, level, building, simulation, render, albu
     lighting: new OfficeLightingView(render.scene, events, {
       lanterns: level.lanterns,
       fixtures: level.fixtures,
+      ceilingLights: level.ceilingLights,
+      office: simulation.office,
       lanternIntensity: config.rendering.lanternIntensity,
       fixtureIntensity: config.rendering.fixtureIntensity,
     }),

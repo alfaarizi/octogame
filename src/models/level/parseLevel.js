@@ -6,7 +6,7 @@
 
 import { atHeight, deepFreeze } from '../../utils.js';
 import { Tile } from '../world/TileMap.js';
-import { readEquipment, readInteractable, readEvidenceSpot, validateInvestigationIds } from './readInvestigation.js';
+import { readCeilingLight, readEquipment, readInteractable, readEvidenceSpot, validateCeilingLightSwitches, validateInvestigationIds } from './readInvestigation.js';
 import { readFurniturePiece } from './furniture.js';
 import {
   box,
@@ -56,6 +56,7 @@ import {
  * @property {readonly Rect[]} obstacles - The furniture footprints the player bumps into.
  * @property {readonly Lantern[]} lanterns
  * @property {readonly GlowingFixture[]} fixtures
+ * @property {readonly { id: string, switchId: string, position: Point3 }[]} ceilingLights
  * @property {readonly Point3[]} portraits - Each hangs on the north wall at (x, z), facing south.
  * @property {readonly EvidenceSpot[]} evidenceSpots - `y` is the height the evidence floats at.
  * @property {readonly Point3[]} batterySpots
@@ -81,6 +82,7 @@ import {
  * @property {ExitDoorLayout} exitDoor
  * @property {readonly Lantern[]} lanterns - Every floor's, together.
  * @property {readonly GlowingFixture[]} fixtures
+ * @property {readonly { id: string, switchId: string, position: Point3 }[]} ceilingLights
  * @property {readonly EvidenceSpot[]} evidenceSpots
  * @property {readonly Point3[]} batterySpots
  * @property {readonly Point3[]} ghostSpots
@@ -145,6 +147,7 @@ export function parseLevel({ building: buildingJson, palette, floors: floorSourc
     placeFloor(readFloor(floorSources[index], files.floors[index], { paint, tileSize }), elevation),
   );
   validateInvestigationIds(floors);
+  validateCeilingLightSwitches(floors);
   const spawnAt = (json, path) => {
     const spawn = object(json, path);
     return { x: number(spawn.x, `${path}.x`), y: integer(spawn.storey, `${path}.storey`) * storeyHeight, z: number(spawn.z, `${path}.z`) };
@@ -163,6 +166,7 @@ export function parseLevel({ building: buildingJson, palette, floors: floorSourc
     exitDoor: readExitDoor(building.exitDoor, `${BUILDING_FILE} exitDoor`),
     lanterns: floors.flatMap((floor) => floor.lanterns),
     fixtures: floors.flatMap((floor) => floor.fixtures),
+    ceilingLights: floors.flatMap((floor) => floor.ceilingLights),
     equipment: floors.flatMap((floor) => floor.equipment),
     interactables: floors.flatMap((floor) => floor.interactables),
     evidenceSpots: floors.flatMap((floor) => floor.evidenceSpots),
@@ -211,6 +215,7 @@ function readFloor({ data, tiles }, file, { paint, tileSize }) {
     ),
     lanterns: list(floor.lanterns, `${file} lanterns`, readLantern),
     fixtures: list(floor.fixtures, `${file} fixtures`, (fixture, path) => readFixture(fixture, path, paint)),
+    ceilingLights: list(floor.ceilingLights ?? [], `${file} ceilingLights`, readCeilingLight),
     portraits: list(floor.portraits, `${file} portraits`, floorPoint),
     equipment: list(floor.equipment ?? [], `${file} equipment`, readEquipment),
     interactables: list(floor.interactables ?? [], `${file} interactables`, readInteractable),
@@ -323,6 +328,7 @@ function placeFloor(floor, elevation) {
     furniture: floor.furniture.map((piece) => ({ ...piece, parts: piece.parts.map(liftBox) })),
     lanterns: floor.lanterns.map(lift),
     fixtures: floor.fixtures.map((fixture) => ({ ...fixture, box: liftBox(fixture.box), light: lift(fixture.light) })),
+    ceilingLights: floor.ceilingLights.map((light) => ({ ...light, position: lift(light.position) })),
     portraits: floor.portraits.map((spot) => atHeight(spot, elevation)),
     equipment: floor.equipment.map((item) => ({ ...item, position: lift(item.position) })),
     interactables: floor.interactables.map((item) => ({ ...item, position: lift(item.position), ...(item.box ? { box: liftBox(item.box) } : {}) })),
