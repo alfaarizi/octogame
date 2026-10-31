@@ -90,7 +90,7 @@ export const GAME_CONFIG = deepFreeze({
     moonlightSkyColor: 0x7586b8,
     moonlightGroundColor: 0x0b0906,
     /** How much you can see with the flashlight off. */
-    moonlightIntensity: 0.65,
+    moonlightIntensity: 0.7,
     lanternIntensity: 1.6,
     /** Server lights, the CCTV monitor and the neon sign. */
     fixtureIntensity: 1.5,

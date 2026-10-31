@@ -8,6 +8,7 @@ import { createEquipmentModel, createRightHand } from './equipmentModels.js';
 /** @typedef {import('../../../types.js').Ray} Ray */
 
 const TORCH_POSITION = Object.freeze({ x: 0.22, y: -0.24, z: -0.5 });
+const CAMERA_POSITION = Object.freeze({ x: .14, y: -.16, z: -.43 });
 const TORCH_BOB_SHARE = 0.4;
 // The beam starts at the torch and meets the middle of the screen a few meters out.
 const BEAM_ORIGIN = Object.freeze({ x: 0.24, y: -0.2, z: -0.56 });
@@ -25,6 +26,7 @@ export class FirstPersonView {
   #torch;
   #held = new THREE.Group();
   #tools = new Map();
+  #heldKind = null;
   #spotlight;
   #bobPhase = 0;
   #bobOffset = 0;
@@ -38,15 +40,16 @@ export class FirstPersonView {
    * @param {number} setup.eyeHeight
    * @param {{ intensity: number, beamCone: Cone }} setup.flashlight
    * @param {number} setup.shadowMapSize
+   * @param {THREE.Texture} setup.cameraScreenTexture
    */
-  constructor(camera, { eyeHeight, flashlight, shadowMapSize }) {
+  constructor(camera, { eyeHeight, flashlight, shadowMapSize, cameraScreenTexture }) {
     this.#camera = camera;
     this.#eyeHeight = eyeHeight;
     this.#maxIntensity = flashlight.intensity;
     this.#sight = { origin: camera.position, direction: this.#viewDirection };
 
     for (const kind of ['flashlight', 'camera', 'battery']) {
-      const tool = createEquipmentModel(kind);
+      const tool = createEquipmentModel(kind, cameraScreenTexture);
       this.#tools.set(kind, tool);
       this.#held.add(tool);
     }
@@ -72,6 +75,10 @@ export class FirstPersonView {
     return this.#camera;
   }
 
+  get isCameraHeld() {
+    return this.#held.visible && this.#tools.get('camera').visible;
+  }
+
   /** @returns {Ray} Where the camera is and the unit vector it looks along. Read it again after the camera moves. */
   get sight() {
     this.#camera.getWorldDirection(this.#viewDirection);
@@ -92,12 +99,19 @@ export class FirstPersonView {
     }
     this.#camera.position.set(position.x, position.y + this.#eyeHeight + this.#bobOffset, position.z);
     this.#camera.rotation.set(pitch, yaw, 0, 'YXZ');
-    this.#held.position.y = TORCH_POSITION.y + this.#bobOffset * TORCH_BOB_SHARE;
+    this.#positionHeldItem();
   }
 
   setHeldItem(kind) {
+    this.#heldKind = kind;
     this.#held.visible = Boolean(kind);
     for (const [name, tool] of this.#tools) tool.visible = name === kind;
+    this.#positionHeldItem();
+  }
+
+  #positionHeldItem() {
+    const position = this.#heldKind === 'camera' ? CAMERA_POSITION : TORCH_POSITION;
+    this.#held.position.set(position.x, position.y + this.#bobOffset * TORCH_BOB_SHARE, position.z);
   }
 
   /** Photo capture excludes the equipment in the foreground. */

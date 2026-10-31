@@ -54,6 +54,8 @@ export class Hud extends UiPanel {
     this.#interaction.textContent = prompt;
     const cameraHeld = !hidden && inventory.activeItem?.kind === 'camera';
     this.#viewfinder.classList.toggle('hidden', !cameraHeld);
+    this.#viewfinder.classList.toggle('target-locked', Boolean(cameraTarget));
+    this.root.classList.toggle('camera-active', cameraHeld);
     this.#cameraStatus.textContent = cameraTarget ? `ANOMALY IN FRAME · ${cameraTarget.name}` : 'CENTER AN ANOMALY · CLICK TO EXPOSE';
     this.#hiding.classList.toggle('hidden', !hidden);
   }

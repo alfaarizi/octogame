@@ -163,6 +163,7 @@ button.secondary { color: var(--text); background: rgba(255, 255, 255, 0.1); }
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.45);
 }
+#hud.camera-active #crosshair { opacity: 0; }
 #hint {
   position: absolute;
   left: 0;
@@ -212,11 +213,25 @@ button.secondary { color: var(--text); background: rgba(255, 255, 255, 0.1); }
 #inventory > span.selected { border-color: #d8e5ce; color: #f0f5dc; box-shadow: inset 0 -2px #c2d6bd; }
 #inventory small { flex-basis: 100%; text-align: right; color: #c2c8bb; font-size: 11px; }
 #interaction { position: absolute; top: 57%; left: 0; right: 0; text-align: center; font: 16px monospace; color: #ecf5d9; }
-#viewfinder { position: absolute; inset: 15% 19% 23%; border: 1px solid #cae4d67a; outline: 8px solid #07100e21; }
-#viewfinder::before, #viewfinder::after { content: ''; position: absolute; top: 50%; left: 45%; width: 10%; border-top: 1px solid #c2d9ca80; }
-#viewfinder::after { transform: rotate(90deg); }
-#viewfinder > span { position: absolute; left: 12px; top: 12px; font: 12px monospace; color: #d1dac7; letter-spacing: .12em; }
-#camera-status { position: absolute; bottom: 12px; left: 8px; right: 8px; text-align: center; font: 11px monospace; color: #d9ecce; }
+#viewfinder { position: absolute; inset: 13% 17% 22%; color: #d5e4db; font: 11px/1.3 monospace; letter-spacing: .08em; }
+#viewfinder::before { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, transparent 49.9%, #cde7dc1c 50%, transparent 50.1%), linear-gradient(transparent 49.9%, #cde7dc1c 50%, transparent 50.1%); }
+.camera-readout, .camera-footer { position: absolute; left: 0; right: 0; display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: #02080769; }
+.camera-readout { top: 0; border-top: 1px solid #d5e4db75; }
+.camera-footer { bottom: 0; border-bottom: 1px solid #d5e4db75; }
+.camera-readout b, .camera-footer b { color: #fff; font-weight: 700; }
+.camera-readout small { font-size: 10px; opacity: .75; }
+.camera-indicator { display: inline-block; width: 7px; height: 7px; margin-right: 5px; border-radius: 50%; background: #ce6c56; box-shadow: 0 0 7px #e47762; }
+.camera-frame, .camera-focus { position: absolute; inset: 0; }
+.camera-frame span, .camera-focus span { position: absolute; width: 19px; height: 19px; border-color: #d0e4d6a6; border-style: solid; }
+.camera-frame span:nth-child(1), .camera-focus span:nth-child(1) { top: 0; left: 0; border-width: 1px 0 0 1px; }
+.camera-frame span:nth-child(2), .camera-focus span:nth-child(2) { top: 0; right: 0; border-width: 1px 1px 0 0; }
+.camera-frame span:nth-child(3), .camera-focus span:nth-child(3) { bottom: 0; left: 0; border-width: 0 0 1px 1px; }
+.camera-frame span:nth-child(4), .camera-focus span:nth-child(4) { bottom: 0; right: 0; border-width: 0 1px 1px 0; }
+.camera-focus { inset: calc(50% - 22px) calc(50% - 32px); }
+.camera-focus span { width: 11px; height: 11px; border-color: #d9ebdebf; }
+.target-locked .camera-focus span { border-color: #a7edaf; box-shadow: 0 0 5px #8ee5a677; }
+#camera-status { position: absolute; bottom: 44px; left: 8px; right: 8px; text-align: center; font: 11px monospace; color: #e2efde; text-shadow: 0 1px 5px #000; }
+.target-locked #camera-status { color: #b4f1b8; }
 #hiding { position: absolute; inset: 0; z-index: -1; background: linear-gradient(#020504d9 0%, #02050488 30%, transparent 43%, transparent 57%, #02050488 70%, #020504eb 100%); }
 #hiding > span { position: absolute; left: 0; right: 0; top: 23%; text-align: center; color: #a1b2a4; font: 13px monospace; letter-spacing: .2em; }
 .case-file { width: min(850px, 100%); }
@@ -231,7 +246,9 @@ button.secondary { color: var(--text); background: rgba(255, 255, 255, 0.1); }
   #inventory { right: 10px; bottom: 14px; max-width: 240px; }
   #inventory > span { min-width: 100px; padding: 10px; font-size: 12px; }
   #meters { left: 10px; bottom: 90px; }
-  #viewfinder { inset: 19% 9% 29%; }
+  #viewfinder { inset: 19% 9% 29%; font-size: 9px; }
+  .camera-readout, .camera-footer { padding: 6px; }
+  .camera-readout small, .camera-footer span:last-child { display: none; }
   #hint { font-size: 16px; bottom: 24%; }
 }
 

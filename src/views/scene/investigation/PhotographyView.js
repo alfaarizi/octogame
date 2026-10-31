@@ -7,6 +7,7 @@ export class PhotographyView {
   #album;
   #flash = new THREE.PointLight(0xe1f5ed, 0, 12, 2);
   #remaining = 0;
+  #feedElapsed = 0;
 
   constructor(render, firstPerson, album) {
     this.#render = render; this.#firstPerson = firstPerson; this.#album = album;
@@ -34,6 +35,15 @@ export class PhotographyView {
     this.#remaining = Math.max(0, this.#remaining - seconds);
     this.#flash.intensity = 32 * this.#remaining / .12;
     this.#flash.visible = this.#remaining > 0;
+    if (this.#firstPerson.isCameraHeld) {
+      this.#feedElapsed += seconds;
+      if (this.#feedElapsed >= 1 / 15) {
+        this.#firstPerson.withoutHeldItem(() => this.#render.updateCameraFeed());
+        this.#feedElapsed = 0;
+      }
+    } else {
+      this.#feedElapsed = 1 / 15;
+    }
   }
 
   reset() { this.#remaining = 0; this.#flash.intensity = 0; this.#flash.visible = false; this.#album.reset(); }

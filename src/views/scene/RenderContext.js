@@ -8,6 +8,7 @@ export class RenderContext {
   #renderer;
   #scene;
   #camera;
+  #cameraFeed = new THREE.WebGLRenderTarget(384, 240, { depthBuffer: true, stencilBuffer: false });
 
   constructor(container, config) {
     this.#renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -17,6 +18,7 @@ export class RenderContext {
     this.#renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     this.#renderer.toneMapping = THREE.ACESFilmicToneMapping;
     this.#renderer.toneMappingExposure = config.exposure;
+    this.#cameraFeed.texture.colorSpace = THREE.SRGBColorSpace;
     container.prepend(this.#renderer.domElement);
 
     this.#scene = new THREE.Scene();
@@ -41,6 +43,21 @@ export class RenderContext {
 
   get canvas() {
     return this.#renderer.domElement;
+  }
+
+  get cameraFeedTexture() {
+    return this.#cameraFeed.texture;
+  }
+
+  /** Draws the scene into the camera's rear LCD, restoring the main framebuffer afterward. */
+  updateCameraFeed() {
+    const previousTarget = this.#renderer.getRenderTarget();
+    try {
+      this.#renderer.setRenderTarget(this.#cameraFeed);
+      this.#renderer.render(this.#scene, this.#camera);
+    } finally {
+      this.#renderer.setRenderTarget(previousTarget);
+    }
   }
 
   render() {

@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 
-const LAMP = Object.freeze({ width: .38, depth: .22, thickness: .02, range: 4.5, intensity: .9 });
+const LAMP = Object.freeze({ width: .38, depth: .22, thickness: .02, range: 4.5, intensity: 1.0 });
 
 /** An opaque fluorescent diffuser and a weak, repeatably stuttering point light. */
 export class BrokenCeilingLight {

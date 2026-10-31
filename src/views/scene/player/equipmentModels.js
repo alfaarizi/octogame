@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { createTorchModel } from './torchModel.js';
+import { createCameraModel } from './cameraModel.js';
 
 const material = (color, emissive = 0) => new THREE.MeshStandardMaterial({ color, emissive, emissiveIntensity: 0.35, roughness: 0.65 });
 const box = (w, h, d, mat, x = 0, y = 0, z = 0) => {
@@ -9,20 +10,11 @@ const box = (w, h, d, mat, x = 0, y = 0, z = 0) => {
 };
 
 /** Geometry is shared by the right-hand view and floor pickups. Forward is -z. */
-export function createEquipmentModel(kind) {
+export function createEquipmentModel(kind, cameraScreenTexture) {
   if (kind === 'flashlight') return createTorchModel();
+  if (kind === 'camera') return createCameraModel(cameraScreenTexture);
   const group = new THREE.Group();
-  if (kind === 'camera') {
-    group.add(box(.24, .15, .09, material(0x252c2f)), box(.07, .04, .07, material(0x414747), .07, .085),
-      box(.14, .09, .005, material(0x426664, 0x426664), -.025, 0, .048),
-      box(.06, .025, .015, material(0xe0e3d9, 0x697c78), -.07, .049, -.05));
-    const lens = new THREE.Mesh(new THREE.CylinderGeometry(.055, .055, .07, 20), material(0x101d26));
-    lens.rotation.x = Math.PI / 2;
-    lens.position.z = -.07;
-    group.add(lens);
-  } else {
-    group.add(box(.07, .14, .045, material(0x547752, 0x224f36)), box(.05, .015, .03, material(0xc7b277), 0, .075));
-  }
+  group.add(box(.07, .14, .045, material(0x547752, 0x224f36)), box(.05, .015, .03, material(0xc7b277), 0, .075));
   return group;
 }
 

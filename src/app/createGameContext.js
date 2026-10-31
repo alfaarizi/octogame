@@ -70,6 +70,7 @@ function createViews({ config, events, level, building, simulation, render, albu
     eyeHeight: config.player.eyeHeight,
     flashlight: config.flashlight,
     shadowMapSize: config.rendering.shadowMapSize,
+    cameraScreenTexture: render.cameraFeedTexture,
   });
   return Object.freeze({
     firstPerson,
