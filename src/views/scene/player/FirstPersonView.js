@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { easeToward, randomSpread } from '../../../utils.js';
-import { createEquipmentModel, createRightHand } from './equipmentModels.js';
+import { createEquipmentModel } from './equipmentModels.js';
+import { createBatteryHand, createCameraHands, createFlashlightHand } from './handModels.js';
 
 /** @typedef {import('../../../types.js').Cone} Cone */
 /** @typedef {import('../../../types.js').Movement} Movement */
@@ -8,7 +9,9 @@ import { createEquipmentModel, createRightHand } from './equipmentModels.js';
 /** @typedef {import('../../../types.js').Ray} Ray */
 
 const TORCH_POSITION = Object.freeze({ x: 0.22, y: -0.24, z: -0.5 });
-const CAMERA_POSITION = Object.freeze({ x: .14, y: -.16, z: -.43 });
+const CAMERA_POSITION = Object.freeze({ x: .08, y: -.16, z: -.43 });
+// The battery lies across the fingers, cap pointing left. `z` slides it toward the camera inside the grip.
+const BATTERY_REST = Object.freeze({ roll: -Math.PI / 3, y: .005, z: .02 });
 const TORCH_BOB_SHARE = 0.4;
 // The beam starts at the torch and meets the middle of the screen a few meters out.
 const BEAM_ORIGIN = Object.freeze({ x: 0.24, y: -0.2, z: -0.56 });
@@ -27,6 +30,10 @@ export class FirstPersonView {
   #held = new THREE.Group();
   #tools = new Map();
   #heldKind = null;
+  #flashlightHand = createFlashlightHand();
+  #cameraHands = createCameraHands();
+  #batteryHand = createBatteryHand();
+  #equipmentLight;
   #spotlight;
   #bobPhase = 0;
   #bobOffset = 0;
@@ -54,7 +61,16 @@ export class FirstPersonView {
       this.#held.add(tool);
     }
     this.#torch = this.#tools.get('flashlight');
-    this.#held.add(createRightHand());
+    const battery = this.#tools.get('battery');
+    battery.rotation.z = BATTERY_REST.roll;
+    battery.position.set(0, BATTERY_REST.y, BATTERY_REST.z);
+    this.#held.add(this.#flashlightHand, this.#cameraHands, this.#batteryHand);
+    this.#held.traverse(object => object.layers.set(1));
+    camera.layers.enable(1);
+    this.#equipmentLight = new THREE.PointLight(0xc4d2cd, .35, .8, 2);
+    this.#equipmentLight.position.set(0, -.04, -.22);
+    this.#equipmentLight.layers.set(1);
+    camera.add(this.#equipmentLight);
     this.#held.position.copy(TORCH_POSITION);
     this.setHeldItem(null);
 
@@ -106,6 +122,10 @@ export class FirstPersonView {
     this.#heldKind = kind;
     this.#held.visible = Boolean(kind);
     for (const [name, tool] of this.#tools) tool.visible = name === kind;
+    this.#flashlightHand.visible = kind === 'flashlight';
+    this.#cameraHands.visible = kind === 'camera';
+    this.#batteryHand.visible = kind === 'battery';
+    this.#equipmentLight.visible = Boolean(kind);
     this.#positionHeldItem();
   }
 
