@@ -30,8 +30,7 @@ export class RoundController {
     const { audio, input, pointerLock, simulation, ui, views } = this.#context;
     // Audio can start here because this runs inside the click or key press that started the round.
     audio.start();
-    simulation.startRound(this.#session);
-    ui.pause.setNoHostiles(!simulation.hostilesEnabled);
+    simulation.startRound();
     views.photography.reset();
     ui.album.updateChecklist(simulation.photography);
     views.ghost.hide();
@@ -97,7 +96,6 @@ export class RoundController {
       hidden: simulation.office.isHidden,
       cameraTarget: !simulation.office.isHidden && simulation.inventory.activeItem?.kind === 'camera'
         ? simulation.photography.target(player.sight) : null,
-      noHostiles: !simulation.hostilesEnabled,
     });
   }
 

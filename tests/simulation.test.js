@@ -107,35 +107,6 @@ describe('Simulation', () => {
     assert.equal(simulation.ghost.isPresent, false);
   });
 
-  test('no-hostiles mode prevents waking, camera aggression, enrage and catches', () => {
-    simulation.startRound({ noHostiles: true });
-    assert.equal(simulation.hostilesEnabled, false);
-    assert.equal(simulation.isPracticeRound, true);
-    assert.equal(simulation.step(120, STAND_STILL), null);
-    simulation.ghost.hearCamera(simulation.player.position, 100);
-    for (let i = 0; i < GAME_CONFIG.round.evidenceRequired; i++) simulation.round.recordEvidence();
-    recorder.bus.emit(GameEvent.PLAYER_CAUGHT);
-    assert.equal(simulation.step(120, STAND_STILL), null);
-    assert.equal(simulation.ghost.isPresent, false);
-    assert.equal(simulation.ghost.isEnraged, false);
-    assert.equal(simulation.threat.closeness, 0);
-  });
-
-  test('toggling off removes an active ghost immediately; re-enabling keeps the round unranked', () => {
-    simulation.ghost.reset(simulation.player.position, 0);
-    simulation.step(.01, STAND_STILL);
-    assert.equal(simulation.ghost.isPresent, true);
-    simulation.setHostilesEnabled(false);
-    assert.equal(simulation.ghost.isPresent, false);
-    assert.equal(simulation.step(3, STAND_STILL), null);
-    simulation.setHostilesEnabled(true);
-    assert.equal(simulation.hostilesEnabled, true);
-    assert.equal(simulation.ghost.isPresent, false);
-    assert.equal(simulation.isPracticeRound, true);
-    simulation.startRound();
-    assert.equal(simulation.isPracticeRound, false);
-  });
-
   test('full inventory leaves an item on the ground; using a battery consumes only that pack', () => {
     simulation.inventory.pickUp({ id: 90, kind: 'flashlight' });
     simulation.inventory.pickUp({ id: 91, kind: 'battery' });

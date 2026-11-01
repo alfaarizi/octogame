@@ -46,12 +46,11 @@ export class ResultScreen extends UiPanel {
    * @param {number} rank - Its 1-based place on the board.
    * @param {RoundResult[]} rankedResults - The leaderboard, best first.
    */
-  open(result, rank, rankedResults, isPractice = false) {
+  open(result, rank, rankedResults) {
     this.#title.textContent = result.escaped ? MESSAGES.escapedTitle : MESSAGES.caughtTitle;
     this.#detail.textContent = result.escaped
       ? MESSAGES.escapedDetail(result, rank)
       : MESSAGES.caughtDetail(result, this.#evidenceRequired);
-    if (isPractice) this.#detail.textContent = 'Development round — no leaderboard entry. Your photographs are below.';
     this.#leaderboard.render(rankedResults, result);
     this.#acceptsInputAt = performance.now() + this.#inputDelay * 1000;
     this.show();

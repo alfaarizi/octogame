@@ -17,7 +17,6 @@ export class Hud extends UiPanel {
   #slots = [requireElement('slot-one'), requireElement('slot-two')];
   #interaction = requireElement('interaction');
   #viewfinder = requireElement('viewfinder');
-  #developmentStatus = requireElement('development-status');
   #hiding = requireElement('hiding');
 
   constructor() {
@@ -43,8 +42,7 @@ export class Hud extends UiPanel {
     this.#shown.applyIfChanged('timer', formatRoundTime(seconds), (text) => (this.#timer.textContent = text));
   }
 
-  setEquipment({ inventory, prompt, hidden, cameraTarget, noHostiles }) {
-    this.#developmentStatus.classList.toggle('hidden', !noHostiles);
+  setEquipment({ inventory, prompt, hidden, cameraTarget }) {
     for (const [index, item] of inventory.slots.entries()) {
       this.#shown.applyIfChanged(`slot-${index}`, `${item?.kind}:${inventory.activeSlot === index}`, () => {
         this.#slots[index].textContent = `${String(index + 1).padStart(2, '0')} / ${item ? ITEM_NAMES[item.kind].toUpperCase() : 'EMPTY'}`;

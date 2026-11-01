@@ -101,7 +101,6 @@
  * @typedef {object} Session
  * @property {string} playerName
  * @property {boolean} chickenMode - Whether to skip the jump scare.
- * @property {boolean} [noHostiles] - Development exploration without a ghost; unranked.
  */
 
 /**

@@ -26,8 +26,6 @@ export class Simulation {
   #ambientNoise;
   #outcome = null;
   #threat = NO_THREAT;
-  #hostilesEnabled = true;
-  #isPracticeRound = false;
 
   constructor({ config, events, building, spawnTable, layout }) {
     this.#config = config;
@@ -51,34 +49,16 @@ export class Simulation {
     });
     this.#footsteps = new FootstepCue(events, config.player);
     this.#ambientNoise = new AmbientNoiseCue(events, config.round);
-    events.on(GameEvent.EXIT_UNLOCKED, () => { if (this.#hostilesEnabled) this.ghost.enrage(); });
-    events.on(GameEvent.PLAYER_CAUGHT, () => { if (this.#hostilesEnabled) this.#outcome ??= RoundOutcome.CAUGHT; });
+    events.on(GameEvent.EXIT_UNLOCKED, () => this.ghost.enrage());
+    events.on(GameEvent.PLAYER_CAUGHT, () => { this.#outcome ??= RoundOutcome.CAUGHT; });
   }
 
   get threat() { return this.#threat; }
   get movement() { return this.office.isHidden ? STANDING_STILL : this.player.movement; }
-  get hostilesEnabled() { return this.#hostilesEnabled; }
-  get isPracticeRound() { return this.#isPracticeRound; }
 
-  /** Development switch. Re-enabling gives a fresh grace period; the round stays unranked. */
-  setHostilesEnabled(enabled) {
-    if (enabled === this.#hostilesEnabled) return;
-    this.#hostilesEnabled = enabled;
-    this.#threat = NO_THREAT;
-    if (!enabled) {
-      this.#isPracticeRound = true;
-      this.ghost.deactivate();
-    } else {
-      this.ghost.reset(this.#spawnTable.ghostSpotFarFrom(this.player.position), this.#config.round.ghostGracePeriod);
-      if (this.exitDoor.isUnlocked) this.ghost.enrage();
-    }
-  }
-
-  startRound({ noHostiles = false } = {}) {
+  startRound() {
     this.#outcome = null;
     this.#threat = NO_THREAT;
-    this.#hostilesEnabled = !noHostiles;
-    this.#isPracticeRound = noHostiles;
     this.inventory.reset();
     this.office.reset();
     this.photography.reset();
@@ -89,7 +69,6 @@ export class Simulation {
     this.flashlight.reset();
     this.actions.syncEquipment();
     this.ghost.reset(this.#layout.ghostStart, this.#config.round.ghostGracePeriod);
-    if (noHostiles) this.ghost.deactivate();
     this.#footsteps.reset();
     this.#ambientNoise.reset();
   }
@@ -114,7 +93,7 @@ export class Simulation {
     this.#threat = ghost.isPresent ? measureThreat(distanceBetween(ghost.position, player.position), this.#config.ghost) : NO_THREAT;
     this.actions.syncEquipment();
     flashlight.update(seconds, round.elapsed, this.#threat.interference);
-    if (this.#hostilesEnabled) ghost.update(seconds, {
+    ghost.update(seconds, {
       playerPosition: player.position,
       playerLightOn: flashlight.isEmitting,
       playerConcealed: this.office.isConcealed,

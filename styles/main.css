@@ -168,7 +168,6 @@ kbd {
   border-top: 1px solid #b09d7c66;
 }
 .menu-toggles .chicken { margin: 0; color: #6c5b45; font-size: 13px; }
-.menu-toggles .development { color: #556a58; }
 .menu-card .chicken input { accent-color: #6b5a3f; }
 .menu-brief { margin-top: 18px; color: #5f5140; font-size: 14px; line-height: 1.55; }
 .menu-brief p { margin: 0 0 10px; }
@@ -373,7 +372,6 @@ button.secondary { color: var(--text); background: rgba(255, 255, 255, 0.1); }
 .case-file .buttons { justify-content: flex-start; }
 .case-file button { border: 1px solid #554735; border-radius: 2px; background: #3d3427; color: #f4ead6; }
 .case-file button.secondary { border: 1px solid #9b8768; background: transparent; color: #4a3f30; }
-.case-file .development { color: #556a58; }
 .case-file .chicken input { accent-color: #6b5a3f; }
 #evidence-checklist { list-style: none; margin: 22px 0 24px; padding: 0; border-top: 1px solid #a89573; border-bottom: 1px solid #a89573; }
 #evidence-checklist li { display: grid; grid-template-columns: 34px minmax(0, 1fr) 76px; align-items: center; gap: 13px; padding: 12px 3px; border-bottom: 1px solid #b09d7c66; }
@@ -407,5 +405,3 @@ button.secondary { color: var(--text); background: rgba(255, 255, 255, 0.1); }
   .evidence-status { grid-column: 2; justify-self: start; }
 }
 
-#development-status { position: absolute; top: 48px; left: 20px; color: #a7d9c3; font: 11px monospace; letter-spacing: .1em; }
-.development { color: #a7c6b5; font-size: 13px; }
