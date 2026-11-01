@@ -32,6 +32,11 @@ export class GlowingLight {
     this.setStrength(1);
   }
 
+  /** Everything to add to the scene: just the light itself. */
+  get objects() {
+    return [this.#light];
+  }
+
   /** The light itself, to add to the scene. */
   get light() {
     return this.#light;

@@ -19,6 +19,7 @@ const StutterDuration = Object.freeze({ EXIT_UNLOCKED: 1.6, AMBIENT_NOISE: 0.4 }
 
 /**
  * Scene lighting: steady glowing props and switchable ceiling tubes with weak, repeatable flicker.
+ * Every light varies realistically; only the ceiling tubes cast a subtle god ray (see BrokenCeilingLight).
  */
 export class OfficeLightingView {
   #scene;
@@ -65,7 +66,7 @@ export class OfficeLightingView {
     const finished = this.#stutter.tick(seconds);
     const progress = finished ? 0 : this.#stutter.remaining / this.#stutterDuration;
     const strength = 1 - STUTTER_DEPTH * Math.sin(Math.PI * progress) ** 2;
-    for (const light of this.#lights) light.setStrength(strength);
+    for (const { light, flicker } of this.#lights) light.setStrength(strength * flicker.at(this.#elapsed));
     for (const { switchId, light } of this.#brokenLights) light.update(this.#office.isSwitchOn(switchId), this.#elapsed);
   }
 
@@ -87,7 +88,23 @@ export class OfficeLightingView {
   }
 
   #addLight(object, light) {
-    this.#scene.add(object, light.light);
-    this.#lights.push(light);
+    const flicker = createFlicker();
+    this.#scene.add(object, ...light.objects);
+    this.#lights.push({ light, flicker });
   }
+}
+
+/** Slow wandering brightness, so each light breathes on its own instead of burning perfectly steady. */
+function createFlicker() {
+  const phase = Math.random() * Math.PI * 2;
+  const slow = 0.7 + Math.random() * 0.6;
+  const fast = 4 + Math.random() * 3;
+  return {
+    /** @param {number} elapsed @returns {number} A strength multiplier that stays just above 0.9. */
+    at(elapsed) {
+      const wander = 0.97 + 0.03 * Math.sin(elapsed * slow + phase);
+      const flutter = 0.99 + 0.01 * Math.sin(elapsed * fast + phase * 2);
+      return wander * flutter;
+    },
+  };
 }

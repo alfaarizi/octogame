@@ -10,6 +10,12 @@
   --dim: #a89a8a;
   --panel: rgba(12, 7, 5, 0.86);
   --line: rgba(255, 138, 42, 0.3);
+  --blood-texture:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='360' height='360'%3E%3Cfilter id='b'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.65 .06' numOctaves='4' seed='9' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 .12 0 0 0 0 .002 0 0 0 0 .004 .9 .8 0 -.45 0'/%3E%3C/filter%3E%3Crect width='360' height='360' filter='url(%23b)'/%3E%3C/svg%3E"),
+    radial-gradient(ellipse at 18% 22%, rgba(255, 84, 56, 0.32), transparent 46%),
+    radial-gradient(ellipse at 78% 66%, rgba(64, 4, 4, 0.5), transparent 52%),
+    radial-gradient(ellipse at 45% 90%, rgba(30, 0, 0, 0.45), transparent 55%),
+    linear-gradient(165deg, #b3120f, #7e0505 46%, #9a0b0b 68%, #5e0202);
   --paper-texture:
     radial-gradient(ellipse at 88% 4%, rgba(128, 91, 46, .18), transparent 44%),
     radial-gradient(ellipse at 4% 98%, rgba(118, 83, 41, .14), transparent 42%),
@@ -91,7 +97,7 @@ kbd {
 
 #title {
   background:
-    radial-gradient(circle at 50% -10%, rgba(255, 138, 42, 0.12), transparent 42%),
+    radial-gradient(circle at 50% -10%, rgba(190, 14, 10, 0.14), transparent 42%),
     radial-gradient(ellipse at center, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.94));
 }
 
@@ -111,7 +117,11 @@ kbd {
   line-height: .85;
   letter-spacing: .02em;
   text-transform: uppercase;
-  text-shadow: 0 0 70px rgba(255, 110, 20, 0.4), 0 4px 0 #1b0b04;
+  color: transparent;
+  background-image: var(--blood-texture);
+  -webkit-background-clip: text;
+  background-clip: text;
+  filter: drop-shadow(0 0 44px rgba(150, 8, 8, 0.4)) drop-shadow(0 4px 0 rgba(28, 0, 0, 0.9));
 }
 .menu-grid {
   display: grid;
@@ -131,7 +141,16 @@ kbd {
 .menu-start input[type=text] { flex: 1 1 220px; color: #2c271f; background: rgba(255, 255, 255, .35); border-color: #a89573; }
 .menu-start input[type=text]::placeholder { color: #8a7b63; }
 .menu-start input[type=text]:focus { border-color: #8a5b3c; }
-.menu-start button { flex: 0 0 auto; }
+.menu-start button {
+  flex: 0 0 auto;
+  color: #f6e9dd;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.65);
+  background-color: #8a0b0b;
+  background-image: var(--blood-texture);
+  border: 1px solid #380202;
+  box-shadow: inset 0 0 16px rgba(0, 0, 0, 0.5), 0 2px 8px #000a;
+}
+.menu-start button:hover { filter: brightness(1.18) saturate(1.05); }
 .menu-toggles {
   display: flex;
   flex-wrap: wrap;

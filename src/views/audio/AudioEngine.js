@@ -6,6 +6,7 @@ const NOISE_BUFFER_SECONDS = 2;
 const SILENCE = 0.0001;
 /** Sources stop this long after their envelope has faded. */
 const TAIL_SECONDS = 0.05;
+const AudioContextClass = globalThis.AudioContext ?? globalThis.webkitAudioContext;
 const SPATIAL_SETTINGS = Object.freeze({ panningModel: 'HRTF', distanceModel: 'inverse', refDistance: 1.5, rolloffFactor: 1.2, maxDistance: 40 });
 
 /**
@@ -59,7 +60,7 @@ export class AudioEngine {
       this.#context.resume();
       return false;
     }
-    this.#context = new AudioContext();
+    this.#context = new AudioContextClass();
     const compressor = this.#context.createDynamicsCompressor();
     compressor.connect(this.#context.destination);
     this.#master = this.createGain(this.#masterVolume);
@@ -199,12 +200,29 @@ export class AudioEngine {
       try {
         const response = await fetch(path);
         if (!response.ok) continue;
-        return await this.#context.decodeAudioData(await response.arrayBuffer());
+        return await this.#decode(await response.arrayBuffer());
       } catch {
         // Missing or unreadable: try the next one.
       }
     }
     return null;
+  }
+
+  /**
+   * Decodes audio with both the promise API (modern browsers) and the callback API
+   * (older Safari): resolve is idempotent, so whichever the browser calls is used.
+   * @param {ArrayBuffer} bytes
+   * @returns {Promise<AudioBuffer>}
+   */
+  #decode(bytes) {
+    return new Promise((resolve, reject) => {
+      try {
+        const decoded = this.#context.decodeAudioData(bytes, resolve, reject);
+        decoded?.then?.(resolve, reject);
+      } catch (error) {
+        reject(error);
+      }
+    });
   }
 
   playSample(buffer, output = this.#master) {

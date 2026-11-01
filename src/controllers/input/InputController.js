@@ -25,8 +25,10 @@ export class InputController {
     this.#bindings = bindings;
     this.#pointerLock = pointerLock;
     this.#gameCodes = new Set(Object.values(bindings).flat());
-    eventTarget.addEventListener('keydown', (event) => this.#onKeyDown(event));
-    eventTarget.addEventListener('keyup', (event) => this.#heldCodes.delete(normalizeKeyCode(event)));
+    // Capture phase, so the keys land here even when another page script or a
+    // browser extension handles the event first and stops its propagation.
+    eventTarget.addEventListener('keydown', (event) => this.#onKeyDown(event), true);
+    eventTarget.addEventListener('keyup', (event) => this.#heldCodes.delete(normalizeKeyCode(event)), true);
     eventTarget.addEventListener('blur', () => this.clear());
     eventTarget.addEventListener('mousemove', (event) => this.#accumulateLook(event));
     surface.addEventListener('mousedown', (event) => {
@@ -93,12 +95,37 @@ export class InputController {
 }
 
 /** KeyboardEvent.code is absent or Unidentified on some browser and keyboard combinations. */
-function normalizeKeyCode({ code, key }) {
+function normalizeKeyCode({ code, key, keyCode }) {
   if (code?.startsWith('Numpad') && /^[12]$/.test(code.slice(-1))) return `Digit${code.slice(-1)}`;
   if (code && code !== 'Unidentified') return code;
   if (/^[a-z]$/i.test(key ?? '')) return `Key${key.toUpperCase()}`;
   if (/^[12]$/.test(key ?? '')) return `Digit${key}`;
   if (key === 'Shift') return 'ShiftLeft';
   if (key?.startsWith('Arrow')) return key;
-  return null;
+  if (key === 'Escape') return 'Escape';
+  // Old WebKit calls the space bar's key value "Spacebar".
+  if (key === ' ' || key === 'Spacebar') return 'Space';
+  return keyCodeToCode(keyCode);
 }
+
+/**
+ * Last-resort legacy `keyCode`, for browsers (or extension-mangled Chromium input)
+ * that report neither a usable `code` nor a usable `key`.
+ */
+function keyCodeToCode(keyCode) {
+  if (!keyCode) return null;
+  if (keyCode >= 65 && keyCode <= 90) return `Key${String.fromCharCode(keyCode)}`;
+  if (keyCode >= 48 && keyCode <= 57) return `Digit${keyCode - 48}`;
+  return UNCODED_KEY_CODES.get(keyCode) ?? null;
+}
+
+/** Legacy keyCodes of the keys this game actually uses. */
+const UNCODED_KEY_CODES = new Map([
+  [16, 'ShiftLeft'],
+  [32, 'Space'],
+  [27, 'Escape'],
+  [37, 'ArrowLeft'],
+  [38, 'ArrowUp'],
+  [39, 'ArrowRight'],
+  [40, 'ArrowDown'],
+]);

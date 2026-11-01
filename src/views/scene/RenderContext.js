@@ -4,7 +4,9 @@ const CAMERA_NEAR = 0.05;
 const CAMERA_FAR = 60;
 const NOOP = () => {};
 
-/** Owns the WebGL renderer, the scene and the camera, plus the scene-wide fog and moonlight. */
+/**
+ * Owns the WebGL renderer, the scene and the camera, plus the scene-wide fog and moonlight.
+ */
 export class RenderContext {
   #renderer;
   #scene;
@@ -14,6 +16,10 @@ export class RenderContext {
   #screenCamera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
 
   constructor(container, config) {
+    // The renderer needs WebGL 2. Check first so unsupported browsers get a clear message.
+    if (!document.createElement('canvas').getContext('webgl2') && !container.querySelector('canvas')) {
+      throw new Error('Your browser cannot run this game: it lacks WebGL 2 graphics support. Try a current Chrome, Firefox, Safari or Opera.');
+    }
     this.#renderer = new THREE.WebGLRenderer({ antialias: true });
     this.#renderer.setPixelRatio(Math.min(window.devicePixelRatio, config.maxPixelRatio));
     this.#renderer.setSize(window.innerWidth, window.innerHeight);

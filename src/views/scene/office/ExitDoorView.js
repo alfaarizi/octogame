@@ -37,7 +37,11 @@ export class ExitDoorView {
   }
 
   update(time) {
-    this.#glow.setStrength(this.#exitDoor.isUnlocked ? PULSE.base + PULSE.swing * Math.sin(time * PULSE.rate) : 0);
+    // The unlocked gate's lamp pulses; a slow wander keeps even its strongest frames alive.
+    const wander = 0.94 + 0.06 * Math.sin(time * 2.3 + 0.7);
+    this.#glow.setStrength(this.#exitDoor.isUnlocked
+      ? (PULSE.base + PULSE.swing * Math.sin(time * PULSE.rate)) * wander
+      : 0);
   }
 }
 
