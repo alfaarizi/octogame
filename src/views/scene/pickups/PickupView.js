@@ -17,7 +17,10 @@ export class PickupView {
     for (const [id, object] of this.#meshes) {
       if (ids.has(id)) continue;
       this.#scene.remove(object);
-      object.traverse((mesh) => { mesh.geometry?.dispose(); if (mesh.material) mesh.material.dispose(); });
+      object.traverse((mesh) => {
+        mesh.geometry?.dispose();
+        if (mesh.material && !mesh.material.userData.shared) mesh.material.dispose();
+      });
       this.#meshes.delete(id);
     }
     for (const item of this.#snapshot) {
@@ -29,7 +32,7 @@ export class PickupView {
       const glintPosition = {
         flashlight: { x: 0, y: 0, z: -.12 },
         camera: { x: -.07, y: .075, z: -.06 },
-        battery: { x: 0, y: .11, z: 0 },
+        battery: { x: 0, y: .047, z: 0 },
       };
       glint.position.copy(glintPosition[item.kind]);
       object.add(glint);

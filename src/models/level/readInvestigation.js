@@ -30,10 +30,10 @@ export function readInteractable(json, path) {
       orientation: choice(item.orientation ?? 'wall', ['wall', 'flat'], `${path}.orientation`),
     } : kind === 'switch' ? {
       facing: choice(item.facing, ['north', 'south', 'east', 'west'], `${path}.facing`),
-    } : kind === 'cache' ? {
+    } : {
       box: box(item.box, `${path}.box`),
       facing: choice(item.facing ?? 'south', ['north', 'south', 'east', 'west'], `${path}.facing`),
-    } : { box: box(item.box, `${path}.box`) }),
+    }),
   };
 }
 

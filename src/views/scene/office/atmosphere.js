@@ -34,7 +34,7 @@ export function createAtmosphere(level, tileMaps) {
   geometry.setAttribute('position', new THREE.Float32BufferAttribute(dust, 3));
   group.add(new THREE.Points(geometry, new THREE.PointsMaterial({ color: 0xa0b7ac, size: .016, transparent: true, opacity: .2, depthWrite: false })));
   for (const [text, x, y, z, yaw] of [
-    ['NIGHT SHIFT / 02:13', 8, 2.15, 9.02, Math.PI], ['WORKSHOP', 17, 2.3, .51, 0],
+    ['WORKSHOP', 17, 2.3, .51, 0],
     ['ARCHIVE / B1', 19, -1.38, 7.42, 0], ['EXIT →', 18, 1.9, 21.95, Math.PI],
     ['NO SIGNAL', 20.5, 1.0, 12.69, 0], ['KEEP QUIET', 3, 5.1, .51, 0],
   ]) {

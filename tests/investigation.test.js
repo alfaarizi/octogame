@@ -33,14 +33,14 @@ describe('inventory', () => {
 
 describe('photography', () => {
   const camera = (building = singleFloorBuilding(SMALL_ROOM)) => new Photography(GAME_CONFIG.camera, building, [subject]);
-  test('scores distinct framed evidence once, supports ordinary photos, and enforces cooldown', () => {
+  test('stores only distinct framed evidence and enforces cooldown', () => {
     const photos = camera();
     assert.equal(photos.take(sight, 0).isNewEvidence, true);
     assert.equal(photos.take(sight, .5), null);
     assert.equal(photos.take(sight, 2).isNewEvidence, false);
     const blank = photos.take({ ...sight, direction: { x: 1, y: 0, z: 0 } }, 4);
     assert.equal(blank.subjectId, null);
-    assert.equal(photos.photos.length, 3);
+    assert.equal(photos.photos.length, 1);
     photos.reset();
     assert.equal(photos.isDocumented(subject.id), false);
     assert.equal(photos.photos.length, 0);
@@ -52,11 +52,24 @@ describe('photography', () => {
     assert.equal(photos.target({ ...sight, direction: { x: 1, y: 0, z: 0 } }), null);
     assert.equal(photos.target({ ...sight, origin: { x: 2.5, y: 1.6, z: 1.7 } }), null);
   });
-  test('album is bounded and retains evidence when ordinary shots are evicted', () => {
+  test('frames only anomalies inside the small viewfinder box', () => {
+    const photos = camera();
+    const { halfAngleX, halfAngleY } = GAME_CONFIG.camera.frame;
+    const distance = sight.origin.z - subject.z;
+    const withinSide = { ...sight, origin: { x: subject.x - Math.tan(halfAngleX * .8) * distance, y: sight.origin.y, z: sight.origin.z } };
+    const outsideSide = { ...sight, origin: { x: subject.x - Math.tan(halfAngleX * 2) * distance, y: sight.origin.y, z: sight.origin.z } };
+    const withinHeight = { ...sight, origin: { x: sight.origin.x, y: subject.y + Math.tan(halfAngleY * .8) * distance, z: sight.origin.z } };
+    const outsideHeight = { ...sight, origin: { x: sight.origin.x, y: subject.y + Math.tan(halfAngleY * 2) * distance, z: sight.origin.z } };
+    assert.equal(photos.target(withinSide), subject);
+    assert.equal(photos.target(outsideSide), null);
+    assert.equal(photos.target(withinHeight), subject);
+    assert.equal(photos.target(outsideHeight), null);
+  });
+  test('misses and duplicate exposures never displace evidence', () => {
     const photos = camera();
     photos.take(sight, 0);
     for (let i = 1; i < 50; i++) photos.take(sight, i * 2);
-    assert.equal(photos.photos.length, GAME_CONFIG.camera.albumSize);
+    assert.equal(photos.photos.length, 1);
     assert.equal(photos.photos[0].isNewEvidence, true);
   });
 });
@@ -98,6 +111,9 @@ describe('office interactions', () => {
     assert.deepEqual(player.position, { x: 1.5, y: 0, z: 1.5 });
     office.leave(player);
     assert.deepEqual(player.position, original);
+    office.enter({ ...closet, facing: 'west' }, player, false);
+    assert.equal(player.yaw, Math.PI / 2);
+    office.leave(player);
     office.enter(closet, player, true);
     assert.equal(office.isHidden, true);
     assert.equal(office.isConcealed, false);

@@ -8,6 +8,7 @@ import {
   formatRoundTime,
   headingTo,
   isWithinCone,
+  isWithinFrame,
   ListenerSet,
   pointAlongHeading,
   randomInRange,
@@ -43,6 +44,18 @@ describe('math', () => {
     const offToTheSide = { x: 1, y: 0, z: 0.5 };
     assert.equal(isWithinCone(ray, cone, offToTheSide), false);
     assert.equal(isWithinCone(ray, cone, offToTheSide, 0.4), true);
+  });
+
+  test('isWithinFrame uses separate horizontal and vertical limits', () => {
+    const ray = { origin: { x: 0, y: 0, z: 0 }, direction: { x: 1, y: 0, z: 0 } };
+    const frame = { halfAngleX: 0.3, halfAngleY: 0.1, range: 10 };
+    assert.equal(isWithinFrame(ray, frame, { x: 5, y: 0, z: 0 }), true);
+    assert.equal(isWithinFrame(ray, frame, { x: 5, y: 0, z: 1 }), true);
+    assert.equal(isWithinFrame(ray, frame, { x: 5, y: 0, z: 2 }), false);
+    assert.equal(isWithinFrame(ray, frame, { x: 5, y: 0.4, z: 0 }), true);
+    assert.equal(isWithinFrame(ray, frame, { x: 5, y: 0.8, z: 0 }), false);
+    assert.equal(isWithinFrame(ray, frame, { x: -5, y: 0, z: 0 }), false);
+    assert.equal(isWithinFrame(ray, frame, { x: 11, y: 0, z: 0 }), false);
   });
 
   test('pointAlongHeading walks the way headingTo points', () => {

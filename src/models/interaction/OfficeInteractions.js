@@ -36,7 +36,7 @@ export class OfficeInteractions {
     this.#witnessed = witnessed;
     const { box } = closet;
     Object.assign(player.position, { x: (box.x0 + box.x1) / 2, y: box.y0, z: (box.z0 + box.z1) / 2 });
-    player.yaw = Math.PI; // All authored closets face south.
+    player.yaw = { south: Math.PI, north: 0, west: Math.PI / 2, east: -Math.PI / 2 }[closet.facing ?? 'south'];
     player.pitch = 0;
   }
 

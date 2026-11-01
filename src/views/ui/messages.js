@@ -21,7 +21,7 @@ export const MESSAGES = Object.freeze({
   caughtDetail: ({ playerName, evidenceCollected }, evidenceRequired) =>
     `${playerName} found ${evidenceCollected} of ${evidenceRequired} anomalies before the ghost got them.`,
 
-  leaderboardEmpty: 'No scores yet. Be the first to go in.',
+  leaderboardEmpty: 'No scores yet.',
   leaderboardEscaped: ({ timeSeconds }) => `escaped in ${formatRoundTime(timeSeconds)}`,
   leaderboardCaught: ({ evidenceCollected }, evidenceRequired) => `caught · ${evidenceCollected}/${evidenceRequired} photos`,
 });

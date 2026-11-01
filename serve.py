@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Dev server for Flashlight Haunt.
+"""Dev server for Night Shift.
 
 Serves this folder at http://localhost:8000 and tells the browser never to cache
 anything, so refreshing the page always loads the newest code.
@@ -43,5 +43,5 @@ class NoCacheHandler(http.server.SimpleHTTPRequestHandler):
 if __name__ == "__main__":
     handler = functools.partial(NoCacheHandler, directory=str(ROOT))
     with DevServer(("127.0.0.1", PORT), handler) as server:
-        print(f"Flashlight Haunt is running at http://localhost:{PORT}", flush=True)
+        print(f"Night Shift is running at http://localhost:{PORT}", flush=True)
         server.serve_forever()

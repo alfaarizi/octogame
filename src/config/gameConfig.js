@@ -35,7 +35,14 @@ export const GAME_CONFIG = deepFreeze({
   },
 
   interaction: { range: 2.3, halfAngle: 0.5, dropDistance: 0.65 },
-  camera: { cooldown: 1.2, range: 7, halfAngle: 0.24, minDistance: 0.7, albumSize: 18, noiseRadius: 16 },
+  camera: {
+    cooldown: 1.2,
+    range: 7,
+    /** The small viewfinder box, as half-angles from the centre line. */
+    frame: { halfAngleX: degreesToRadians(2.85), halfAngleY: degreesToRadians(1.95) },
+    minDistance: 0.7,
+    noiseRadius: 16,
+  },
 
   flashlight: {
     /** Seconds of light from a full battery. */

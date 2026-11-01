@@ -75,7 +75,7 @@ function createViews({ config, events, level, building, simulation, render, albu
   return Object.freeze({
     firstPerson,
     investigation: new InvestigationView(render.scene, simulation.office, simulation.photography),
-    photography: new PhotographyView(render, firstPerson, album),
+    photography: new PhotographyView(render, album),
     lighting: new OfficeLightingView(render.scene, events, {
       lanterns: level.lanterns,
       fixtures: level.fixtures,

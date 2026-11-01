@@ -2,13 +2,16 @@ import * as THREE from 'three';
 
 const CAMERA_NEAR = 0.05;
 const CAMERA_FAR = 60;
+const NOOP = () => {};
 
 /** Owns the WebGL renderer, the scene and the camera, plus the scene-wide fog and moonlight. */
 export class RenderContext {
   #renderer;
   #scene;
   #camera;
-  #cameraFeed = new THREE.WebGLRenderTarget(384, 240, { depthBuffer: true, stencilBuffer: false });
+  #cameraFeed;
+  #screenScene = new THREE.Scene();
+  #screenCamera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
 
   constructor(container, config) {
     this.#renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -18,7 +21,13 @@ export class RenderContext {
     this.#renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     this.#renderer.toneMapping = THREE.ACESFilmicToneMapping;
     this.#renderer.toneMappingExposure = config.exposure;
-    this.#cameraFeed.texture.colorSpace = THREE.SRGBColorSpace;
+    this.#cameraFeed = new THREE.WebGLRenderTarget(this.canvas.width, this.canvas.height, { depthBuffer: true, stencilBuffer: false });
+    this.#cameraFeed.texture.colorSpace = THREE.LinearSRGBColorSpace;
+    const screen = new THREE.Mesh(
+      new THREE.PlaneGeometry(2, 2),
+      new THREE.MeshBasicMaterial({ map: this.#cameraFeed.texture, depthTest: false, depthWrite: false }),
+    );
+    this.#screenScene.add(screen);
     container.prepend(this.#renderer.domElement);
 
     this.#scene = new THREE.Scene();
@@ -49,34 +58,46 @@ export class RenderContext {
     return this.#cameraFeed.texture;
   }
 
-  /** Draws the scene into the camera's rear LCD, restoring the main framebuffer afterward. */
-  updateCameraFeed() {
-    const previousTarget = this.#renderer.getRenderTarget();
+  /** Draws the world once into a shared texture, then overlays the held item. */
+  render(cameraPreviewActive = false, afterWorldRender = NOOP) {
+    this.#camera.layers.set(0);
+    if (cameraPreviewActive) this.#renderer.setRenderTarget(this.#cameraFeed);
     try {
-      this.#renderer.setRenderTarget(this.#cameraFeed);
       this.#renderer.render(this.#scene, this.#camera);
     } finally {
-      this.#renderer.setRenderTarget(previousTarget);
+      if (cameraPreviewActive) this.#renderer.setRenderTarget(null);
+    }
+    if (cameraPreviewActive) this.#renderer.render(this.#screenScene, this.#screenCamera);
+    afterWorldRender();
+
+    const background = this.#scene.background;
+    const autoClear = this.#renderer.autoClear;
+    try {
+      this.#scene.background = null;
+      this.#renderer.autoClear = false;
+      this.#renderer.clearDepth();
+      this.#camera.layers.set(1);
+      this.#renderer.render(this.#scene, this.#camera);
+    } finally {
+      this.#camera.layers.set(0);
+      this.#renderer.autoClear = autoClear;
+      this.#scene.background = background;
     }
   }
 
-  render() {
-    this.#renderer.render(this.#scene, this.#camera);
-  }
-
-  /** Read immediately after rendering, before WebGL clears its drawing buffer. */
-  capturePhoto() {
-    this.render();
+  /** Copies the world pass before the held item is drawn; JPEG compression runs off the input event. */
+  captureWorldPhoto(onReady) {
     const image = document.createElement('canvas');
     image.width = 960;
     image.height = Math.round(image.width * this.canvas.height / this.canvas.width);
     image.getContext('2d').drawImage(this.canvas, 0, 0, image.width, image.height);
-    return image.toDataURL('image/jpeg', 0.85);
+    image.toBlob(onReady, 'image/jpeg', 0.85);
   }
 
   #fitToWindow() {
     this.#camera.aspect = window.innerWidth / window.innerHeight;
     this.#camera.updateProjectionMatrix();
     this.#renderer.setSize(window.innerWidth, window.innerHeight);
+    this.#cameraFeed.setSize(this.canvas.width, this.canvas.height);
   }
 }

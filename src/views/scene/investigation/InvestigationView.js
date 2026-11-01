@@ -102,28 +102,43 @@ function createNote({ name, position, orientation }) {
   return group;
 }
 
-function createCloset({ box, name }) {
+function createCloset({ box, name, facing = 'south' }) {
   const group = new THREE.Group();
   const metal = surface(0x354441);
   const { x0, x1, y0, y1, z0, z1 } = box;
+  for (const [side, bounds] of [
+    ['west', { x0, x1: x0 + .06, y0, y1, z0, z1 }],
+    ['east', { x0: x1 - .06, x1, y0, y1, z0, z1 }],
+    ['north', { x0, x1, y0, y1, z0, z1: z0 + .06 }],
+    ['south', { x0, x1, y0, y1, z0: z1 - .06, z1 }],
+  ]) if (side !== facing) group.add(createBoxMeshFromBounds(bounds, metal));
   for (const bounds of [
-    { x0, x1: x0 + .06, y0, y1, z0, z1 }, { x0: x1 - .06, x1, y0, y1, z0, z1 },
-    { x0, x1, y0, y1, z0, z1: z0 + .06 }, { x0, x1, y0: y1 - .06, y1, z0, z1 },
+    { x0, x1, y0: y1 - .06, y1, z0, z1 },
     { x0, x1, y0, y1: y0 + .06, z0, z1 },
   ]) group.add(createBoxMeshFromBounds(bounds, metal));
   // Two inset doors leave a narrow center seam. The slots also serve as the hidden camera's view.
   const doorGap = .012;
-  const doorMiddle = (x0 + x1) / 2;
-  for (const [doorLeft, doorRight] of [[x0 + .035, doorMiddle - doorGap], [doorMiddle + doorGap, x1 - .035]]) {
+  const westFacing = facing === 'west';
+  const doorMiddle = westFacing ? (z0 + z1) / 2 : (x0 + x1) / 2;
+  const firstEdge = westFacing ? z0 : x0;
+  const lastEdge = westFacing ? z1 : x1;
+  for (const [doorLeft, doorRight] of [[firstEdge + .035, doorMiddle - doorGap], [doorMiddle + doorGap, lastEdge - .035]]) {
     for (const [bottom, top] of [[.07, 1.46], [1.49, 1.56], [1.64, 1.71], [1.74, y1 - y0 - .05]]) {
-      group.add(createBoxMeshFromBounds({ x0: doorLeft, x1: doorRight, z0: z1 - .035, z1, y0: y0 + bottom, y1: y0 + top }, metal));
+      const face = westFacing
+        ? { x0, x1: x0 + .035, z0: doorLeft, z1: doorRight }
+        : { x0: doorLeft, x1: doorRight, z0: z1 - .035, z1 };
+      group.add(createBoxMeshFromBounds({ ...face, y0: y0 + bottom, y1: y0 + top }, metal));
     }
   }
-  for (const x of [doorMiddle - .07, doorMiddle + .07]) {
-    group.add(createBoxMesh({ width: .025, height: .18, depth: .045 }, { x, y: y0 + 1.05, z: z1 + .02 }, surface(0xa7a594)));
+  for (const offset of [-.07, .07]) {
+    const position = westFacing
+      ? { x: x0 - .02, y: y0 + 1.05, z: doorMiddle + offset }
+      : { x: doorMiddle + offset, y: y0 + 1.05, z: z1 + .02 };
+    group.add(createBoxMesh({ width: westFacing ? .045 : .025, height: .18, depth: westFacing ? .025 : .045 }, position, surface(0xa7a594)));
   }
   const label = createLabel('STAFF LOCKER', .38, .1, '#b8c2ab', '#293b36');
-  label.position.set(doorMiddle, y0 + 2.05, z1 + .006);
+  label.position.set(westFacing ? x0 - .006 : doorMiddle, y0 + 2.05, westFacing ? doorMiddle : z1 + .006);
+  if (westFacing) label.rotation.y = -Math.PI / 2;
   group.add(label);
   group.name = name;
   group.traverse((mesh) => { if (mesh.isMesh) { mesh.castShadow = true; mesh.receiveShadow = true; } });

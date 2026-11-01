@@ -17,7 +17,7 @@ export class Hud extends UiPanel {
   #slots = [requireElement('slot-one'), requireElement('slot-two')];
   #interaction = requireElement('interaction');
   #viewfinder = requireElement('viewfinder');
-  #cameraStatus = requireElement('camera-status');
+  #developmentStatus = requireElement('development-status');
   #hiding = requireElement('hiding');
 
   constructor() {
@@ -31,7 +31,7 @@ export class Hud extends UiPanel {
 
   setEvidence(collected, required) {
     this.#shown.applyIfChanged('evidence', collected, () => {
-      this.#evidence.textContent = `EVIDENCE ${collected} / ${required}`;
+      this.#evidence.textContent = `${collected} / ${required} FILED`;
       this.#evidence.classList.remove('bump');
       // Forces a reflow so the CSS animation restarts.
       void this.#evidence.offsetWidth;
@@ -44,10 +44,10 @@ export class Hud extends UiPanel {
   }
 
   setEquipment({ inventory, prompt, hidden, cameraTarget, noHostiles }) {
-    requireElement('development-status').classList.toggle('hidden', !noHostiles);
+    this.#developmentStatus.classList.toggle('hidden', !noHostiles);
     for (const [index, item] of inventory.slots.entries()) {
       this.#shown.applyIfChanged(`slot-${index}`, `${item?.kind}:${inventory.activeSlot === index}`, () => {
-        this.#slots[index].textContent = `${index + 1}  ${item ? ITEM_NAMES[item.kind] : 'Empty'}`;
+        this.#slots[index].textContent = `${String(index + 1).padStart(2, '0')} / ${item ? ITEM_NAMES[item.kind].toUpperCase() : 'EMPTY'}`;
         this.#slots[index].classList.toggle('selected', inventory.activeSlot === index);
       });
     }
@@ -56,7 +56,6 @@ export class Hud extends UiPanel {
     this.#viewfinder.classList.toggle('hidden', !cameraHeld);
     this.#viewfinder.classList.toggle('target-locked', Boolean(cameraTarget));
     this.root.classList.toggle('camera-active', cameraHeld);
-    this.#cameraStatus.textContent = cameraTarget ? `ANOMALY IN FRAME · ${cameraTarget.name}` : 'CENTER AN ANOMALY · CLICK TO EXPOSE';
     this.#hiding.classList.toggle('hidden', !hidden);
   }
 

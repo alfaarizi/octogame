@@ -122,6 +122,39 @@ export function isWithinCone({ origin, direction }, { halfAngle, range }, target
   return angle <= halfAngle + Math.atan(targetRadius / Math.max(distance, MIN_WIDTH_DISTANCE));
 }
 
+/**
+ * Whether `target` lies inside a rectangular frame around `ray`, such as a viewfinder whose
+ * horizontal and vertical half-angles differ. `targetRadius` widens the frame for big targets.
+ * @param {Ray} ray
+ * @param {{ halfAngleX: number, halfAngleY: number, range: number }} frame
+ * @param {Point3} target
+ * @param {number} [targetRadius]
+ * @returns {boolean}
+ */
+export function isWithinFrame({ origin, direction }, { halfAngleX, halfAngleY, range }, target, targetRadius = 0) {
+  const tx = target.x - origin.x, ty = target.y - origin.y, tz = target.z - origin.z;
+  const distance = Math.hypot(tx, ty, tz);
+  if (distance > range) return false;
+  if (distance < 1e-6) return true;
+  const directionLength = Math.hypot(direction.x, direction.y, direction.z);
+  const fx = direction.x / directionLength, fy = direction.y / directionLength, fz = direction.z / directionLength;
+  // Looking almost straight up or down leaves the world up parallel to the view, so use another axis.
+  const worldUp = Math.abs(fy) > 0.999 ? { x: 0, y: 0, z: -1 } : { x: 0, y: 1, z: 0 };
+  let rx = fy * worldUp.z - fz * worldUp.y;
+  let ry = fz * worldUp.x - fx * worldUp.z;
+  let rz = fx * worldUp.y - fy * worldUp.x;
+  const rightLength = Math.hypot(rx, ry, rz);
+  rx /= rightLength; ry /= rightLength; rz /= rightLength;
+  const ux = ry * fz - rz * fy, uy = rz * fx - rx * fz, uz = rx * fy - ry * fx;
+  const ahead = tx * fx + ty * fy + tz * fz;
+  if (ahead <= 1e-6) return false;
+  const across = Math.abs(tx * rx + ty * ry + tz * rz);
+  const vertically = Math.abs(tx * ux + ty * uy + tz * uz);
+  const padding = Math.atan(targetRadius / Math.max(distance, MIN_WIDTH_DISTANCE));
+  return Math.atan2(across, ahead) <= halfAngleX + padding
+    && Math.atan2(vertically, ahead) <= halfAngleY + padding;
+}
+
 // ---- Randomness ----
 // Where a `random` argument is accepted, pass a function returning values in [0, 1) to make results predictable in tests.
 

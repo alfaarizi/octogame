@@ -8,6 +8,7 @@ const glass = new THREE.MeshPhysicalMaterial({ color: 0x10191d, roughness: .12, 
 const markings = new THREE.MeshBasicMaterial({ color: 0xb6c4bd });
 const statusLight = new THREE.MeshBasicMaterial({ color: 0xa94335 });
 const labelTexture = createLabelTexture();
+for (const material of [shell, rubber, metal, glass, markings, statusLight]) material.userData.shared = true;
 
 function createBodyTexture() {
   const canvas = document.createElement('canvas');
@@ -85,7 +86,7 @@ export function createCameraModel(screenTexture) {
   camera.add(label);
   const display = new THREE.Mesh(
     new THREE.PlaneGeometry(.150, .091),
-    new THREE.MeshBasicMaterial({ color: screenTexture ? 0xffffff : 0x18282a, map: screenTexture, toneMapped: false }),
+    new THREE.MeshBasicMaterial({ color: screenTexture ? 0xffffff : 0x18282a, map: screenTexture }),
   );
   display.position.set(-.026, -.006, .0562);
   camera.add(display);

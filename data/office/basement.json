@@ -9,7 +9,6 @@
       {"name": "CNC machine (new)", "parts": [{"box": [15, 2.05, 16.2, 3.3, 0, 1], "color": "appliance"}, {"box": [15.1, 2.15, 16.1, 3.2, 1, 1.05], "color": "gym"}, {"box": [15.05, 2.5, 16.15, 2.65, 1.05, 1.5], "color": "gym"}]},
       {"name": "desk (Ajeng)", "parts": [{"desk": [16.4, 2, 17.6, 2.6]}, {"chair": {"x": 17, "z": 2.9}, "facing": "north"}]},
       {"name": "desk (Ferry)", "parts": [{"desk": [17.6, 2, 18.8, 2.6]}, {"chair": {"x": 18.2, "z": 2.9}, "facing": "north"}]},
-      {"name": "column", "parts": [{"box": [18.8, 3.15, 19.25, 3.6, 0, 3], "color": "pillar"}]},
       {"name": "desk (Rafidal)", "parts": [{"desk": [17.9, 3.95, 18.6, 5]}, {"chair": {"x": 17.6, "z": 4.45}, "facing": "east"}]},
       {"name": "work table", "parts": [{"table": [14.3, 3.9, 15.4, 6.2], "height": 0.76, "color": "wood"}, {"stool": {"x": 14, "z": 4.4}, "height": 0.48, "color": "chair"}, {"stool": {"x": 14, "z": 5.6}, "height": 0.48, "color": "chair"}, {"stool": {"x": 15.7, "z": 4.4}, "height": 0.48, "color": "chair"}, {"stool": {"x": 15.7, "z": 5.6}, "height": 0.48, "color": "chair"}]},
       {"name": "workbench", "parts": [{"table": [18, 5.95, 20.9, 6.5], "height": 0.76, "color": "wood"}]},
@@ -63,8 +62,6 @@
   "equipment": [
   ],
   "interactables": [
-    {"id": "storage-closet", "name": "storage locker", "kind": "closet", "position": {"x": 18.6, "y": 1.25, "z": 8.84}, "box": [18.1, 8, 19.1, 8.8, 0, 2.3]},
-    {"id": "basement-supplies", "name": "supply drawer", "kind": "cache", "position": {"x": 20, "y": 2.25, "z": 7.44}, "box": [19.7, 7, 20.3, 7.4, 1.9, 2.45], "facing": "south"},
     {"id": "basement-lights", "name": "basement lights", "kind": "switch", "position": {"x": 15, "y": 1.3, "z": 2.01}, "facing": "south"}
   ]
 }

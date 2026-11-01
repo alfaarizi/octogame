@@ -95,7 +95,8 @@ export class RoundController {
       inventory: simulation.inventory,
       prompt: simulation.actions.prompt,
       hidden: simulation.office.isHidden,
-      cameraTarget: simulation.photography.target(player.sight),
+      cameraTarget: !simulation.office.isHidden && simulation.inventory.activeItem?.kind === 'camera'
+        ? simulation.photography.target(player.sight) : null,
       noHostiles: !simulation.hostilesEnabled,
     });
   }

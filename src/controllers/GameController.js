@@ -19,6 +19,7 @@ export class GameController {
   #loop;
   #worldTime = 0;
   #session = null;
+  #afterWorldRender = () => this.#context.views.photography.afterWorldRender();
 
   constructor(context) {
     this.#context = context;
@@ -89,6 +90,6 @@ export class GameController {
     views.exitDoor.update(this.#worldTime);
     views.investigation.update();
     views.photography.update(seconds);
-    render.render();
+    render.render(views.firstPerson.isCameraHeld, this.#afterWorldRender);
   }
 }

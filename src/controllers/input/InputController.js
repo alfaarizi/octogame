@@ -8,6 +8,7 @@ import { Action, DEFAULT_KEY_BINDINGS, MOUSE_PRIMARY } from './keyBindings.js';
 export class InputController {
   #bindings;
   #pointerLock;
+  #gameCodes;
   #heldCodes = new Set();
   #lookDelta = { x: 0, y: 0 };
   /** Emits each Action as an event when one of its keys is pressed. */
@@ -23,8 +24,9 @@ export class InputController {
   constructor({ surface, pointerLock, bindings = DEFAULT_KEY_BINDINGS, eventTarget = window }) {
     this.#bindings = bindings;
     this.#pointerLock = pointerLock;
-    eventTarget.addEventListener('keydown', (event) => this.#press(event.code, event.repeat));
-    eventTarget.addEventListener('keyup', (event) => this.#heldCodes.delete(event.code));
+    this.#gameCodes = new Set(Object.values(bindings).flat());
+    eventTarget.addEventListener('keydown', (event) => this.#onKeyDown(event));
+    eventTarget.addEventListener('keyup', (event) => this.#heldCodes.delete(normalizeKeyCode(event)));
     eventTarget.addEventListener('blur', () => this.clear());
     eventTarget.addEventListener('mousemove', (event) => this.#accumulateLook(event));
     surface.addEventListener('mousedown', (event) => {
@@ -64,9 +66,13 @@ export class InputController {
     this.#lookDelta = { x: 0, y: 0 };
   }
 
-  #press(code, isRepeat) {
+  #onKeyDown(event) {
+    const code = normalizeKeyCode(event);
+    if (!code) return;
+    if (this.#pointerLock.isLocked && this.#gameCodes.has(code) && event.cancelable) event.preventDefault();
+    const wasHeld = this.#heldCodes.has(code);
     this.#heldCodes.add(code);
-    if (!isRepeat) this.#announcePress(code);
+    if (!wasHeld && !event.repeat) this.#announcePress(code);
   }
 
   #announcePress(code) {
@@ -77,11 +83,22 @@ export class InputController {
 
   #accumulateLook(event) {
     if (!this.#pointerLock.isLocked) return;
-    this.#lookDelta.x += event.movementX;
-    this.#lookDelta.y += event.movementY;
+    this.#lookDelta.x += event.movementX ?? event.webkitMovementX ?? 0;
+    this.#lookDelta.y += event.movementY ?? event.webkitMovementY ?? 0;
   }
 
   #axis(positive, negative) {
     return (this.isHeld(positive) ? 1 : 0) - (this.isHeld(negative) ? 1 : 0);
   }
+}
+
+/** KeyboardEvent.code is absent or Unidentified on some browser and keyboard combinations. */
+function normalizeKeyCode({ code, key }) {
+  if (code?.startsWith('Numpad') && /^[12]$/.test(code.slice(-1))) return `Digit${code.slice(-1)}`;
+  if (code && code !== 'Unidentified') return code;
+  if (/^[a-z]$/i.test(key ?? '')) return `Key${key.toUpperCase()}`;
+  if (/^[12]$/.test(key ?? '')) return `Digit${key}`;
+  if (key === 'Shift') return 'ShiftLeft';
+  if (key?.startsWith('Arrow')) return key;
+  return null;
 }

@@ -91,9 +91,8 @@ export class Building {
 
   /** Physical, eye-height sight check used by interactions, photography and the ghost. */
   hasClearRay(from, to) {
-    const floorFor = (y) => this.#floors.findLast((floor) => floor.elevation <= y + 0.001);
-    const floor = floorFor(from.y);
-    if (!floor || floor !== floorFor(to.y) || !floor.tileMap.hasLineOfSight(from, to)) return false;
+    const floor = floorAtOrBelow(this.#floors, from.y);
+    if (!floor || floor !== floorAtOrBelow(this.#floors, to.y) || !floor.tileMap.hasLineOfSight(from, to)) return false;
     return !floor.occluders.some((box) => segmentIntersectsBox(from, to, box));
   }
 
@@ -115,6 +114,13 @@ export class Building {
       Math.abs(floor.elevation - height) <= Math.abs(nearest.elevation - height) ? floor : nearest,
     );
   }
+}
+
+function floorAtOrBelow(floors, height) {
+  for (let index = floors.length - 1; index >= 0; index--) {
+    if (floors[index].elevation <= height + .001) return floors[index];
+  }
+  return null;
 }
 
 const isWithinStep = (height, standingHeight) => Math.abs(height - standingHeight) <= MAX_STEP;

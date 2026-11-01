@@ -1,8 +1,9 @@
-import { distanceBetween, isWithinCone } from '../../utils.js';
+import { distanceBetween, isWithinFrame } from '../../utils.js';
 
-/** Camera exposure rules and a bounded metadata album. Pixels belong to the view. */
+/** Camera exposure rules and metadata for distinct crime evidence. Pixels belong to the view. */
 export class Photography {
   #config;
+  #frame;
   #building;
   #subjects;
   #photos = [];
@@ -12,6 +13,7 @@ export class Photography {
 
   constructor(config, building, subjects) {
     this.#config = config;
+    this.#frame = { ...config.frame, range: config.range };
     this.#building = building;
     this.#subjects = subjects;
   }
@@ -24,7 +26,7 @@ export class Photography {
   target(sight) {
     return this.#subjects.find((subject) =>
       distanceBetween(sight.origin, subject) >= this.#config.minDistance
-      && isWithinCone(sight, this.#config, subject)
+      && isWithinFrame(sight, this.#frame, subject)
       && this.#building.hasClearRay(sight.origin, subject)) ?? null;
   }
 
@@ -38,12 +40,7 @@ export class Photography {
       id: this.#nextId++, elapsed, subjectId: subject?.id ?? null,
       caption: subject?.name ?? 'No anomaly in frame', isNewEvidence,
     });
-    this.#photos.push(photo);
-    // Keep all evidence shots, evict ordinary/duplicate exposures first.
-    if (this.#photos.length > this.#config.albumSize) {
-      const expendable = this.#photos.findIndex((entry) => !entry.isNewEvidence);
-      this.#photos.splice(expendable < 0 ? 0 : expendable, 1);
-    }
+    if (isNewEvidence) this.#photos.push(photo);
     return photo;
   }
 }

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Flashlight Haunt</title>
+  <title>Night Shift</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎃</text></svg>">
   <link rel="stylesheet" href="styles/main.css">
   <!-- Must load before any module so it can report modules that fail to load. -->
@@ -17,56 +17,68 @@
   <div id="flash"></div>
 
   <div id="hud" class="hidden">
-    <div id="evidence">EVIDENCE 0 / 5</div>
+    <div id="evidence">0 / 5 FILED</div>
     <div id="development-status" class="hidden">DEV · NO HOSTILES</div>
     <div id="timer">0:00.0</div>
     <div id="meters">
-      <div class="meter"><span>🔦</span><div class="bar"><div id="battery-fill"></div></div></div>
-      <div class="meter" id="stamina-meter"><span>🏃</span><div class="bar"><div id="stamina-fill"></div></div></div>
+      <div class="meter"><span>LIGHT</span><div class="bar"><div id="battery-fill"></div></div></div>
+      <div class="meter" id="stamina-meter"><span>BREATH</span><div class="bar"><div id="stamina-fill"></div></div></div>
     </div>
     <div id="crosshair"></div>
     <div id="hint"></div>
     <div id="interaction"></div>
-    <div id="inventory"><span id="slot-one"></span><span id="slot-two"></span><small>1 / 2 select · E interact · Q drop · J case file</small></div>
+    <div id="inventory"><span id="slot-one"></span><span id="slot-two"></span><small>1 / 2 SWAP · E INSPECT · Q DROP · J FILE</small></div>
     <div id="viewfinder" class="hidden">
-      <div class="camera-readout"><span><i class="camera-indicator"></i> PHOTO <small>· NIGHT SHIFT</small></span><span>RAW <b>4:3</b></span></div>
-      <div class="camera-frame"><span></span><span></span><span></span><span></span></div>
       <div class="camera-focus"><span></span><span></span><span></span><span></span></div>
-      <div class="camera-footer"><span>1/60 <b>F2.8</b> ISO 1600</span><span>MF-35 · 01</span></div>
-      <div id="camera-status"></div>
     </div>
     <div id="hiding" class="hidden"><span>HIDDEN · E TO LEAVE</span></div>
   </div>
 
   <div id="title" class="screen hidden">
-    <div class="panel">
-      <h1>Flashlight Haunt</h1>
-      <p class="tag">After hours. Five anomalies. Bring back proof.</p>
-      <form id="start-form">
-        <input id="name" type="text" maxlength="16" placeholder="Your name" autocomplete="off" spellcheck="false">
-        <button type="submit">Enter the office</button>
-      </form>
-      <label class="chicken"><input type="checkbox" id="chicken"> Chicken mode (no jump scare)</label>
-      <label class="chicken development"><input type="checkbox" id="no-hostiles"> Development: no hostiles (unranked)</label>
-      <div class="howto">
-        <div><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> move &nbsp;·&nbsp; <kbd>Shift</kbd> sprint &nbsp;·&nbsp; <kbd>Mouse</kbd> look</div>
-        <div><kbd>E</kbd> interact / hide &nbsp;·&nbsp; <kbd>Q</kbd> drop &nbsp;·&nbsp; <kbd>1</kbd><kbd>2</kbd> select item</div>
-        <div><kbd>Click</kbd> use held item &nbsp;·&nbsp; <kbd>J</kbd> case file / photos &nbsp;·&nbsp; <kbd>Esc</kbd> pause</div>
-        <div><b>The ghost freezes in your light.</b> Hold the beam on it to banish it.</div>
-        <div>Pick up your flashlight and camera from the trolley. Photograph the five anomalies, then reach the main gate. A flash attracts the ghost. Hide before it sees you enter.</div>
+    <div class="panel menu">
+      <header class="menu-hero">
+        <h1>Night Shift</h1>
+      </header>
+      <div class="menu-grid">
+        <section class="menu-card menu-start">
+          <form id="start-form">
+            <input id="name" type="text" maxlength="16" placeholder="Your name" autocomplete="off" spellcheck="false">
+            <button type="submit">Enter the office</button>
+          </form>
+          <div class="menu-toggles">
+            <label class="chicken"><input type="checkbox" id="chicken"> Chicken mode (no jump scare)</label>
+            <label class="chicken development"><input type="checkbox" id="no-hostiles"> Development: no hostiles (unranked)</label>
+          </div>
+          <div class="menu-brief">
+            <p>Pick up your flashlight and camera from the trolley. Photograph the five anomalies, then reach the main gate.</p>
+            <p class="menu-tip"><b>The ghost freezes in your light.</b> Hold the beam on it to banish it. A flash attracts the ghost. Hide before it sees you enter.</p>
+          </div>
+        </section>
+        <aside class="menu-side">
+          <div class="menu-card menu-controls">
+            <h3>Field manual</h3>
+            <div class="control-row"><span class="control-keys"><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd></span><span>Move</span></div>
+            <div class="control-row"><span class="control-keys"><kbd>Shift</kbd></span><span>Sprint</span></div>
+            <div class="control-row"><span class="control-keys"><kbd>Mouse</kbd></span><span>Look</span></div>
+            <div class="control-row"><span class="control-keys"><kbd>E</kbd></span><span>Interact / hide</span></div>
+            <div class="control-row"><span class="control-keys"><kbd>1</kbd><kbd>2</kbd></span><span>Select item</span></div>
+            <div class="control-row"><span class="control-keys"><kbd>Click</kbd></span><span>Use held item</span></div>
+            <div class="control-row"><span class="control-keys"><kbd>Q</kbd></span><span>Drop</span></div>
+            <div class="control-row"><span class="control-keys"><kbd>J</kbd><kbd>Esc</kbd></span><span>Case file / pause</span></div>
+          </div>
+          <ol id="board-title" class="board"></ol>
+        </aside>
       </div>
-      <ol id="board-title" class="board"></ol>
     </div>
   </div>
 
   <div id="pause" class="screen hidden">
     <div class="panel case-file">
       <h2>Case file</h2>
-      <p class="tag">Simulation paused · Photograph each anomaly, then escape.</p>
       <label class="chicken development"><input type="checkbox" id="pause-no-hostiles"> Development: no hostiles (unranked)</label>
       <ul id="evidence-checklist"></ul>
       <div class="buttons"><button id="resume">Resume investigation</button><button id="quit" class="secondary">Quit to title</button></div>
-      <p class="album-help">Your photographs · Click a frame to download. Kept until the next round.</p>
+      <h3 class="album-title">Evidences caught</h3>
       <div id="pause-photos" class="photo-album"></div>
     </div>
   </div>
@@ -81,7 +93,6 @@
       </div>
       <div class="keys-hint"><kbd>Enter</kbd> play again &nbsp;·&nbsp; <kbd>N</kbd> next player</div>
       <ol id="board-end" class="board"></ol>
-      <p class="album-help">Photographs from this investigation · Click to download</p>
       <div id="result-photos" class="photo-album"></div>
     </div>
   </div>

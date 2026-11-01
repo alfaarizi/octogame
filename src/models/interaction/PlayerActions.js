@@ -105,7 +105,7 @@ export class PlayerActions {
       this.feedback(photo.isNewEvidence && this.round.evidenceCollected === this.round.evidenceRequired
         ? 'All five anomalies recorded. The main gate is open. RUN!'
         : photo.isNewEvidence ? `Evidence recorded: ${photo.caption}`
-        : photo.subjectId ? 'Already documented. Photograph a different anomaly.' : 'Photo saved. Center an anomaly from 0.7–7 m away.');
+        : photo.subjectId ? 'Already documented. Photograph a different anomaly.' : 'No evidence recorded. Center an anomaly from 0.7–7 m away.');
       return photo;
     } else this.feedback('Your hand is empty. Look at equipment and press E.');
     return null;

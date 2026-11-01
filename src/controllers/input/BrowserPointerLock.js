@@ -12,25 +12,30 @@ export class BrowserPointerLock {
 
   constructor(element) {
     this.#element = element;
-    document.addEventListener('pointerlockchange', () => this.#changeListeners.notify(this.isLocked));
-    document.addEventListener('pointerlockerror', () => this.#changeListeners.notify(false));
+    element.tabIndex = 0;
+    const changed = () => this.#changeListeners.notify(this.isLocked);
+    const failed = () => this.#changeListeners.notify(false);
+    for (const name of ['pointerlockchange', 'webkitpointerlockchange']) document.addEventListener(name, changed);
+    for (const name of ['pointerlockerror', 'webkitpointerlockerror']) document.addEventListener(name, failed);
   }
 
   get isLocked() {
-    return document.pointerLockElement === this.#element;
+    return document.pointerLockElement === this.#element || document.webkitPointerLockElement === this.#element;
   }
 
   request() {
     try {
-      // Browsers refuse a re-lock right after Esc; that lands in pointerlockerror, so the rejection is ignored here.
-      this.#element.requestPointerLock()?.catch?.(() => {});
+      try { this.#element.focus({ preventScroll: true }); } catch { this.#element.focus(); }
+      const request = this.#element.requestPointerLock ?? this.#element.webkitRequestPointerLock;
+      // Browsers refuse a re-lock right after Esc; pointerlockerror handles it.
+      request?.call(this.#element)?.catch?.(() => {});
     } catch {
       // Older browsers throw instead of rejecting; same outcome.
     }
   }
 
   release() {
-    if (this.isLocked) document.exitPointerLock();
+    if (this.isLocked) (document.exitPointerLock ?? document.webkitExitPointerLock)?.call(document);
   }
 
   onChange(listener) {
