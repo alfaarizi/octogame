@@ -37,8 +37,9 @@ html, body {
   user-select: none;
 }
 
+#stage { display: block; position: fixed; inset: 0; }
+#stage:focus { outline: none; }
 canvas { display: block; position: fixed; inset: 0; }
-canvas:focus { outline: none; }
 
 h1, h2 {
   font-family: 'Creepster', Georgia, serif;

@@ -11,12 +11,13 @@ export class PickupField {
 
   populate({ equipment = [], batterySpots = [] }) {
     this.clear();
-    for (const item of equipment) this.add(item.kind, item.position);
+    for (const item of equipment) this.add(item.kind, item.position, this.#nextId++, item.facing);
     for (const position of batterySpots) this.add(ItemKind.BATTERY, position);
   }
 
-  add(kind, position, id = this.#nextId++) {
-    const item = Object.freeze({ id, kind, position: Object.freeze({ ...position }) });
+  /** @param {'north' | 'south' | 'east' | 'west'} [facing] - Where the item's front (lens, beam) points. */
+  add(kind, position, id = this.#nextId++, facing = 'north') {
+    const item = Object.freeze({ id, kind, position: Object.freeze({ ...position }), facing });
     this.#items = Object.freeze([...this.#items, item]);
     return item;
   }

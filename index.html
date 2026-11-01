@@ -13,6 +13,10 @@
   </script>
 </head>
 <body>
+  <!-- Holds the game canvas and keeps keyboard focus during play. Key-grabbing browser extensions such as
+       Vimium swallow D, F, J and the digits unless a text field or a plugin element like <object> is focused,
+       and a text field would show the macOS accent popup while a movement key is held. -->
+  <object id="stage" aria-label="Game view"></object>
   <div id="vignette"></div>
   <div id="flash"></div>
 
@@ -46,7 +50,7 @@
             <button type="submit">Enter the office</button>
           </form>
           <div class="menu-toggles">
-            <label class="chicken"><input type="checkbox" id="chicken"> Chicken mode (no jump scare)</label>
+            <label class="chicken"><input type="checkbox" id="chicken"> I'm a chicken</label>
             <label class="chicken development"><input type="checkbox" id="no-hostiles"> Development: no hostiles (unranked)</label>
           </div>
           <div class="menu-brief">

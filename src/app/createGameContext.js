@@ -44,8 +44,9 @@ export function createGameContext({ config, level, isTestMode }) {
   const building = new Building(level.floors, level.tileSize);
   const spawnTable = new SpawnTable(level);
   const simulation = new Simulation({ config, events, building, spawnTable, layout: level });
-  const render = new RenderContext(document.body, config.rendering);
-  const pointerLock = isTestMode ? new SimulatedPointerLock() : new BrowserPointerLock(render.canvas);
+  const stage = document.getElementById('stage');
+  const render = new RenderContext(stage, config.rendering);
+  const pointerLock = isTestMode ? new SimulatedPointerLock() : new BrowserPointerLock(render.canvas, stage);
   const store = new LocalJsonStore();
   const ui = createUi({ config, events });
 

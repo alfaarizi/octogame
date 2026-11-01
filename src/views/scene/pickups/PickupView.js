@@ -1,6 +1,9 @@
 import * as THREE from 'three';
 import { createEquipmentModel } from '../player/equipmentModels.js';
 
+/** Turn that points an equipment model, built pointing north (-z), toward each facing. */
+const FACING_YAW = Object.freeze({ north: 0, west: Math.PI / 2, south: Math.PI, east: -Math.PI / 2 });
+
 /** Ground items have physical silhouettes and a faint marker visible before acquiring a torch. */
 export class PickupView {
   #scene;
@@ -28,6 +31,7 @@ export class PickupView {
       const object = createEquipmentModel(item.kind);
       object.scale.setScalar(1.4);
       object.position.copy(item.position);
+      object.rotation.y = FACING_YAW[item.facing];
       const glint = new THREE.Mesh(new THREE.SphereGeometry(.014, 8, 6), new THREE.MeshBasicMaterial({ color: 0xb4dfd9 }));
       const glintPosition = {
         flashlight: { x: 0, y: 0, z: -.12 },

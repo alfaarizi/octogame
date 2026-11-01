@@ -87,6 +87,12 @@ describe('parseLevel', () => {
     assert.deepEqual(level.floors.map((floor) => floor.tilesOrigin), [{ x: 0, z: 0 }, { x: 4, z: 2 }]);
   });
 
+  test('equipment points the way its "facing" says, north unless given', () => {
+    const position = { x: 2, y: 0, z: 1.5 };
+    const level = parseLevel(sources({ floor: { equipment: [{ kind: 'camera', position, facing: 'west' }, { kind: 'flashlight', position }] } }));
+    assert.deepEqual(level.equipment.map((item) => item.facing), ['west', 'north']);
+  });
+
   test('furniture on an upper floor is lifted to its elevation', () => {
     const level = parseLevel(sources({ upstairs: { furniture: { room: [{ name: 'block', parts: [{ box: [1, 1, 2, 2, 0, 1], color: 'wood' }] }] } } }));
     assert.deepEqual(level.floors[1].furniture[0].parts[0], { x0: 1, z0: 1, x1: 2, z1: 2, y0: 3, y1: 4, color: 0x5a3a24 });
@@ -99,6 +105,7 @@ describe('level format errors', () => {
 
   test('rejects unsupported equipment and duplicate interaction IDs across floors', () => {
     rejects(sources({ floor: { equipment: [{ kind: 'unknown', position: { x: 2, y: 0, z: 1.5 } }] } }), 'equipment[0].kind');
+    rejects(sources({ floor: { equipment: [{ kind: 'camera', position: { x: 2, y: 0, z: 1.5 }, facing: 'up' }] } }), 'equipment[0].facing');
     const note = { id: 'memo', kind: 'note', name: 'Memo', text: 'Remember', position: { x: 2, y: 1, z: 1.5 } };
     rejects(sources({ floor: { interactables: [note] }, upstairs: { interactables: [note] } }), 'duplicate id "memo"');
   });

@@ -8,11 +8,17 @@ import { ListenerSet } from '../../utils.js';
  */
 export class BrowserPointerLock {
   #element;
+  #keyboardTarget;
   #changeListeners = new ListenerSet();
 
-  constructor(element) {
+  /**
+   * @param {HTMLElement} element - The element that captures the mouse.
+   * @param {HTMLElement} [keyboardTarget] - Focused on each request, so the keys reach the game. Defaults to `element`.
+   */
+  constructor(element, keyboardTarget = element) {
     this.#element = element;
-    element.tabIndex = 0;
+    this.#keyboardTarget = keyboardTarget;
+    keyboardTarget.tabIndex = 0;
     const changed = () => this.#changeListeners.notify(this.isLocked);
     const failed = () => this.#changeListeners.notify(false);
     for (const name of ['pointerlockchange', 'webkitpointerlockchange']) document.addEventListener(name, changed);
@@ -25,7 +31,7 @@ export class BrowserPointerLock {
 
   request() {
     try {
-      try { this.#element.focus({ preventScroll: true }); } catch { this.#element.focus(); }
+      try { this.#keyboardTarget.focus({ preventScroll: true }); } catch { this.#keyboardTarget.focus(); }
       const request = this.#element.requestPointerLock ?? this.#element.webkitRequestPointerLock;
       // Browsers refuse a re-lock right after Esc; pointerlockerror handles it.
       request?.call(this.#element)?.catch?.(() => {});

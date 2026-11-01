@@ -7,7 +7,10 @@ function choice(value, choices, path) {
 
 export function readEquipment(json, path) {
   const item = object(json, path);
-  return { kind: choice(item.kind, ['flashlight', 'camera', 'battery'], `${path}.kind`), position: point3(item.position, `${path}.position`) };
+  return {
+    kind: choice(item.kind, ['flashlight', 'camera', 'battery'], `${path}.kind`), position: point3(item.position, `${path}.position`),
+    facing: choice(item.facing ?? 'north', ['north', 'south', 'east', 'west'], `${path}.facing`),
+  };
 }
 
 export function readEvidenceSpot(json, path) {

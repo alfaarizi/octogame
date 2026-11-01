@@ -61,6 +61,12 @@ describe('PickupField', () => {
     assert.equal(field.items[0].id, item.id);
     assert.equal(field.items[0].position.x, 2);
   });
+
+  test('starting equipment keeps the way it was laid out; other items point north', () => {
+    const field = new PickupField();
+    field.populate({ equipment: [{ kind: PickupKind.CAMERA, position: { x: 1, y: .1, z: 1 }, facing: 'west' }], batterySpots: [{ x: 2, y: .1, z: 2 }] });
+    assert.deepEqual(field.items.map((item) => item.facing), ['west', 'north']);
+  });
 });
 
 describe('leaderboard', () => {

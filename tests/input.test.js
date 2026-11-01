@@ -81,3 +81,17 @@ test('prefixed pointer lock events and methods keep older WebKit input active', 
     globalThis.document = previousDocument;
   }
 });
+
+test('pointer lock focuses its keyboard target, so key-grabbing extensions pass keys on', () => {
+  const previousDocument = globalThis.document;
+  globalThis.document = new EventSource();
+  try {
+    const canvas = { focus() { this.focused = true; }, requestPointerLock() {} };
+    const stage = { tabIndex: -1, focus() { this.focused = true; } };
+    new BrowserPointerLock(canvas, stage).request();
+    assert.equal(stage.focused, true);
+    assert.equal(canvas.focused, undefined);
+  } finally {
+    globalThis.document = previousDocument;
+  }
+});
