@@ -156,7 +156,7 @@
   "evidenceSpots": [
     {"id": "handprint", "name": "The sixth fingerprint", "room": "office", "kind": "handprint", "x": 2.68, "y": 0.764, "z": 3.22, "clue": "Ground floor \u00b7 A handprint on the central office desks has too many fingers."},
     {"id": "phone", "name": "The disconnected caller", "room": "workshop", "kind": "phone", "x": 16.2, "y": 0.89, "z": 6.8, "clue": "Ground floor \u00b7 The workshop meeting table. A phone rings without a cable."},
-    {"id": "visitor", "name": "The visitor without a face", "room": "guest parking", "kind": "silhouette", "x": 18.7, "y": 1.05, "z": 19.2, "clue": "Outside \u00b7 A visitor waits beside the parked car, near the main gate."}
+    {"id": "visitor", "name": "The visitor who stayed", "room": "guest parking", "kind": "skull", "x": 18.7, "y": 0.1, "z": 19.2, "clue": "Outside \u00b7 A skull grins up from beside the parked car, near the main gate."}
   ],
   "batterySpots": [
     {"x": 7.9, "y": 0.098, "z": 5.6},

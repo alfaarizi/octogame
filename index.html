@@ -88,16 +88,27 @@
   </div>
 
   <div id="end" class="screen hidden">
-    <div class="panel">
-      <h2 id="end-title"></h2>
-      <p id="end-detail"></p>
-      <div class="buttons">
-        <button id="again">Play again</button>
-        <button id="next" class="secondary">Next player</button>
+    <div class="panel menu">
+      <header class="menu-hero">
+        <h2 id="end-title"></h2>
+      </header>
+      <div class="menu-grid">
+        <section class="menu-card result-card">
+          <p id="end-detail"></p>
+          <div class="buttons">
+            <button id="again">Play again</button>
+            <button id="next" class="secondary">Next player</button>
+          </div>
+          <div class="keys-hint"><kbd>Enter</kbd> play again &nbsp;·&nbsp; <kbd>N</kbd> next player</div>
+          <div class="result-album">
+            <h3 class="album-title">Evidences caught</h3>
+            <div id="result-photos" class="photo-album"></div>
+          </div>
+        </section>
+        <aside class="menu-side">
+          <ol id="board-end" class="board"></ol>
+        </aside>
       </div>
-      <div class="keys-hint"><kbd>Enter</kbd> play again &nbsp;·&nbsp; <kbd>N</kbd> next player</div>
-      <ol id="board-end" class="board"></ol>
-      <div id="result-photos" class="photo-album"></div>
     </div>
   </div>
 

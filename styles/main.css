@@ -94,15 +94,15 @@ kbd {
 }
 .panel.small { width: min(420px, 100%); }
 
-/* ---- Title / game menu ---- */
+/* ---- Title / game menu, and the result screen built from the same cards ---- */
 
-#title {
+#title, #end {
   background:
     radial-gradient(circle at 50% -10%, rgba(190, 14, 10, 0.14), transparent 42%),
     radial-gradient(ellipse at center, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.94));
 }
 
-#title .panel.menu {
+.panel.menu {
   width: min(1080px, 100%);
   padding: 0;
   text-align: left;
@@ -113,7 +113,7 @@ kbd {
 }
 
 .menu-hero { margin-bottom: 26px; text-align: center; }
-#title h1 {
+#title h1, #end-title {
   font-size: clamp(54px, 11vw, 118px);
   line-height: .85;
   letter-spacing: .02em;
@@ -130,7 +130,7 @@ kbd {
   gap: 18px;
   align-items: start;
 }
-.menu-card, #board-title {
+.menu-card, #board-title, #board-end {
   color: #2c271f;
   background-color: #e8dec8;
   background-image: var(--paper-texture);
@@ -142,7 +142,7 @@ kbd {
 .menu-start input[type=text] { flex: 1 1 220px; color: #2c271f; background: rgba(255, 255, 255, .35); border-color: #a89573; }
 .menu-start input[type=text]::placeholder { color: #8a7b63; }
 .menu-start input[type=text]:focus { border-color: #8a5b3c; }
-.menu-start button {
+.menu-card button {
   flex: 0 0 auto;
   color: #f6e9dd;
   text-shadow: 0 1px 0 rgba(0, 0, 0, 0.65);
@@ -151,7 +151,14 @@ kbd {
   border: 1px solid #380202;
   box-shadow: inset 0 0 16px rgba(0, 0, 0, 0.5), 0 2px 8px #000a;
 }
-.menu-start button:hover { filter: brightness(1.18) saturate(1.05); }
+.menu-card button:hover { filter: brightness(1.18) saturate(1.05); }
+.menu-card button.secondary {
+  color: #4a3f30;
+  text-shadow: none;
+  background: transparent;
+  border: 1px solid #9b8768;
+  box-shadow: none;
+}
 .menu-toggles {
   display: flex;
   flex-wrap: wrap;
@@ -190,12 +197,18 @@ kbd {
 .control-keys { display: flex; flex: 0 0 auto; gap: 2px; }
 .control-keys kbd { min-width: 0; }
 .menu-card kbd { color: #3a3226; background: rgba(255, 255, 255, .35); border-color: #9b8768; }
-#board-title { margin: 0; padding: 0 14px; border: 1px solid #b6a382; }
-#board-title::before { border-bottom-color: #b09d7c; color: #8a5b3c; }
-#board-title li { padding-left: 0; padding-right: 0; border-bottom-color: #b09d7c66; }
-#board-title li span:last-child { color: #6f6250; }
-#board-title li.me { color: #4a2e22; background: #b56a4f26; border-left: 2px solid #a15842; }
-#board-title li.empty { color: #7a6a55; }
+#board-title, #board-end { margin: 0; padding: 0 14px; border: 1px solid #b6a382; }
+#board-title::before, #board-end::before { border-bottom-color: #b09d7c; color: #8a5b3c; }
+#board-title li, #board-end li { padding-left: 0; padding-right: 0; border-bottom-color: #b09d7c66; }
+#board-title li span:last-child, #board-end li span:last-child { color: #6f6250; }
+#board-title li.me, #board-end li.me { color: #4a2e22; background: #b56a4f26; border-left: 2px solid #a15842; }
+#board-title li.empty, #board-end li.empty { color: #7a6a55; }
+#end-title { font-size: clamp(46px, 8vw, 92px); }
+.result-card #end-detail { margin: 0 0 18px; color: #3a3226; font-size: 17px; line-height: 1.5; }
+.result-card .buttons { justify-content: flex-start; margin-top: 0; }
+.result-card .keys-hint { color: #6f6250; }
+.result-album:has(.photo-album:empty) { display: none; }
+.result-card .album-title { margin: 22px 0 14px; padding-top: 18px; }
 
 
 .tag { color: var(--dim); margin: 0 0 22px; }
@@ -255,7 +268,6 @@ button.secondary { color: var(--text); background: rgba(255, 255, 255, 0.1); }
 .board li.me { color: #edd6c5; background: #673b2e45; border-left: 2px solid #ab5e47; }
 .board li.empty { color: var(--dim); justify-content: center; }
 
-#end-detail { font-size: 18px; margin: 0 0 18px; }
 .keys-hint { color: var(--dim); font-size: 13px; margin-top: 12px; }
 
 /* ---- In-game HUD ---- */

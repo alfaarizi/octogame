@@ -160,10 +160,10 @@ describe('office layout', () => {
   });
 
   test('each crime scene subject rests on its authored floor or furniture', () => {
-    const baseBelowTarget = { handprint: .004, phone: .13, drawing: .004, clock: .23, silhouette: 1.05 };
+    const baseBelowTarget = { handprint: .004, phone: .13, drawing: .004, clock: .23, skull: .1 };
     for (const floor of OFFICE.floors) for (const subject of floor.evidenceSpots) {
       const baseY = subject.y - baseBelowTarget[subject.kind];
-      if (subject.kind === 'silhouette') {
+      if (subject.kind === 'skull') {
         assert.ok(Math.abs(baseY - floor.elevation) < .03, `${subject.id} is above the ground`);
         continue;
       }

@@ -169,7 +169,7 @@ function createAnomaly(subject) {
   } else if (subject.kind === 'clock') {
     group.add(...createClock(image()));
   } else {
-    group.add(...createVisitor(marked));
+    group.add(...createSkull(marked));
   }
   group.userData.evidenceMaterials = evidenceMaterials;
   group.position.set(subject.x, subject.y, subject.z);
@@ -209,29 +209,38 @@ function createClock(faceMaterial) {
   return [dial, face, stem, foot];
 }
 
-function createVisitor(marked) {
-  const coat = marked(new THREE.MeshStandardMaterial({ color: 0x273b39, emissive: 0x33625b, emissiveIntensity: .25, roughness: .95 }));
-  const face = new THREE.MeshStandardMaterial({ color: 0x060a09, roughness: 1 });
-  const parts = [];
-  const torso = new THREE.Mesh(new THREE.CylinderGeometry(.24, .37, 1.05, 9), coat);
-  torso.position.y = -.21;
-  parts.push(torso);
+/** A human skull resting on its jaw, centered 0.1 above the ground and grinning north (-z). */
+function createSkull(marked) {
+  const bone = marked(new THREE.MeshStandardMaterial({ color: 0xd8cfb4, emissive: 0x6f8f86, emissiveIntensity: .25, roughness: .85 }));
+  const hollow = new THREE.MeshStandardMaterial({ color: 0x060a09, roughness: 1 });
+  const cranium = new THREE.Mesh(new THREE.SphereGeometry(.1, 16, 12), bone);
+  cranium.scale.set(.82, .85, 1);
+  cranium.position.set(0, .02, .015);
+  const parts = [
+    cranium,
+    createBoxMesh({ width: .12, height: .065, depth: .07 }, { x: 0, y: -.035, z: -.058 }, bone),
+    createBoxMesh({ width: .105, height: .028, depth: .085 }, { x: 0, y: -.088, z: -.05 }, bone),
+  ];
   for (const side of [-1, 1]) {
-    const leg = new THREE.Mesh(new THREE.CylinderGeometry(.09, .11, .5, 8), coat);
-    leg.position.set(side * .16, -.78, 0);
-    const shoe = createBoxMesh({ width: .2, height: .07, depth: .3 }, { x: side * .16, y: -1.015, z: -.07 }, face);
-    const arm = new THREE.Mesh(new THREE.CylinderGeometry(.1, .12, .7, 8), coat);
-    arm.rotation.z = side * -.2;
-    arm.position.set(side * .31, -.2, 0);
-    parts.push(leg, shoe, arm);
+    const cheekbone = new THREE.Mesh(new THREE.SphereGeometry(.026, 10, 8), bone);
+    cheekbone.position.set(side * .05, -.022, -.07);
+    const eyeSocket = new THREE.Mesh(new THREE.SphereGeometry(.031, 12, 10), hollow);
+    eyeSocket.scale.z = .6;
+    eyeSocket.position.set(side * .036, .01, -.087);
+    parts.push(cheekbone, eyeSocket);
   }
-  const hood = new THREE.Mesh(new THREE.SphereGeometry(.24, 12, 8), coat);
-  hood.position.y = .48;
-  const voidFace = new THREE.Mesh(new THREE.SphereGeometry(.16, 10, 8), face);
-  voidFace.scale.z = .35;
-  voidFace.position.set(0, .47, -.205);
-  parts.push(hood, voidFace);
-  return parts;
+  const noseHole = new THREE.Mesh(new THREE.SphereGeometry(.017, 10, 8), hollow);
+  noseHole.scale.set(.65, 1, .45);
+  noseHole.position.set(0, -.03, -.093);
+  parts.push(noseHole);
+  for (let tooth = 0; tooth < 6; tooth++) {
+    parts.push(createBoxMesh({ width: .012, height: .018, depth: .01 }, { x: (tooth - 2.5) * .0145, y: -.069, z: -.094 }, bone));
+  }
+  const skull = new THREE.Group();
+  skull.add(...parts);
+  // Rolled back onto the cranium, so the face tips up toward whoever is standing over it.
+  skull.rotation.set(.3, .35, .1);
+  return [skull];
 }
 
 /** Canvas marks only paint the subject; the meshes define its physical size and support. */

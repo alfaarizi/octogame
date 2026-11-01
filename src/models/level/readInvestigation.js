@@ -18,7 +18,7 @@ export function readEvidenceSpot(json, path) {
   return {
     ...point3(item, path), id: text(item.id, `${path}.id`), name: text(item.name, `${path}.name`),
     room: text(item.room, `${path}.room`), clue: text(item.clue, `${path}.clue`),
-    kind: choice(item.kind, ['handprint', 'phone', 'drawing', 'clock', 'silhouette'], `${path}.kind`),
+    kind: choice(item.kind, ['handprint', 'phone', 'drawing', 'clock', 'skull'], `${path}.kind`),
   };
 }
 
